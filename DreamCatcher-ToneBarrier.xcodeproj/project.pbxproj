@@ -1,0 +1,651 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 50;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D1F24F669DD00FA19FA /* AppDelegate.m */; };
+		B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2224F669DD00FA19FA /* SceneDelegate.m */; };
+		B9259D2624F669DD00FA19FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2524F669DD00FA19FA /* ViewController.m */; };
+		B9259D2924F669DD00FA19FA /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9259D2724F669DD00FA19FA /* Main.storyboard */; };
+		B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2A24F669DD00FA19FA /* ContentView.swift */; };
+		B9259D2D24F669E000FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D2C24F669E000FA19FA /* Assets.xcassets */; };
+		B9259D3024F669E000FA19FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */; };
+		B9259D3324F669E000FA19FA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D3224F669E000FA19FA /* main.m */; };
+		B9259D3724F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B9259D3D24F669E100FA19FA /* Interface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9259D3B24F669E100FA19FA /* Interface.storyboard */; };
+		B9259D3F24F669E200FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D3E24F669E200FA19FA /* Assets.xcassets */; };
+		B9259D4624F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		B9259D4C24F669E200FA19FA /* InterfaceController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D4B24F669E200FA19FA /* InterfaceController.m */; };
+		B9259D4F24F669E200FA19FA /* ExtensionDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D4E24F669E200FA19FA /* ExtensionDelegate.m */; };
+		B9259D5224F669E200FA19FA /* NotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D5124F669E200FA19FA /* NotificationController.m */; };
+		B9259D5524F669E200FA19FA /* ComplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D5424F669E200FA19FA /* ComplicationController.m */; };
+		B9259D5724F669E300FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D5624F669E300FA19FA /* Assets.xcassets */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		B9259D3824F669E100FA19FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B9259D1324F669DD00FA19FA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B9259D3524F669E100FA19FA;
+			remoteInfo = "DreamCatcher-ToneBarrier WatchKit App";
+		};
+		B9259D4724F669E200FA19FA /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = B9259D1324F669DD00FA19FA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = B9259D4424F669E200FA19FA;
+			remoteInfo = "DreamCatcher-ToneBarrier WatchKit Extension";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		B9259D5F24F669E300FA19FA /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				B9259D4624F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9259D6324F669E300FA19FA /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				B9259D3724F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9259D1E24F669DD00FA19FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
+		B9259D1F24F669DD00FA19FA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
+		B9259D2124F669DD00FA19FA /* SceneDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SceneDelegate.h; sourceTree = "<group>"; };
+		B9259D2224F669DD00FA19FA /* SceneDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SceneDelegate.m; sourceTree = "<group>"; };
+		B9259D2424F669DD00FA19FA /* ViewController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ViewController.h; sourceTree = "<group>"; };
+		B9259D2524F669DD00FA19FA /* ViewController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ViewController.m; sourceTree = "<group>"; };
+		B9259D2824F669DD00FA19FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		B9259D2A24F669DD00FA19FA /* ContentView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContentView.swift; sourceTree = "<group>"; };
+		B9259D2C24F669E000FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B9259D2F24F669E000FA19FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		B9259D3124F669E000FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9259D3224F669E000FA19FA /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
+		B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9259D3C24F669E100FA19FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
+		B9259D3E24F669E200FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B9259D4024F669E200FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		B9259D4A24F669E200FA19FA /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
+		B9259D4B24F669E200FA19FA /* InterfaceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InterfaceController.m; sourceTree = "<group>"; };
+		B9259D4D24F669E200FA19FA /* ExtensionDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ExtensionDelegate.h; sourceTree = "<group>"; };
+		B9259D4E24F669E200FA19FA /* ExtensionDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ExtensionDelegate.m; sourceTree = "<group>"; };
+		B9259D5024F669E200FA19FA /* NotificationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationController.h; sourceTree = "<group>"; };
+		B9259D5124F669E200FA19FA /* NotificationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = NotificationController.m; sourceTree = "<group>"; };
+		B9259D5324F669E200FA19FA /* ComplicationController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ComplicationController.h; sourceTree = "<group>"; };
+		B9259D5424F669E200FA19FA /* ComplicationController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ComplicationController.m; sourceTree = "<group>"; };
+		B9259D5624F669E300FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		B9259D5824F669E300FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		B9259D1824F669DD00FA19FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9259D4224F669E200FA19FA /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		B9259D1224F669DD00FA19FA = {
+			isa = PBXGroup;
+			children = (
+				B9259D1D24F669DD00FA19FA /* DreamCatcher-ToneBarrier */,
+				B9259D3A24F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */,
+				B9259D4924F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */,
+				B9259D1C24F669DD00FA19FA /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		B9259D1C24F669DD00FA19FA /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */,
+				B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */,
+				B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		B9259D1D24F669DD00FA19FA /* DreamCatcher-ToneBarrier */ = {
+			isa = PBXGroup;
+			children = (
+				B9259D1E24F669DD00FA19FA /* AppDelegate.h */,
+				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
+				B9259D2124F669DD00FA19FA /* SceneDelegate.h */,
+				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
+				B9259D2424F669DD00FA19FA /* ViewController.h */,
+				B9259D2524F669DD00FA19FA /* ViewController.m */,
+				B9259D2724F669DD00FA19FA /* Main.storyboard */,
+				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
+				B9259D2C24F669E000FA19FA /* Assets.xcassets */,
+				B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */,
+				B9259D3124F669E000FA19FA /* Info.plist */,
+				B9259D3224F669E000FA19FA /* main.m */,
+			);
+			path = "DreamCatcher-ToneBarrier";
+			sourceTree = "<group>";
+		};
+		B9259D3A24F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */ = {
+			isa = PBXGroup;
+			children = (
+				B9259D3B24F669E100FA19FA /* Interface.storyboard */,
+				B9259D3E24F669E200FA19FA /* Assets.xcassets */,
+				B9259D4024F669E200FA19FA /* Info.plist */,
+			);
+			path = "DreamCatcher-ToneBarrier WatchKit App";
+			sourceTree = "<group>";
+		};
+		B9259D4924F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */ = {
+			isa = PBXGroup;
+			children = (
+				B9259D4A24F669E200FA19FA /* InterfaceController.h */,
+				B9259D4B24F669E200FA19FA /* InterfaceController.m */,
+				B9259D4D24F669E200FA19FA /* ExtensionDelegate.h */,
+				B9259D4E24F669E200FA19FA /* ExtensionDelegate.m */,
+				B9259D5024F669E200FA19FA /* NotificationController.h */,
+				B9259D5124F669E200FA19FA /* NotificationController.m */,
+				B9259D5324F669E200FA19FA /* ComplicationController.h */,
+				B9259D5424F669E200FA19FA /* ComplicationController.m */,
+				B9259D5624F669E300FA19FA /* Assets.xcassets */,
+				B9259D5824F669E300FA19FA /* Info.plist */,
+				B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */,
+			);
+			path = "DreamCatcher-ToneBarrier WatchKit Extension";
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		B9259D1A24F669DD00FA19FA /* DreamCatcher-ToneBarrier */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9259D6424F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier" */;
+			buildPhases = (
+				B9259D1724F669DD00FA19FA /* Sources */,
+				B9259D1824F669DD00FA19FA /* Frameworks */,
+				B9259D1924F669DD00FA19FA /* Resources */,
+				B9259D6324F669E300FA19FA /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B9259D3924F669E100FA19FA /* PBXTargetDependency */,
+			);
+			name = "DreamCatcher-ToneBarrier";
+			productName = "DreamCatcher-ToneBarrier";
+			productReference = B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */;
+			productType = "com.apple.product-type.application";
+		};
+		B9259D3524F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9259D6024F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier WatchKit App" */;
+			buildPhases = (
+				B9259D3424F669E100FA19FA /* Resources */,
+				B9259D5F24F669E300FA19FA /* Embed App Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				B9259D4824F669E200FA19FA /* PBXTargetDependency */,
+			);
+			name = "DreamCatcher-ToneBarrier WatchKit App";
+			productName = "DreamCatcher-ToneBarrier WatchKit App";
+			productReference = B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */;
+			productType = "com.apple.product-type.application.watchapp2";
+		};
+		B9259D4424F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B9259D5C24F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier WatchKit Extension" */;
+			buildPhases = (
+				B9259D4124F669E200FA19FA /* Sources */,
+				B9259D4224F669E200FA19FA /* Frameworks */,
+				B9259D4324F669E200FA19FA /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "DreamCatcher-ToneBarrier WatchKit Extension";
+			productName = "DreamCatcher-ToneBarrier WatchKit Extension";
+			productReference = B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */;
+			productType = "com.apple.product-type.watchkit2-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		B9259D1324F669DD00FA19FA /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 1200;
+				LastUpgradeCheck = 1200;
+				TargetAttributes = {
+					B9259D1A24F669DD00FA19FA = {
+						CreatedOnToolsVersion = 12.0;
+					};
+					B9259D3524F669E100FA19FA = {
+						CreatedOnToolsVersion = 12.0;
+					};
+					B9259D4424F669E200FA19FA = {
+						CreatedOnToolsVersion = 12.0;
+					};
+				};
+			};
+			buildConfigurationList = B9259D1624F669DD00FA19FA /* Build configuration list for PBXProject "DreamCatcher-ToneBarrier" */;
+			compatibilityVersion = "Xcode 9.3";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = B9259D1224F669DD00FA19FA;
+			productRefGroup = B9259D1C24F669DD00FA19FA /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				B9259D1A24F669DD00FA19FA /* DreamCatcher-ToneBarrier */,
+				B9259D3524F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */,
+				B9259D4424F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		B9259D1924F669DD00FA19FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9259D3024F669E000FA19FA /* LaunchScreen.storyboard in Resources */,
+				B9259D2D24F669E000FA19FA /* Assets.xcassets in Resources */,
+				B9259D2924F669DD00FA19FA /* Main.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9259D3424F669E100FA19FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9259D3F24F669E200FA19FA /* Assets.xcassets in Resources */,
+				B9259D3D24F669E100FA19FA /* Interface.storyboard in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9259D4324F669E200FA19FA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9259D5724F669E300FA19FA /* Assets.xcassets in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		B9259D1724F669DD00FA19FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9259D3324F669E000FA19FA /* main.m in Sources */,
+				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
+				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
+				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
+				B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B9259D4124F669E200FA19FA /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B9259D4F24F669E200FA19FA /* ExtensionDelegate.m in Sources */,
+				B9259D5524F669E200FA19FA /* ComplicationController.m in Sources */,
+				B9259D4C24F669E200FA19FA /* InterfaceController.m in Sources */,
+				B9259D5224F669E200FA19FA /* NotificationController.m in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		B9259D3924F669E100FA19FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B9259D3524F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */;
+			targetProxy = B9259D3824F669E100FA19FA /* PBXContainerItemProxy */;
+		};
+		B9259D4824F669E200FA19FA /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = B9259D4424F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */;
+			targetProxy = B9259D4724F669E200FA19FA /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		B9259D2724F669DD00FA19FA /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B9259D2824F669DD00FA19FA /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B9259D2F24F669E000FA19FA /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		B9259D3B24F669E100FA19FA /* Interface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				B9259D3C24F669E100FA19FA /* Base */,
+			);
+			name = Interface.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		B9259D5A24F669E300FA19FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+			};
+			name = Debug;
+		};
+		B9259D5B24F669E300FA19FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++14";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu11;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+			};
+			name = Release;
+		};
+		B9259D5D24F669E300FA19FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp.watchkitextension";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Debug;
+		};
+		B9259D5E24F669E300FA19FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit Extension/Info.plist";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp.watchkitextension";
+				PRODUCT_NAME = "${TARGET_NAME}";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Release;
+		};
+		B9259D6124F669E300FA19FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				IBSC_MODULE = DreamCatcher_ToneBarrier_WatchKit_Extension;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Debug;
+		};
+		B9259D6224F669E300FA19FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				IBSC_MODULE = DreamCatcher_ToneBarrier_WatchKit_Extension;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit App/Info.plist";
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				TARGETED_DEVICE_FAMILY = 4;
+				VALIDATE_PRODUCT = YES;
+				WATCHOS_DEPLOYMENT_TARGET = 7.0;
+			};
+			name = Release;
+		};
+		B9259D6524F669E300FA19FA /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		B9259D6624F669E300FA19FA /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = N9987K9442;
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier/Info.plist";
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = iphoneos;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		B9259D1624F669DD00FA19FA /* Build configuration list for PBXProject "DreamCatcher-ToneBarrier" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9259D5A24F669E300FA19FA /* Debug */,
+				B9259D5B24F669E300FA19FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B9259D5C24F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier WatchKit Extension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9259D5D24F669E300FA19FA /* Debug */,
+				B9259D5E24F669E300FA19FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B9259D6024F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier WatchKit App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9259D6124F669E300FA19FA /* Debug */,
+				B9259D6224F669E300FA19FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B9259D6424F669E300FA19FA /* Build configuration list for PBXNativeTarget "DreamCatcher-ToneBarrier" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B9259D6524F669E300FA19FA /* Debug */,
+				B9259D6624F669E300FA19FA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = B9259D1324F669DD00FA19FA /* Project object */;
+}
