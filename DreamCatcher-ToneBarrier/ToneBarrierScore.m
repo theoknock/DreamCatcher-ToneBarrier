@@ -31,7 +31,7 @@ typedef enum : NSUInteger {
 } RandomDistributionRangeScalarType;
 
 struct tone_barrier_score {
-    char * title[256];
+    char * title;
     struct audio_buffer {
         AVAudioFormat * __nonnull audio_format;
         double duration;
@@ -55,50 +55,51 @@ struct tone_barrier_score {
                             GKGaussianDistribution * gaussian_distributor;
                             RandomDistributionRangeScalarType range_scalar_type;
                             union distribution_range {
-                                float * mean_deviation;
-                                int * lower_upper_bounds;
+                                struct distribution_range_lower_upper_bounds {
+                                    int lower_bounds, upper_bounds;
+                                } distribution_range_lower_upper_bounds;
+                                struct distribution_range_mean_deviation {
+                                    float mean, deviation;
+                                } distribution_range_mean_deviation;
                             } distribution_range;
                         } distributor;
                     } random_generator;
                 } frequencies;
             } channel;
-        } * __nonnull channel_list;
+        } * __nonnull * channel_list;
     } audio_buffer;
 } tone_barrier_score;
 
 @interface ToneBarrierScore ()
 
-@property (nonatomic, readonly) struct tone_barrier_score * (^init_tone_barrier_score_ptr)(char * [256], struct audio_buffer *);
+@property (nonatomic, readonly) struct tone_barrier_score * (^tone_barrier_score_ptr)(struct tone_barrier_score *);
+
+
+@property (nonatomic, readonly) struct tone_barrier_score * (^init_tone_barrier_score_ptr)(char *, struct audio_buffer *);
 @property (nonatomic, readonly) struct audio_buffer * (^init_audio_buffer_ptr)(AVAudioFormat * __nonnull, double, AVAudioFrameCount, struct channel_list *);
 @property (nonatomic, readonly) struct channel_list * (^init_channel_list_ptr)(AVAudioChannelCount, struct channel *);
 @property (nonatomic, readonly) struct channel * (^init_channel_ptr)(ChannelOutput, AVAudioFramePosition, AVAudioFrameCount, float * __nonnull, struct frequencies *);
 @property (nonatomic, readonly) struct frequencies * (^init_frequencies_ptr)(int, double * __nonnull, struct random_generator *);
 @property (nonatomic, readonly) struct random_generator * (^init_random_generator_ptr)(struct source *, struct distributor *);
-@property (nonatomic, readonly) struct source * (^init_source_ptr)(GKMersenneTwisterRandomSource *, RandomScalarType);
-@property (nonatomic, readonly) struct distributor * (^init_distributor_ptr)(GKGaussianDistribution *, DistributionRangeScalarType, union distribution_range * );
-@property (nonatomic, readonly) union  distribution_range * (^init_distribution_range_ptr)(void *);
+@property (nonatomic, readonly) struct source * (^init_source_ptr)(GKMersenneTwisterRandomSource *, RandomSourceScalarType);
+@property (nonatomic, readonly) struct distributor * (^init_distributor_ptr)(GKGaussianDistribution *, RandomDistributionRangeScalarType, union distribution_range *);
+@property (nonatomic, readonly) union distribution_range * (^init_distribution_range_ptr)(struct distribution_range_lower_upper_bounds *, struct distribution_range_mean_deviation *);
+@property (nonatomic, readonly) struct distribution_range_lower_upper_bounds * (^init_distribution_range_lower_upper_bounds_ptr)(int lower_bounds, int upper_bounds);
+@property (nonatomic, readonly) struct distribution_range_mean_deviation * (^init_distribution_range_mean_deviation_ptr)(float mean, float deviation);
 
-@property (nonatomic, readonly) struct tone_barrier_score * (^score_tone_barrier)(struct tone_barrier_score * (^)(char * [256],
-                                                                                                                    struct audio_buffer * (^)(AVAudioFormat * __nonnull,
-                                                                                                                    double,
-                                                                                                                    AVAudioFrameCount,
-                                                                                                                    struct channel_list * (^)(AVAudioChannelCount,
-                                                                                                                    struct channel * (^)(ChannelOutput,
-                                                                                                                    AVAudioFramePosition,
-                                                                                                                    AVAudioFrameCount,
-                                                                                                                    float * __nonnull,
-                                                                                                                    struct frequencies * (^)(int,
-                                                                                                                    double * __nonnull,
-                                                                                                                    struct random_generator * (^)(struct source * (^)(GKMersenneTwisterRandomSource *,
-                                                                                                                    RandomScalarType),
-                                                                                                                    struct distributor * (^)(GKGaussianDistribution *,
-                                                                                                                    DistributionRangeScalarType,
-                                                                                                                    union distribution_range * (^)(void *)))))))));
+@property (nonatomic, readonly) struct tone_barrier_score * (^score_tone_barrier)(struct tone_barrier_score * (^)(char *,
+                                struct audio_buffer * (^)(AVAudioFormat * __nonnull, double, AVAudioFrameCount,
+                                struct channel_list * (^)(AVAudioChannelCount,
+                                struct channel * (^)(ChannelOutput, AVAudioFramePosition, AVAudioFrameCount, float * __nonnull,
+                                struct frequencies * (^)(int, double * __nonnull,
+                                struct random_generator * (^)(struct source * (^)(GKMersenneTwisterRandomSource *, RandomSourceScalarType),
+                                struct distributor * (^)(GKGaussianDistribution *, RandomDistributionRangeScalarType,
+                                union distribution_range * (^)(struct distribution_range_lower_upper_bounds * (^)(int lower_bounds, int upper_bounds), struct distribution_range_mean_deviation * (^)(float mean, float deviation))))))))));
 
 
 @end
 
-            //static struct audio_buffer * __nonnull (^init_buffer)(AVAudioFormat * ) = ^struct audio_buffer * __nonnull (AVAudioFormat * __nullable audio_format)
+//static struct audio_buffer * __nonnull (^init_buffer)(AVAudioFormat * ) = ^struct audio_buffer * __nonnull (AVAudioFormat * __nullable audio_format)
 //{
 //    struct channel_list * channels = malloc(sizeof(struct channel_list));
 //    channels->audio_format                = audio_format;
@@ -116,7 +117,7 @@ struct tone_barrier_score {
 //};
 
 @implementation ToneBarrierScore
-
+                                                                                                                                                                                                                                                                     
 static ToneBarrierScore * player = NULL;
 + (ToneBarrierScore * _Nonnull )player
 {
@@ -144,34 +145,60 @@ static ToneBarrierScore * player = NULL;
     return self;
 }
 
+// EXAMPLE
+typedef struct keyval{
+    char *key;
+    void *value;
+} keyval;
+
+keyval *keyval_new(char *key, void *value);
+keyval *keyval_copy(keyval const *in);
+void keyval_free(keyval *in);
+int keyval_matches(keyval const *in, char const *key);
+
+extern void *dictionary_not_found;
+
+typedef struct dictionary{
+   keyval **pairs;
+   int length;
+} dictionary;
+
+dictionary *dictionary_new (void);
+dictionary *dictionary_copy(dictionary *in);
+void dictionary_free(dictionary *in);
+void dictionary_add(dictionary *in, char *key, void *value);
+void *dictionary_find(dictionary const *in, char const *key);
+
+//
 
 // TO-DO: Compare tone_barrier_score struct members that are pointers
 //        to the same in the dict and keyval structs,
 //        as well as the pointers as passed to and received by (and returned by) functions
 
-- (struct tone_barrier_score *(^)(struct tone_barrier_score *(^)(char **, struct audio_buffer *(^)(AVAudioFormat * _Nonnull, double, AVAudioFrameCount, struct channel_list *(^)(AVAudioChannelCount, struct channel *(^)(ChannelOutput, AVAudioFramePosition, AVAudioFrameCount, float * _Nonnull, struct frequencies *(^)(int, double * _Nonnull, struct random_generator *(^)(struct source *(^)(GKMersenneTwisterRandomSource *, RandomScalarType), struct distributor *(^)(GKGaussianDistribution *, DistributionRangeScalarType, union distribution_range *(^)(void *))))))))))score_tone_barrier
+- (struct tone_barrier_score *(^)(struct tone_barrier_score *(^)(char *, struct audio_buffer *(^)(AVAudioFormat * _Nonnull, double, AVAudioFrameCount, struct channel_list *(^)(AVAudioChannelCount, struct channel *(^)(ChannelOutput, AVAudioFramePosition, AVAudioFrameCount, float * _Nonnull, struct frequencies *(^)(int, double * _Nonnull, struct random_generator *(^)(struct source *(^)(GKMersenneTwisterRandomSource *, RandomSourceScalarType), struct distributor *(^)(GKGaussianDistribution *, RandomDistributionRangeScalarType, union distribution_range *(^)(struct distribution_range_lower_upper_bounds *(^)(int, int), struct distribution_range_mean_deviation *(^)(float, float)))))))))))score_tone_barrier
 {
-return ^struct tone_barrier_score *(struct tone_barrier_score *(^tone_barrier_score)(char ** title,
-                                                                                     struct audio_buffer *(^audio_buffer)(AVAudioFormat * _Nonnull audio_format,
-                                                                                                                          double duration,
-                                                                                                                          AVAudioFrameCount frame_count,
-                                                                                                                          struct channel_list *(^channel_list)(AVAudioChannelCount channel_count,
-                                                                                                                                                               struct channel *(^channel)(ChannelOutput channeL_output,
-                                                                                                                                                                                          AVAudioFramePosition frame_position,
-                                                                                                                                                                                          AVAudioFrameCount frame_count,
-                                                                                                                                                                                          float * _Nonnull samples,
-                                                                                                                                                                                          struct frequencies *(^frequencies)(int frequency_count,
-                                                                                                                                                                                                                             double * _Nonnull frequencies,
-                                                                                                                                                                                                                             struct random_generator *(^random_generator)(struct source *(^)(GKMersenneTwisterRandomSource *random_source,
-                                                                                                                                                                                                                                                                                                 RandomScalarType random_scalar_type),
-                                                                                                                                                                                                                                                                          struct distributor *(^)(GKGaussianDistribution *random_distribution,
-                                                                                                                                                                                                                                                                                                  DistributionRangeScalarType range_scalar_type, union distribution_range *(^)(void *))))))))))score_tone_barrier
-                                                                                                                                                                                                                                                                                                                                                union distribution_range *(^init_distribution_range)(void *))))))))
-{
-    struct tone_barrier_score * score = malloc(sizeof(struct tone_barrier_score));
-    score = (tone_barrier_score)ToneBarrierScore.player.init_tone_barrier_score_ptr(title, init_audio_buffer(nil));
-    return score;
-};
+    return ^struct tone_barrier_score *(struct tone_barrier_score *(^tone_barrier_score)(char * title,
+                                                                                         struct audio_buffer *(^audio_buffer)(AVAudioFormat * _Nonnull audio_format,
+                                                                                                                              double duration,
+                                                                                                                              AVAudioFrameCount frame_count,
+                                                                                                                              struct channel_list *(^channel_list)(AVAudioChannelCount channel_count,
+                                                                                                                                                                   struct channel *(^channel)(ChannelOutput channeL_output,
+                                                                                                                                                                                              AVAudioFramePosition frame_position,
+                                                                                                                                                                                              AVAudioFrameCount frame_count,
+                                                                                                                                                                                              float * _Nonnull samples,
+                                                                                                                                                                                              struct frequencies *(^frequencies)(int frequency_count,
+                                                                                                                                                                                                                                 double * _Nonnull frequencies,
+                                                                                                                                                                                                                                 struct random_generator *(^random_generator)(struct source *(^)(GKMersenneTwisterRandomSource *random_source,
+                                                                                                                                                                                                                                                                                                 RandomSourceScalarType random_source_scalar_type),
+                                                                                                                                                                                                                                                                              struct distributor *(^)(GKGaussianDistribution *random_distribution,
+                                                                                                                                                                                                                                                                                                      RandomDistributionRangeScalarType random_distribution_range_scalar_type,
+                                                                                                                                                                                                                                                                                                      union distribution_range *(^)(struct distribution_range_lower_upper_bounds *(^)(int, int),
+                                                                                                                                                                                                                                                                                                                                    struct distribution_range_mean_deviation *(^)(float, float))))))))))
+    {
+        struct tone_barrier_score * score = malloc(sizeof(struct tone_barrier_score));
+        * score = * tone_barrier_score(nil, nil);
+        return score;
+    };
 }
 
 - (struct tone_barrier_score *(^)(char **, struct audio_buffer *))init_tone_barrier_score_ptr
@@ -179,6 +206,9 @@ return ^struct tone_barrier_score *(struct tone_barrier_score *(^tone_barrier_sc
     return ^ struct tone_barrier_score *(char ** title, struct audio_buffer * buffer)
     {
         struct tone_barrier_score * score = malloc(sizeof(struct tone_barrier_score));
+//        strcpy(score->title, *title);
+        score->title = * title;
+        score->audio_buffer = * buffer;
         
         return score;
     };
