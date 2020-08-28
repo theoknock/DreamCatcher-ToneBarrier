@@ -1,0 +1,40 @@
+// When saying, "Goodbye," is just too much for now...
+
+typedef enum : NSUInteger {
+    RandomSourceScalarTypeInt,
+    RandomSourceScalarTypeFloat
+} RandomSourceScalarType;
+
+typedef enum : NSUInteger {
+    RandomDistributionRangeLowerUpperBounds,
+    RandomDistributionRangeMeanDeviation
+} RandomDistributionRangeScalarType;
+
+union DistributionRange
+{
+    int * distribution_range_lower_upper_bounds;
+    float * distribution_range_mean_deviation;
+};
+typedef union DistributionRange DistributionRange;
+
+struct RandomDistributor
+{
+    GKGaussianDistribution * distributor;
+    RandomDistributionRangeScalarType range_scalar_type;
+    DistributionRange range_parameters;
+};
+typedef struct RandomDistributor RandomDistributor;
+
+struct RandomSource
+{
+    GKMersenneTwisterRandomSource * source;
+    RandomSourceScalarType source_scalar_type;
+};
+typedef struct RandomSource RandomSource;
+
+struct Randomizer
+{
+    RandomSource random_source;
+    RandomDistributor random_distributor;
+};
+typedef struct Randomizer Randomizer;

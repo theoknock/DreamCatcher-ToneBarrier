@@ -24,7 +24,9 @@
 		B9259D5224F669E200FA19FA /* NotificationController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D5124F669E200FA19FA /* NotificationController.m */; };
 		B9259D5524F669E200FA19FA /* ComplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D5424F669E200FA19FA /* ComplicationController.m */; };
 		B9259D5724F669E300FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D5624F669E300FA19FA /* Assets.xcassets */; };
-		B9259D6D24F66C9C00FA19FA /* ToneBarrierScore.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScore.m */; };
+		B9259D6D24F66C9C00FA19FA /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
+		B9EF5C5C24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = B9EF5C5A24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodeld */; };
+		B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -99,8 +101,11 @@
 		B9259D5624F669E300FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B9259D5824F669E300FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
-		B9259D6B24F66C9C00FA19FA /* ToneBarrierScore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScore.h; sourceTree = "<group>"; };
-		B9259D6C24F66C9C00FA19FA /* ToneBarrierScore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScore.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; };
+		B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScorePlayer.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B9EF5C5B24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = ToneBarrierScore.xcdatamodel; sourceTree = "<group>"; };
+		B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -108,6 +113,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -128,6 +134,7 @@
 				B9259D3A24F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */,
 				B9259D4924F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */,
 				B9259D1C24F669DD00FA19FA /* Products */,
+				B9EF5C5D24F955F6008EC0F9 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -150,14 +157,16 @@
 				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
-				B9259D6B24F66C9C00FA19FA /* ToneBarrierScore.h */,
-				B9259D6C24F66C9C00FA19FA /* ToneBarrierScore.m */,
+				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
+				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
+				B9EF5C5A24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodeld */,
 				B9259D2724F669DD00FA19FA /* Main.storyboard */,
 				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
 				B9259D2C24F669E000FA19FA /* Assets.xcassets */,
 				B9259D3124F669E000FA19FA /* Info.plist */,
 				B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */,
 				B9259D3224F669E000FA19FA /* main.m */,
+				B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */,
 			);
 			path = "DreamCatcher-ToneBarrier";
 			sourceTree = "<group>";
@@ -188,6 +197,14 @@
 				B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */,
 			);
 			path = "DreamCatcher-ToneBarrier WatchKit Extension";
+			sourceTree = "<group>";
+		};
+		B9EF5C5D24F955F6008EC0F9 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */,
+			);
+			name = Frameworks;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -322,7 +339,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
-				B9259D6D24F66C9C00FA19FA /* ToneBarrierScore.m in Sources */,
+				B9259D6D24F66C9C00FA19FA /* ToneBarrierScorePlayer.m in Sources */,
+				B9EF5C5C24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodeld in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
@@ -435,6 +453,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
@@ -486,6 +505,7 @@
 				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
 				GCC_WARN_UNUSED_FUNCTION = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.0;
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 			};
@@ -587,6 +607,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
@@ -607,6 +628,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
+				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				VALIDATE_PRODUCT = YES;
 			};
@@ -652,6 +674,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		B9EF5C5A24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				B9EF5C5B24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodel */,
+			);
+			currentVersion = B9EF5C5B24F94CC8008EC0F9 /* ToneBarrierScore.xcdatamodel */;
+			path = ToneBarrierScore.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = B9259D1324F669DD00FA19FA /* Project object */;
 }

@@ -5,7 +5,7 @@
 //  Created by Xcode Developer on 8/26/20.
 //
 
-#import "ToneBarrierScore.h"
+#import "ToneBarrierScorePlayer.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
@@ -29,6 +29,16 @@ typedef enum : NSUInteger {
     RandomDistributionRangeLowerUpperBounds,
     RandomDistributionRangeMeanDeviation
 } RandomDistributionRangeScalarType;
+
+typedef struct distribution_range_parameters
+{
+    void * number_pointer;
+} distribution_range_parameters;
+
+/*
+ int * __nonnull lower_upper_bounds;
+ float * __nonnull mean_deviation;
+ */
 
 struct tone_barrier_score {
     char * title;
@@ -55,12 +65,8 @@ struct tone_barrier_score {
                             GKGaussianDistribution * gaussian_distributor;
                             RandomDistributionRangeScalarType range_scalar_type;
                             union distribution_range {
-                                struct distribution_range_lower_upper_bounds {
-                                    int lower_bounds, upper_bounds;
-                                } distribution_range_lower_upper_bounds;
-                                struct distribution_range_mean_deviation {
-                                    float mean, deviation;
-                                } distribution_range_mean_deviation;
+                                struct distribution_range_parameters distribution_range_lower_upper_bounds;
+                                struct distribution_range_parameters distribution_range_mean_deviation;
                             } distribution_range;
                         } distributor;
                     } random_generator;
@@ -70,7 +76,7 @@ struct tone_barrier_score {
     } audio_buffer;
 } tone_barrier_score;
 
-@interface ToneBarrierScore ()
+@interface ToneBarrierScorePlayer ()
 
 @property (nonatomic, readonly) struct tone_barrier_score * (^tone_barrier_score_ptr)(struct tone_barrier_score *);
 
@@ -83,9 +89,8 @@ struct tone_barrier_score {
 @property (nonatomic, readonly) struct random_generator * (^init_random_generator_ptr)(struct source *, struct distributor *);
 @property (nonatomic, readonly) struct source * (^init_source_ptr)(GKMersenneTwisterRandomSource *, RandomSourceScalarType);
 @property (nonatomic, readonly) struct distributor * (^init_distributor_ptr)(GKGaussianDistribution *, RandomDistributionRangeScalarType, union distribution_range *);
-@property (nonatomic, readonly) union distribution_range * (^init_distribution_range_ptr)(struct distribution_range_lower_upper_bounds *, struct distribution_range_mean_deviation *);
-@property (nonatomic, readonly) struct distribution_range_lower_upper_bounds * (^init_distribution_range_lower_upper_bounds_ptr)(int lower_bounds, int upper_bounds);
-@property (nonatomic, readonly) struct distribution_range_mean_deviation * (^init_distribution_range_mean_deviation_ptr)(float mean, float deviation);
+@property (nonatomic, readonly) union distribution_range * (^init_distribution_range_ptr)(struct distribution_range_parameters);
+@property (nonatomic, readonly) struct distribution_range_parameters * (^init_distribution_range_parameters_ptr)(void *);
 
 @property (nonatomic, readonly) struct tone_barrier_score * (^score_tone_barrier)(struct tone_barrier_score * (^)(char *,
                                 struct audio_buffer * (^)(AVAudioFormat * __nonnull, double, AVAudioFrameCount,
@@ -116,21 +121,21 @@ struct tone_barrier_score {
 //    return stereo_channel_list;
 //};
 
-@implementation ToneBarrierScore
-                                                                                                                                                                                                                                                                     
-static ToneBarrierScore * player = NULL;
-+ (ToneBarrierScore * _Nonnull )player
+@implementation ToneBarrierScorePlayer
+                                        
+static ToneBarrierScorePlayer * sharedInstance = NULL;
++ (ToneBarrierScorePlayer * _Nonnull )sharedInstance
 {
     static dispatch_once_t onceSecurePredicate;
     dispatch_once(&onceSecurePredicate,^
                   {
-        if (!player)
+        if (!sharedInstance)
         {
-            player = [[self alloc] init];
+            sharedInstance = [[self alloc] init];
         }
     });
     
-    return player;
+    return sharedInstance;
 }
 
 - (instancetype)init
@@ -233,32 +238,32 @@ void *dictionary_find(dictionary const *in, char const *key);
         switch (
             };
 }
-
-- (struct gaussian_distributor * (^)(GaussianDistributorRangeValuesScalarType, void *))init_gaussian_distributor
-{
-    return ^struct gaussian_distributor * (GaussianDistributorRangeValuesScalarType distributor_range_values_scalar_type, void * distribution_range_values)
-    {
-        struct gaussian_distributor * random_distributor = malloc(sizeof(struct gaussian_distributor));
-        union  distribution_range * ran
-        switch (distributor_range_values_scalar_type) {
-            case GaussianDistributorRangeValuesScalarTypeLowerUpperBounds:
-            {
-                gaussian_distributor->distribution = (int *)distribution_range_values;
-                gaussian_distributor->distribution = [[GKGaussianDistribution alloc] initWithRandomSource:<#(nonnull id<GKRandom>)#> lowestValue:<#(NSInteger)#> highestValue:<#(NSInteger)#>]
-                break;
-            }
-            case GaussianDistributorRangeValuesScalarTypeMeanDeviation:
-            {
-                random_distributor->mean_deviation = (float *)distribution_range_values;
-                break;
-            }
-            default:
-                break;
-        }
-        
-        return random_distributor;
-    };
-}
+//
+//- (struct gaussian_distributor * (^)(GaussianDistributorRangeValuesScalarType, void *))init_gaussian_distributor
+//{
+//    return ^struct gaussian_distributor * (GaussianDistributorRangeValuesScalarType distributor_range_values_scalar_type, void * distribution_range_values)
+//    {
+//        struct gaussian_distributor * random_distributor = malloc(sizeof(struct gaussian_distributor));
+//        union  distribution_range * ran
+//        switch (distributor_range_values_scalar_type) {
+//            case GaussianDistributorRangeValuesScalarTypeLowerUpperBounds:
+//            {
+//                gaussian_distributor->distribution = (int *)distribution_range_values;
+//                gaussian_distributor->distribution = [[GKGaussianDistribution alloc] initWithRandomSource:<#(nonnull id<GKRandom>)#> lowestValue:<#(NSInteger)#> highestValue:<#(NSInteger)#>]
+//                break;
+//            }
+//            case GaussianDistributorRangeValuesScalarTypeMeanDeviation:
+//            {
+//                random_distributor->mean_deviation = (float *)distribution_range_values;
+//                break;
+//            }
+//            default:
+//                break;
+//        }
+//
+//        return random_distributor;
+//    };
+//}
 
 - (struct channel_frequencies * (^)(void))init_channel_frequencies
 {
@@ -448,21 +453,6 @@ void *dictionary_find(dictionary const *in, char const *key);
 //        return stereo_channels;
 //    };
 //}
-
-static ToneBarrierGenerator *sharedGenerator = NULL;
-+ (nonnull ToneBarrierGenerator *)sharedGenerator
-{
-    static dispatch_once_t onceSecurePredicate;
-    dispatch_once(&onceSecurePredicate,^
-                  {
-        if (!sharedGenerator)
-        {
-            sharedGenerator = [[self alloc] init];
-        }
-    });
-    
-    return sharedGenerator;
-}
 
 double Normalize(double a, double b)
 {
@@ -926,17 +916,19 @@ static void(^createAudioBuffer)(AVAudioSession *, AVAudioFormat *, CreateAudioBu
         AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
         pcmBuffer.frameLength        = frameCount;
         
-        //        double tone_split = randomize(0.0, 1.0, 1.0);
-        //        double device_volume = pow(audioSession.outputVolume, 3.0);
         
-        //        calculateChannelData(pcmBuffer.frameLength,
-        //                             channel_frequencies_left,
-        //                             tone_split,
-        //                             device_volume,
-        //                             pcmBuffer.floatChannelData[0]);
-        //
-        //        calculateChannelData(pcmBuffer.frameLength,
-        //                             channel_frequencies_right,
+        
+                double tone_split = randomize(0.0, 1.0, 1.0);
+                double device_volume = pow(audioSession.outputVolume, 3.0);
+        
+                calculateChannelData(pcmBuffer.frameLength,
+                                     channel_frequencies_left,
+                                     tone_split,
+                                     device_volume,
+                                     pcmBuffer.floatChannelData[0]);
+        
+                calculateChannelData(pcmBuffer.frameLength,
+                                     channel_frequencies_right,
         
         
         return pcmBuffer;

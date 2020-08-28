@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="17189" systemVersion="20A5354i" minimumToolsVersion="Automatic" sourceLanguage="Objective-C" userDefinedModelVersionIdentifier="">
+    <entity name="PlayerNode" representedClassName="PlayerNode" parentEntity="ToneBarrierScore" syncable="YES" codeGenerationType="class">
+        <relationship name="player_node" maxCount="1" deletionRule="Nullify" destinationEntity="PlayerNode" inverseName="player_nodes" inverseEntity="ToneBarrierScore"/>
+    </entity>
+    <entity name="ToneBarrierScore" representedClassName="ToneBarrierScore" syncable="YES" codeGenerationType="class">
+        <attribute name="player_node_count" attributeType="Integer 16" derived="YES" derivationExpression="player_nodes" usesScalarValueType="YES"/>
+        <attribute name="tone_barrier_score_id" optional="YES" attributeType="String"/>
+        <relationship name="player_nodes" toMany="YES" deletionRule="Nullify" destinationEntity="PlayerNode" inverseName="player_node" inverseEntity="PlayerNode"/>
+    </entity>
+    <elements>
+        <element name="ToneBarrierScore" positionX="-867.5853271484375" positionY="-1659.462356567383" width="128" height="88"/>
+        <element name="PlayerNode" positionX="-855.12158203125" positionY="-1506.099853515625" width="128" height="58"/>
+    </elements>
+</model>
