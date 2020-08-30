@@ -16,14 +16,12 @@
 struct RandomSource
 {
     const void * class;    /* must be first */
-    enum RandomNumberGeneratorFunc random_number_generator_func;
     double * lower_bound;
     double * higher_bound;
+    enum RandomNumberGeneratorFunc random_number_generator_func;
     __unsafe_unretained double (^random_number_generator)(double, double);
 };
 
-//typedef double (^RandomSourceGenerator)(double, double);
-/*RandomSourceGenerator random_source_generator_drand48 */
 double (^random_number_generator_drand48)(double, double) = ^double(double lower_bound, double higher_bound)
 {
     double random = drand48();
@@ -56,9 +54,7 @@ double(^_Nonnull(^ _Nonnull random_number_generator)(enum RandomNumberGeneratorF
     }
 };
 
-
-
-static void * RandomSource_ctor(void * _self, enum RandomNumberGeneratorFunc random_number_generator_func, double * lower_bound, double * higher_bound,  double (^generate_random)(enum RandomNumberGeneratorFunc, double, double))
+static void * RandomSource_ctor(void * _self, enum RandomNumberGeneratorFunc random_number_generator_func, double * lower_bound, double * higher_bound)
 {
     struct RandomSource * self = _self;
     self->lower_bound = lower_bound;
@@ -93,23 +89,18 @@ static int RandomSource_differ(const void * _self, const void * _b)
     const struct RandomSource * self = _self;
     const struct RandomSource * b = _b;
 
-    if (self == b)
+    if (&self == &b)
     {
         return 0;
-    }
-
-    if (!b || b->class != RandomSource)
-    {
+    } else {
         return 1;
     }
-
-    return strcmp(self->text, b->text);
 }
 
-static const struct Class _String = {
+static const struct Class _RandomSource = {
     sizeof(struct RandomSource),
-    String_ctor, String_dtor,
-    String_clone, String_differ
+    RandomSource_ctor,  RandomSource_dtor,
+    RandomSource_clone, RandomSource_differ
 };
 
-const void *String = &_String;
+const void * RandomSource = &_RandomSource;
