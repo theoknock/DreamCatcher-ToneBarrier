@@ -38,7 +38,7 @@ double (^random_number_generator_arc4random)(double, double) = ^double(double lo
     return result;
 };
 
-double(^_Nonnull(^ _Nonnull random_number_generator)(enum RandomNumberGeneratorFunc))(double, double) = ^(enum RandomNumberGeneratorFunc random_number_generator_func) {
+double (^_Nonnull(^ _Nonnull random_number_generator)(enum RandomNumberGeneratorFunc))(double, double) = ^(enum RandomNumberGeneratorFunc random_number_generator_func) {
     switch (random_number_generator_func) {
         case random_number_generator_func_drand48:
             return random_number_generator_drand48;

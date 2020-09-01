@@ -130,109 +130,106 @@ struct ChannelList
 };
 typedef struct ChannelList ChannelList;
 
-typedef void (^BufferConsumedCompletionBlock)(void);
-typedef void (^ConsumeBufferBlock)(AVAudioPlayerNode * _Nonnull, BufferConsumedCompletionBlock); // BufferRenderedCompletionBlock coincides with ConsumeBufferBlock, in that the consume task follows completion of the render task
-typedef void (^BufferRenderedCompletionBlock)(AVAudioPCMBuffer * _Nonnull, ConsumeBufferBlock); // ConsumeBufferBlock contains the code that schedules the buffer
 
-typedef AVAudioPCMBuffer * (^SampleBuffer)(AVAudioFormat *, double, AVAudioSession *);
-static SampleBuffer buffer_samples = ^AVAudioPCMBuffer * (AVAudioFormat *audio_format, double duration, AVAudioSession *)
-{
-    double duration = 0.25;
-    AVAudioFrameCount frameCount = ([audioFormat sampleRate] * duration);
-    AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
-    pcmBuffer.frameLength        = frameCount;
-    
-    double tone_split = randomize(0.0, 1.0, 1.0);
-    double device_volume = pow(audioSession.outputVolume, 3.0);
-    
-    //        calculateChannelData(pcmBuffer.frameLength,
-    //                             frequencies_struct_left,
-    //                             tone_split,
-    //                             device_volume,
-    //                             pcmBuffer.floatChannelData[0]);
-    //
-    //        calculateChannelData(pcmBuffer.frameLength,
-    //                             frequencies_struct_right,
-    //                             tone_split,
-    //                             device_volume,
-    //                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
-    
-    return pcmBuffer;
-};
+//typedef AVAudioPCMBuffer * (^SampleBuffer)(AVAudioFormat *, double, AVAudioSession *);
+//static SampleBuffer buffer_samples = ^AVAudioPCMBuffer * (AVAudioFormat * audio_format, double duration, AVAudioSession * audio_session)
+//{
+//    double duration = 0.25;
+//    AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
+//    AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+//    pcmBuffer.frameLength        = frameCount;
+//    
+//    double tone_split = randomize(0.0, 1.0, 1.0);
+//    double device_volume = pow(audio_session.outputVolume, 3.0);
+//    
+//    //        calculateChannelData(pcmBuffer.frameLength,
+//    //                             frequencies_struct_left,
+//    //                             tone_split,
+//    //                             device_volume,
+//    //                             pcmBuffer.floatChannelData[0]);
+//    //
+//    //        calculateChannelData(pcmBuffer.frameLength,
+//    //                             frequencies_struct_right,
+//    //                             tone_split,
+//    //                             device_volume,
+//    //                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
+//    
+//    return pcmBuffer;
+//};
 
-typedef void (^BufferRenderer)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, SampleBuffer buffer_samples, BufferRenderedCompletionBlock);
-BufferRenderer render_buffer = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, CreateAudioBufferCompletionBlock createAudioBufferCompletionBlock)
-{
+//typedef void (^BufferRenderer)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, SampleBuffer buffer_samples, BufferRenderedCompletionBlock);
+//BufferRenderer render_buffer = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, BufferRenderedCompletionBlock bufferRenderedCompletionBlock
+//{
+//
+//    static void (^audioBufferCreatedCompletionBlock)(void);
+//    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
+//        bufferRenderedCompletionBlock();
+//    };
+//    bufferRenderedCompletionBlock = ^void(void)
+//    {
+//        createAudioBufferCompletionBlock(calculateBufferData(), ^{
+//            tonePlayedCompletionBlock();
+//        });
+//    };
+//    audioBufferCreatedCompletionBlock();
+//};
 
-    static void (^audioBufferCreatedCompletionBlock)(void);
-    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
-        audioBufferCreatedCompletionBlock();
-    };
-    audioBufferCreatedCompletionBlock = ^void(void)
-    {
-        createAudioBufferCompletionBlock(calculateBufferData(), ^{
-            tonePlayedCompletionBlock();
-        });
-    };
-    audioBufferCreatedCompletionBlock();
-};
+//struct Buffer
+//{
+//    double duration;
+//    AVAudioFrameCount frame_count;
+//    ChannelList channel_list;
+//    __unsafe_unretained SampleBuffer buffer_samples;
+//    __unsafe_unretained BufferRenderer render_buffer;
+//};
+//typedef struct Buffer Buffer;
 
-struct Buffer
-{
-    double duration;
-    AVAudioFrameCount frame_count;
-    ChannelList channel_list;
-    __unsafe_unretained SampleBuffer buffer_samples;
-    __unsafe_unretained BufferRenderer render_buffer;
-};
-typedef struct Buffer Buffer;
+//struct PlayerNode
+//{
+//    AVAudioSession * audio_session;
+//    AVAudioFormat * audio_format;
+//    AVAudioPlayerNode * __nonnull player_node;
+//    Buffer * __nonnull sample_buffer;
+//};
+//typedef struct PlayerNode PlayerNode;
 
-struct PlayerNode
-{
-    AVAudioSession * audio_session;
-    AVAudioFormat * audio_format;
-    AVAudioPlayerNode * __nonnull player_node;
-    Buffer * __nonnull sample_buffer;
-};
-typedef struct PlayerNode PlayerNode;
-
-typedef void (^BufferScheduler)(PlayerNode *, BufferConsumedCompletionBlock);
+//typedef void (^BufferScheduler)(PlayerNode *, BufferConsumedCompletionBlock);
 //BufferScheduler schedule_buffer = ^(PlayerNode * player_node, ^(AVAudioPCMBuffer * _Nonnull, BufferConsumedCompletionBlock buffer_consumed)
 //{
 //
 //)};
        
 
-void * (^new)(const void *, const size_t *) = ^ void * (const void * node, const size_t *)
-{
-    
-};
-static const size_t _PlayerNode = sizeof(struct PlayerNode);
-
-const void *  = & _Set;
-                                    
-void * new (const void * type, ...)
-{
-    const size_t size = * (const size_t *) type;
-    void * p = calloc(1, size);
-    assert(p); return p;
-}
-                                   
-struct ToneBarrierScore
-{
-    char * title;
-    int player_node_count;
-    PlayerNode * __nonnull * playerNodes;
-    __unsafe_unretained BufferScheduler schedule_buffer;
-    __unsafe_unretained BufferRenderedCompletionBlock buffer_rendered;
-};
-typedef struct ToneBarrierScore ToneBarrierScore;
+//void * (^new)(const void *, const size_t *) = ^ void * (const void * node, const size_t *)
+//{
+//
+//};
+//static const size_t _PlayerNode = sizeof(struct PlayerNode);
+//
+//const void *  = & _Set;
+//
+//void * new (const void * type, ...)
+//{
+//    const size_t size = * (const size_t *) type;
+//    void * p = calloc(1, size);
+//    assert(p); return p;
+//}
+//
+//struct ToneBarrierScore
+//{
+//    char * title;
+//    int player_node_count;
+//    PlayerNode * __nonnull * playerNodes;
+//    __unsafe_unretained BufferScheduler schedule_buffer;
+//    __unsafe_unretained BufferRenderedCompletionBlock buffer_rendered;
+//};
+//typedef struct ToneBarrierScore ToneBarrierScore;
 
 @interface ToneBarrierScorePlayer ()
 
-@property (nonatomic, readonly) ToneBarrierScore * (^tone_barrier_score_standard)(char *, PlayerNode * __nonnull *);
-@property (nonatomic, readonly) PlayerNode * (^player_nodes)(NSUInteger, PCMBuffer);
-@property (nonatomic, readonly) PCMBuffer * (^pcm_buffer)(AVAudioFormat * __nonnull, double, AVAudioFrameCount, ChannelList);
+//@property (nonatomic, readonly) ToneBarrierScore * (^tone_barrier_score_standard)(char *, PlayerNode * __nonnull *);
+//@property (nonatomic, readonly) PlayerNode * (^player_nodes)(NSUInteger, PCMBuffer);
+//@property (nonatomic, readonly) PCMBuffer * (^pcm_buffer)(AVAudioFormat * __nonnull, double, AVAudioFrameCount, ChannelList);
 
 @end
 
@@ -426,71 +423,73 @@ static ToneBarrierScorePlayer * sharedInstance = NULL;
 //    return noErr;
 //}
 
-void (^calculateChannelData)(AVAudioFrameCount, double, double, double, float *) = ^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples)
+typedef void (^PlayedToneCompletionBlock)(void);
+typedef void (^BufferRenderedCompletionBlock)(AVAudioPlayerNode * _Nonnull player_node, AVAudioPCMBuffer * _Nonnull buffer, PlayedToneCompletionBlock _Nonnull playedToneCompletionBlock);
+
+static void(^createAudioBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioFormat *, BufferRenderedCompletionBlock) = ^(AVAudioPlayerNode * player_node, AVAudioSession * audioSession, AVAudioFormat * audioFormat, BufferRenderedCompletionBlock bufferRenderedCompletionBlock)
 {
-    for (int index = 0; index < sampleCount; index++)
-    {
-        double normalized_time = normalize(0.0, 1.0, index, 0.0, sampleCount);
-        double sine_frequency = sinf(2.0 * M_PI * normalized_time * frequency);
-        double sample = sine_frequency * envelope_lfo(normalized_time, outputVolume);
-        
-        if (samples) samples[index] = sample;
-    }
-};
-
-
-
-typedef void (^BufferConsumedCompletionBlock)(void);
-
-//
-
-
-// Called by renderer, executes consume, which passes buffer consumed to player
-
-// Called by player
-typedef void (^RenderBufferBlock)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, BufferRenderedCompletionBlock);
-
-static void(^renderBuffer)(AVAudioSession *, AVAudioFormat *, CreateAudioBufferCompletionBlock) = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, CreateAudioBufferCompletionBlock createAudioBufferCompletionBlock)
-{
-    static AVAudioPCMBuffer * (^calculateBufferData)(void);
-    calculateBufferData = ^AVAudioPCMBuffer *(void)
-    {
-        double duration = 0.25;
+    // playerNode buffer scheduler goes here
+    [player_node scheduleBuffer:^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
+     {
+        double duration = random_source_drand48(0.25, 1.75);;
         AVAudioFrameCount frameCount = ([audioFormat sampleRate] * duration);
         AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
         pcmBuffer.frameLength        = frameCount;
         
-        double tone_split = randomize(0.0, 1.0, 1.0);
+        AVAudioChannelCount channel_count = audioFormat.channelCount;
+        double root_freq = random_source_drand48(400.0, 2000.0) * duration;
+        double harmonic_freq = root_freq * (5.0/4.0);
+        NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", duration, root_freq, harmonic_freq);
         double device_volume = pow(audioSession.outputVolume, 3.0);
-                                                          
-//        calculateChannelData(pcmBuffer.frameLength,
-//                             frequencies_struct_left,
-//                             tone_split,
-//                             device_volume,
-//                             pcmBuffer.floatChannelData[0]);
-//
-//        calculateChannelData(pcmBuffer.frameLength,
-//                             frequencies_struct_right,
-//                             tone_split,
-//                             device_volume,
-//                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
+        
+        buffer_sample(pcmBuffer.frameLength,
+                      root_freq,
+                      duration,
+                      device_volume,
+                      pcmBuffer.floatChannelData[0],
+                      channel_count);
+        
+        buffer_sample(pcmBuffer.frameLength,
+                      harmonic_freq,
+                      duration,
+                      device_volume,
+                      (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
+                      channel_count);
         
         return pcmBuffer;
-    };
-    
-    static void (^audioBufferCreatedCompletionBlock)(void);
-    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
-        audioBufferCreatedCompletionBlock();
-    };
-    audioBufferCreatedCompletionBlock = ^void(void)
-    {
-        createAudioBufferCompletionBlock(calculateBufferData(), ^{
-            tonePlayedCompletionBlock();
-        });
-    };
-    audioBufferCreatedCompletionBlock();
-};
+    }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
+      {
+        //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
+        //        {
+        for (int index = 0; index < sampleCount; index++)
+        {
+            double normalized_time = normalize(0.0, 1.0, index);
+            double sine_frequency = sample_frequency(normalized_time, frequency);
+            double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+            
+            if (samples) samples[index] = sample;
+            //                if (samples[channel]) samples[channel][index] = sample;
+        }
+    }) atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+        if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
+        {
+            //            playedToneCompletionBlock();
+        }
+    }];
 
+
+//    static void (^audioBufferCreatedCompletionBlock)(void);
+//    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
+//        audioBufferCreatedCompletionBlock();
+//    };
+//    audioBufferCreatedCompletionBlock = ^void(void)
+//    {
+//        createAudioBufferCompletionBlock(calculateBufferData(), ^{
+//            tonePlayedCompletionBlock();
+//        });
+//    };
+//    audioBufferCreatedCompletionBlock();
+};
 
 - (BOOL)play
 {
@@ -538,8 +537,69 @@ static void(^renderBuffer)(AVAudioSession *, AVAudioFormat *, CreateAudioBufferC
             {
                 [self.playerNode play];
             }
+        
+            ^(AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
+            {
+                ^AVAudioPCMBuffer * (void (^buffer_samples)(AVAudioFrameCount frame_count, double frequency, double duration, double outputVolume, float * samples))
+                {
+                    return [AVAudioPCMBuffer new];
+                }(audio_format.sampleRate * duration);
+            };
             
-            renderBuffer([AVAudioSession sharedInstance], [self.playerNode outputFormatForBus:0], ^(AVAudioPCMBuffer * audio_buffer, /*ConsumeBufferBlock consumeBufferBlock,*/ BufferConsumedCompletionBlock bufferConsumedCompletionBlock) {
+            static void(^createAudioBuffer)(AVAudioSession *, AVAudioFormat *, BufferRenderedCompletionBlock) = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, BufferRenderedCompletionBlock bufferRenderedCompletionBlock)
+            {
+                static AVAudioPCMBuffer * (^init_buffer)(void (^buffer_samples)(AVAudioFrameCount, double , double, double, float *));
+                init_buffer = ^AVAudioPCMBuffer * (void (^buffer_samples)(AVAudioFrameCount frame_count, double frequency, double duration, double outputVolume, float * samples))
+                {
+                    double duration = 0.25;
+                    AVAudioFrameCount frameCount = ([audioFormat sampleRate] * duration);
+                    AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
+                    pcmBuffer.frameLength        = frameCount;
+                    
+                    double tone_split = random_source_drand48(0.0, 2.0);  // randomize(0.0, 1.0, 1.0);
+                    double root_freq = random_source_drand48(400.0, 2000.0);
+                    double harmonic_freq = root_freq * (5.0/4.0);
+                    NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", tone_split, root_freq, harmonic_freq);
+                    double device_volume = pow(audioSession.outputVolume, 3.0);
+            
+                            buffer_samples(pcmBuffer.frameLength,
+                                                             root_freq,
+                                                             tone_split,
+                                                             device_volume,
+                                                             pcmBuffer.floatChannelData[0]);
+                                
+                                        buffer_samples(pcmBuffer.frameLength,
+                                                             harmonic_freq,
+                                                             tone_split,
+                                                             device_volume,
+                                                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
+                                        
+                                        return pcmBuffer;
+                } ^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples)
+                {
+                    for (int index = 0; index < sampleCount; index++)
+                    {
+                        double normalized_time = normalize(0.0, 1.0, index);
+                        double sine_frequency = sample_frequency(normalized_time, frequency); // sinf(2.0 * M_PI * normalized_time * frequency);
+                        double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+                        
+                        if (samples) samples[index] = sample;
+                    }
+                };
+);
+                
+                static void (^audioBufferCreatedCompletionBlock)(void);
+                static void (^tonePlayedCompletionBlock)(void) = ^(void) {
+                    audioBufferCreatedCompletionBlock();
+                };
+                audioBufferCreatedCompletionBlock = ^void(void)
+                {
+                    createAudioBufferCompletionBlock(calculateBufferData(), ^{
+                        tonePlayedCompletionBlock();
+                    });
+                };
+                audioBufferCreatedCompletionBlock();
+            }([AVAudioSession sharedInstance], _audioFormat, ^double(^(void))(double) {
                 [self.playerNode scheduleBuffer:audio_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
                     if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
                     {
@@ -554,8 +614,6 @@ static void(^renderBuffer)(AVAudioSession *, AVAudioFormat *, CreateAudioBufferC
             return FALSE;
         }
     }
-    
-    return FALSE;
 }
 
 @end

@@ -102,7 +102,7 @@
 		B9259D5624F669E300FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B9259D5824F669E300FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
-		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; };
+		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScorePlayer.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B9E51BD324FB006700BB4EB7 /* RandomSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RandomSource.h; path = ToneBarrierScoreDataStructure/RandomSource.h; sourceTree = "<group>"; };
 		B9E51BD424FB006700BB4EB7 /* RandomSource.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RandomSource.c; path = ToneBarrierScoreDataStructure/RandomSource.c; sourceTree = "<group>"; wrapsLines = 0; };
