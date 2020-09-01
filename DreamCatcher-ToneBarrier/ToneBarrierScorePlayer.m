@@ -425,123 +425,72 @@ static ToneBarrierScorePlayer * sharedInstance = NULL;
 
 typedef void (^PlayedToneCompletionBlock)(void);
 typedef void (^BufferRenderedCompletionBlock)(AVAudioPlayerNode * _Nonnull player_node, AVAudioPCMBuffer * _Nonnull buffer, PlayedToneCompletionBlock _Nonnull playedToneCompletionBlock);
+typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioFormat *, BufferRenderedCompletionBlock);
 
 static void(^createAudioBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioFormat *, BufferRenderedCompletionBlock) = ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
 {
-    ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
-    {
-        buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
-                        {
-            double duration = random_source_drand48(0.25, 1.75);;
-            AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
-            AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
-            pcmBuffer.frameLength        = frameCount;
-            
-            AVAudioChannelCount channel_count = audio_format.channelCount;
-            double root_freq = random_source_drand48(400.0, 2000.0) * duration;
-            double harmonic_freq = root_freq * (5.0/4.0);
-            NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", duration, root_freq, harmonic_freq);
-            double device_volume = pow(audio_session.outputVolume, 3.0);
-            
-            buffer_sample(pcmBuffer.frameLength,
-                          root_freq,
-                          duration,
-                          device_volume,
-                          pcmBuffer.floatChannelData[0],
-                          channel_count);
-            
-            buffer_sample(pcmBuffer.frameLength,
-                          harmonic_freq,
-                          duration,
-                          device_volume,
-                          (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
-                          channel_count);
-            
-            return pcmBuffer;
-        }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
-          {
-            //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
-            //        {
-            for (int index = 0; index < sampleCount; index++)
-            {
-                double normalized_time = normalize(0.0, 1.0, index);
-                double sine_frequency = sample_frequency(normalized_time, frequency);
-                double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+    static void(^render_buffer)(void);
+                    // plays tone
+    render_buffer = ^{
+        // creates tone
+        ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
+        {   // returns buffer            // creates buffer
+            buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
+                            {
+                double duration = random_source_drand48(0.25, 1.75);;
+                AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
+                AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+                pcmBuffer.frameLength        = frameCount;
                 
-                if (samples) samples[index] = sample;
-                //                if (samples[channel]) samples[channel][index] = sample;
-            }
-        }), ^(void) {
-            // call a block member of recursive block goes here
-        } /* PlayedToneCompletionBlock here */ );
-    } (player_node, audio_session, audio_format, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
-       {
-        [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-            played_tone();
-        }];
-    });
-
-        [player_node scheduleBuffer:^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
-         {
-            double duration = random_source_drand48(0.25, 1.75);;
-            AVAudioFrameCount frameCount = ([audioFormat sampleRate] * duration);
-            AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
-            pcmBuffer.frameLength        = frameCount;
-            
-            AVAudioChannelCount channel_count = audioFormat.channelCount;
-            double root_freq = random_source_drand48(400.0, 2000.0) * duration;
-            double harmonic_freq = root_freq * (5.0/4.0);
-            NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", duration, root_freq, harmonic_freq);
-            double device_volume = pow(audioSession.outputVolume, 3.0);
-            
-            buffer_sample(pcmBuffer.frameLength,
-                          root_freq,
-                          duration,
-                          device_volume,
-                          pcmBuffer.floatChannelData[0],
-                          channel_count);
-            
-            buffer_sample(pcmBuffer.frameLength,
-                          harmonic_freq,
-                          duration,
-                          device_volume,
-                          (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
-                          channel_count);
-            
-            return pcmBuffer;
-        }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
-          {
-            //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
-            //        {
-            for (int index = 0; index < sampleCount; index++)
-            {
-                double normalized_time = normalize(0.0, 1.0, index);
-                double sine_frequency = sample_frequency(normalized_time, frequency);
-                double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+                AVAudioChannelCount channel_count = audio_format.channelCount;
+                double root_freq = random_source_drand48(400.0, 2000.0) * duration;
+                double harmonic_freq = root_freq * (5.0/4.0);
+                NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", duration, root_freq, harmonic_freq);
+                double device_volume = pow(audio_session.outputVolume, 3.0);
                 
-                if (samples) samples[index] = sample;
-                //                if (samples[channel]) samples[channel][index] = sample;
-            }
-        }) atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-            if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-            {
-                //            playedToneCompletionBlock();
-            }
-        }];
-    }));//(player_node, audio_session, audio_format, );
+                buffer_sample(pcmBuffer.frameLength,
+                              root_freq,
+                              duration,
+                              device_volume,
+                              pcmBuffer.floatChannelData[0],
+                              channel_count);
+                
+                buffer_sample(pcmBuffer.frameLength,
+                              harmonic_freq,
+                              duration,
+                              device_volume,
+                              (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
+                              channel_count);
+                
+                return pcmBuffer;
+              // buffer_sample executable
+            }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
+              {
+                //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
+                //        {
+                for (int index = 0; index < sampleCount; index++)
+                {
+                    double normalized_time = normalize(0.0, 1.0, index);
+                    double sine_frequency = sample_frequency(normalized_time, frequency);
+                    double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+                    
+                    if (samples) samples[index] = sample;
+                    //                if (samples[channel]) samples[channel][index] = sample;
+                }
+                // PlayedToneCompletionBlock executable
+            }), ^(void) {
+                render_buffer();
+            });
+          // render_buffer parameters                // BufferRenderedCompletionBlock executable
+        } (player_node, audio_session, audio_format, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
+            [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+                played_tone();
+            }];
+        });
+    };
+    
+    render_buffer();
 
-
-//    static void (^audioBufferCreatedCompletionBlock)(void);
-//    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
-//        audioBufferCreatedCompletionBlock();
-//    };
-//    audioBufferCreatedCompletionBlock = ^void(void)
-//    {
-//        createAudioBufferCompletionBlock(calculateBufferData(), ^{
-//            tonePlayedCompletionBlock();
-//        });
-//    };
-//    audioBufferCreatedCompletionBlock();
 };
 
 - (BOOL)play
@@ -562,6 +511,8 @@ static void(^createAudioBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioFo
         self.mixerNode = nil;
         
         [self.audioEngine stop];
+        
+        return FALSE;
     } else {
         [self setupEngine];
         
@@ -590,80 +541,68 @@ static void(^createAudioBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioFo
             {
                 [self.playerNode play];
             }
-        
-            // Putting together a bare-bones, block + parameters only to decide now many (or which) functions belong
-            // in the chain of block literals
-            // To-do: Add player node parameter to BufferRenderedCompletionBlock and to the createAudioBuffer block
             
-            ^(AVAudioPlayerNode * _Nonnull, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
-            {
-                ^AVAudioPCMBuffer * (void (^buffer_samples)(AVAudioFrameCount frame_count, double frequency, double duration, double outputVolume, float * samples))
-                {
-                    return [AVAudioPCMBuffer new];
-                }(audio_format.sampleRate * duration);
+            static void(^render_buffer)(void);
+            // plays tone
+            render_buffer = ^{
+                // creates tone
+                ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
+                {   // returns buffer            // creates buffer
+                    buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
+                                    {
+                        double duration = random_source_drand48(0.25, 1.75);;
+                        AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
+                        AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+                        pcmBuffer.frameLength        = frameCount;
+                        
+                        AVAudioChannelCount channel_count = audio_format.channelCount;
+                        double root_freq = random_source_drand48(400.0, 2000.0) * duration;
+                        double harmonic_freq = root_freq * (5.0/4.0);
+                        NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", duration, root_freq, harmonic_freq);
+                        double device_volume = pow(audio_session.outputVolume, 3.0);
+                        
+                        buffer_sample(pcmBuffer.frameLength,
+                                      root_freq,
+                                      duration,
+                                      device_volume,
+                                      pcmBuffer.floatChannelData[0],
+                                      channel_count);
+                        
+                        buffer_sample(pcmBuffer.frameLength,
+                                      harmonic_freq,
+                                      duration,
+                                      device_volume,
+                                      (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
+                                      channel_count);
+                        
+                        return pcmBuffer;
+                        // buffer_sample executable
+                    }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
+                      {
+                        //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
+                        //        {
+                        for (int index = 0; index < sampleCount; index++)
+                        {
+                            double normalized_time = normalize(0.0, 1.0, index);
+                            double sine_frequency = sample_frequency(normalized_time, frequency);
+                            double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+                            
+                            if (samples) samples[index] = sample;
+                            //                if (samples[channel]) samples[channel][index] = sample;
+                        }
+                        // PlayedToneCompletionBlock executable
+                    }), ^(void) {
+                        render_buffer();
+                    });
+                    // render_buffer parameters                // BufferRenderedCompletionBlock executable
+                } ([self playerNode], [AVAudioSession sharedInstance], [self.playerNode outputFormatForBus:0], ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
+                    [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+                        played_tone();
+                    }];
+                });
             };
             
-            static void(^createAudioBuffer)(AVAudioSession *, AVAudioFormat *, BufferRenderedCompletionBlock) = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, BufferRenderedCompletionBlock bufferRenderedCompletionBlock)
-            {
-                static AVAudioPCMBuffer * (^init_buffer)(void (^buffer_samples)(AVAudioFrameCount, double , double, double, float *));
-                init_buffer = ^AVAudioPCMBuffer * (void (^buffer_samples)(AVAudioFrameCount frame_count, double frequency, double duration, double outputVolume, float * samples))
-                {
-                    double duration = 0.25;
-                    AVAudioFrameCount frameCount = ([audioFormat sampleRate] * duration);
-                    AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audioFormat frameCapacity:frameCount];
-                    pcmBuffer.frameLength        = frameCount;
-                    
-                    double tone_split = random_source_drand48(0.0, 2.0);  // randomize(0.0, 1.0, 1.0);
-                    double root_freq = random_source_drand48(400.0, 2000.0);
-                    double harmonic_freq = root_freq * (5.0/4.0);
-                    NSLog(@"\tDuration:\t%fs\t\tRoot frequency:\t%f\t\tHarmonic frequency:\t%f", tone_split, root_freq, harmonic_freq);
-                    double device_volume = pow(audioSession.outputVolume, 3.0);
-            
-                            buffer_samples(pcmBuffer.frameLength,
-                                                             root_freq,
-                                                             tone_split,
-                                                             device_volume,
-                                                             pcmBuffer.floatChannelData[0]);
-                                
-                                        buffer_samples(pcmBuffer.frameLength,
-                                                             harmonic_freq,
-                                                             tone_split,
-                                                             device_volume,
-                                                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
-                                        
-                                        return pcmBuffer;
-                } ^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples)
-                {
-                    for (int index = 0; index < sampleCount; index++)
-                    {
-                        double normalized_time = normalize(0.0, 1.0, index);
-                        double sine_frequency = sample_frequency(normalized_time, frequency); // sinf(2.0 * M_PI * normalized_time * frequency);
-                        double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
-                        
-                        if (samples) samples[index] = sample;
-                    }
-                };
-);
-                
-                static void (^audioBufferCreatedCompletionBlock)(void);
-                static void (^tonePlayedCompletionBlock)(void) = ^(void) {
-                    audioBufferCreatedCompletionBlock();
-                };
-                audioBufferCreatedCompletionBlock = ^void(void)
-                {
-                    createAudioBufferCompletionBlock(calculateBufferData(), ^{
-                        tonePlayedCompletionBlock();
-                    });
-                };
-                audioBufferCreatedCompletionBlock();
-            }([AVAudioSession sharedInstance], _audioFormat, ^double(^(void))(double) {
-                [self.playerNode scheduleBuffer:audio_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-                    if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                    {
-                        playedToneCompletionBlock();
-                    }
-                }];
-            });
+            render_buffer();
             
             return TRUE;
             
