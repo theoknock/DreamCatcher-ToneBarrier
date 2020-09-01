@@ -27,6 +27,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) AVAudioFormat * _Nullable     audioFormat;
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
 
+- (BOOL)play;
+
 //@property (copy, nonatomic, readwrite) BufferConsumedCompletionBlock bufferConsumed;
 //@property (copy, nonatomic, readwrite)  void (^ _Nonnull (^ _Nonnull buffer_consumed)(void))(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull /*, BufferRenderedCompletionBlock*/);
 //@property (copy, nonatomic, readwrite) ConsumeBufferBlock consumeBuffer;
