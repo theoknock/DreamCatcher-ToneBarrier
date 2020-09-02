@@ -15,8 +15,8 @@
 
 #import "ToneBarrierScorePlayer.h"
 
-#include "new.h"
-#include "Class.h"
+//#include "new.h"
+//#include "Class.h"
 #include "RandomSource.h"
 
 #import <AVFoundation/AVFoundation.h>
@@ -40,7 +40,27 @@ Scale scale = ^double(double min_new, double max_new, double val_old, double min
     return val_new;
 };
 
+typedef double (^FrequencySample)(double, double);
+FrequencySample sample_frequency = ^(double time, double frequency)
+{
+    double result = sinf(M_PI * 2.0 * time * frequency);
+    
+    return result;
+};
+
+typedef double (^AmplitudeSample)(double, double);
+AmplitudeSample sample_amplitude = ^(double time, double gain)
+{
+    double result = pow(sinf(time * M_PI), gain);
+    
+    return result;
+};
+
 @interface ToneBarrierScorePlayer ()
+{
+    struct RandomSource * duration_random_source;
+    struct RandomSource * frequency_random_source;
+}
 
 @end
 
@@ -65,6 +85,9 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 {
     if (self == [super init])
     {
+        duration_random_source  = new(random_generator_drand48, 0.25, 1.75);
+        frequency_random_source = new(random_generator_drand48, 400.0, 2000.0);
+        
         [self setupEngine];
     }
     
@@ -175,13 +198,13 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                 {   // returns buffer            // creates buffer
                     buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
                                     {
-                        double duration = random_number_generator(random_number_generator_func_drand48)(0.25, 1.75);
+                        double duration = duration_random_source->generate_random(duration_random_source);
                         AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                         AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
                         pcmBuffer.frameLength        = frameCount;
                         
                         AVAudioChannelCount channel_count = audio_format.channelCount;
-                        double root_freq = random_number_generator(random_number_generator_func_drand48)(400.0, 2000.0) /** duration*/;
+                        double root_freq = frequency_random_source->generate_random(frequency_random_source) /** duration*/;
                         double harmonic_freq = root_freq * (5.0/4.0);
                         NSLog(@"  dur:  %fs\tfreq(s):  %f\t%f", duration, root_freq, harmonic_freq);
                         double device_volume = pow(audio_session.outputVolume, 3.0);
@@ -202,15 +225,17 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                         
                         return pcmBuffer;
                         // buffer_sample executable
-                    }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double outputVolume, float * samples, AVAudioChannelCount channel_count)
+                    }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double output_volume, float * samples, AVAudioChannelCount channel_count)
                       {
+                        NSLog(@"  dur:  %fs\tfreq:  %f\tvol:  %f", duration, frequency, output_volume);
+                        
                         //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
                         //        {
                         for (int index = 0; index < sampleCount; index++)
                         {
                             double normalized_time = normalize(0.0, 1.0, index);
                             double sine_frequency = sample_frequency(normalized_time, frequency);
-                            double sample = sine_frequency * sample_amplitude(normalized_time, outputVolume);
+                            double sample = sine_frequency * sample_amplitude(normalized_time, output_volume);
                             
                             if (samples) samples[index] = sample;
                             //                if (samples[channel]) samples[channel][index] = sample;
