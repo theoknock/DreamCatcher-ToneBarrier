@@ -7,18 +7,14 @@
 
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
+#import <UIKit/UIKit.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
-//typedef void (^BufferConsumedCompletionBlock)(void);
-//typedef void (^ConsumeBufferBlock)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, BufferConsumedCompletionBlock);
-//typedef void (^BufferRenderedCompletionBlock)(ConsumeBufferBlock);
-//typedef void (^RenderBufferBlock)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, BufferRenderedCompletionBlock);
-
-
 @interface ToneBarrierScorePlayer : NSObject
 
-+ (nonnull ToneBarrierScorePlayer *)sharedInstance;
++ (nonnull ToneBarrierScorePlayer *)sharedPlayer;
 
 @property (nonatomic, strong) AVAudioEngine * _Nonnull audioEngine;
 @property (nonatomic, strong) AVAudioPlayerNode * _Nullable playerNode;
@@ -28,17 +24,6 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
 
 - (BOOL)play;
-
-//@property (copy, nonatomic, readwrite) BufferConsumedCompletionBlock bufferConsumed;
-//@property (copy, nonatomic, readwrite)  void (^ _Nonnull (^ _Nonnull buffer_consumed)(void))(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull /*, BufferRenderedCompletionBlock*/);
-//@property (copy, nonatomic, readwrite) ConsumeBufferBlock consumeBuffer;
-//@property (copy, nonatomic, readwrite) BufferRenderedCompletionBlock bufferRendered;
-//@property (copy, nonatomic, readwrite) RenderBufferBlock renderBuffer;
-
-
-
-
-
 
 
 @end

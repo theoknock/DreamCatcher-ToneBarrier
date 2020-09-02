@@ -71,8 +71,8 @@ static void * RandomSource_dtor(void * _self)
 {
     struct RandomSource * self = _self;
 
-    free(self->lower_bound),  self->lower_bound  = 0;
-    free(self->higher_bound), self->higher_bound = 0;
+    (void)(free((void *)self->lower_bound)),  self->lower_bound  = 0;
+    (void)(free((void *)self->higher_bound)), self->higher_bound = 0;
     
     return self;
 }

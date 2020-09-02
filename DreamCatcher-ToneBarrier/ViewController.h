@@ -6,6 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+#import "ToneBarrierScorePlayer.h"
 
 @interface ViewController : UIViewController
 

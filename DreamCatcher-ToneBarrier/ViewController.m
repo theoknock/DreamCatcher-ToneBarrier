@@ -20,9 +20,8 @@
 }
 
 - (IBAction)playToneBarrierScore:(UIButton *)sender forEvent:(UIEvent *)event {
-    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedInstance play];
-    [sender setImage:([ToneBarrierScorePlayer.sharedInstance.audioEngine isRunning] && isToneBarrierScorePlaying) ? [UIImage systemImageNamed:@"stop"] : [UIImage systemImageNamed:@"play"] forState:UIControlStateNormal];
-//
+    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer play];
+    [sender setImage:([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning] && isToneBarrierScorePlaying) ? [UIImage systemImageNamed:@"stop"] : [UIImage systemImageNamed:@"play"] forState:UIControlStateNormal];
 }
 
 @end

@@ -38,3 +38,235 @@ struct Randomizer
     RandomDistributor random_distributor;
 };
 typedef struct Randomizer Randomizer;
+
+
+// ---------
+
+//StereoChannelList * (^createStereoChannelList)(AVAudioFrameCount, AVAudioChannelCount, float * const *) = ^StereoChannelList * (AVAudioFrameCount frame_capacity,
+//                                                                                                                                                 AVAudioChannelCount channel_count,
+//                                                                                                                                                 float * const * channel_samples)
+//{
+//    StereoChannelList * stereoChannelList = (StereoChannelList *)malloc(sizeof(StereoChannelList) + (2 * sizeof(StereoChannel)));
+//    stereoChannelList->channel_count = channel_count;
+//    for (StereoChannelOutput channel = 0; channel < channel_count; channel++)
+//    {
+//        StereoChannel * stereoChannel = (StereoChannel *)malloc(sizeof(StereoChannel));
+//        stereoChannel->stereo_channel_output = (StereoChannelOutput)channel;
+//        stereoChannel->samples = channel_samples[channel];
+//
+//        Frequencies * frequencies = (Frequencies *)malloc(sizeof(Frequencies) + sizeof(float));
+//        int frequency_count = 2;
+//        float * frequencies_arr = malloc(frequency_count * sizeof(float));
+//        for (int i = 0; i < frequency_count; i++)
+//        {
+//            frequencies_arr[i] = 440 * (i * (5.0/4.0));
+//        }
+//        frequencies->frequencies = frequencies_arr;
+//        stereoChannel->frequencies = *frequencies;
+//
+//        stereoChannelList->channels[channel] = stereoChannel;
+//    }
+//
+//    return stereoChannelList;
+//};
+
+//+ (StereoChannelList *)audioBufferListWithNumberOfFrames:(UInt32)frames
+//                                      numberOfChannels:(UInt32)channels
+//                                           interleaved:(BOOL)interleaved
+//{
+//    unsigned nBuffers;
+//    unsigned bufferSize;
+//    unsigned channelsPerBuffer;
+//    if (interleaved)
+//    {
+//        nBuffers = 1;
+//        bufferSize = sizeof(float) * frames * channels;
+//        channelsPerBuffer = channels;
+//    }
+//    else
+//    {
+//        nBuffers = channels;
+//        bufferSize = sizeof(float) * frames;
+//        channelsPerBuffer = 1;
+//    }
+//
+//    AudioBufferList *audioBufferList = (AudioBufferList *)malloc(sizeof(AudioBufferList) + sizeof(AudioBuffer) * (channels-1));
+//    audioBufferList->mNumberBuffers = nBuffers;
+//    for(unsigned i = 0; i < nBuffers; i++)
+//    {
+//        audioBufferList->mBuffers[i].mNumberChannels = channelsPerBuffer;
+//        audioBufferList->mBuffers[i].mDataByteSize = bufferSize;
+//        audioBufferList->mBuffers[i].mData = calloc(bufferSize, 1);
+//    }
+//    return audioBufferList;
+//}
+
+
+// Modify for Frequencies struct initializer
+//static OSStatus recordingCallback(void *inRefCon,
+//                                  AudioUnitRenderActionFlags *ioActionFlags,
+//                                  const AudioTimeStamp *inTimeStamp,
+//                                  UInt32 inBusNumber,
+//                                  UInt32 inNumberFrames,
+//                                  AudioBufferList *ioData) {
+//
+//    // the data gets rendered here
+//    AudioBuffer buffer;
+//
+//    // a variable where we check the status
+//    OSStatus status;
+//
+//    /**
+//     This is the reference to the object who owns the callback.
+//     */
+//    AudioProcessor *audioProcessor = (AudioProcessor*) inRefCon;
+//
+//    /**
+//     on this point we define the number of channels, which is mono
+//     for the iphone. the number of frames is usally 512 or 1024.
+//     */
+//    buffer.mDataByteSize = inNumberFrames * 2; // sample size
+//    buffer.mNumberChannels = 1; // one channel
+//    buffer.mData = malloc( inNumberFrames * 2 ); // buffer size
+//
+//    // we put our buffer into a bufferlist array for rendering
+//    AudioBufferList bufferList;
+//    bufferList.mNumberBuffers = 1;
+//    bufferList.mBuffers[0] = buffer;
+//
+//    // render input and check for error
+//    status = AudioUnitRender([audioProcessor audioUnit], ioActionFlags, inTimeStamp, inBusNumber, inNumberFrames, &bufferList);
+//    [audioProcessor hasError:status:__FILE__:__LINE__];
+//
+//    // process the bufferlist in the audio processor
+//    [audioProcessor processBuffer:&bufferList];
+//
+//    // clean up the buffer
+//    free(bufferList.mBuffers[0].mData);
+//
+//    return noErr;
+//}
+
+
+//static void(^initStereoChannel)(void * inRefCon, float * samples, AVAudioFrameCount samples_count, StereoChannelList * stereoChannelData)
+//{
+//    NSObject * refCon = (__bridge NSObject *) inRefCon;
+//
+//    // iterate over incoming stream an copy to output stream
+//    for (int i = 0; i < stereoChannelData->channel_count; i++) {
+//        StereoChannel channel = stereoChannelData->channels[i];
+//        channel.samples_count = samples_count;
+//        channel.samples       = samples;
+//    }
+//    return noErr;
+//}
+
+
+//@property (nonatomic, readonly) ToneBarrierScore * (^tone_barrier_score_standard)(char *, PlayerNode * __nonnull *);
+//@property (nonatomic, readonly) PlayerNode * (^player_nodes)(NSUInteger, PCMBuffer);
+//@property (nonatomic, readonly) PCMBuffer * (^pcm_buffer)(AVAudioFormat * __nonnull, double, AVAudioFrameCount, ChannelList);
+
+//typedef AVAudioPCMBuffer * (^SampleBuffer)(AVAudioFormat *, double, AVAudioSession *);
+//static SampleBuffer buffer_samples = ^AVAudioPCMBuffer * (AVAudioFormat * audio_format, double duration, AVAudioSession * audio_session)
+//{
+//    double duration = 0.25;
+//    AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
+//    AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+//    pcmBuffer.frameLength        = frameCount;
+//
+//    double tone_split = randomize(0.0, 1.0, 1.0);
+//    double device_volume = pow(audio_session.outputVolume, 3.0);
+//
+//    //        calculateChannelData(pcmBuffer.frameLength,
+//    //                             frequencies_struct_left,
+//    //                             tone_split,
+//    //                             device_volume,
+//    //                             pcmBuffer.floatChannelData[0]);
+//    //
+//    //        calculateChannelData(pcmBuffer.frameLength,
+//    //                             frequencies_struct_right,
+//    //                             tone_split,
+//    //                             device_volume,
+//    //                             ([audioFormat channelCount] == 2) ? pcmBuffer.floatChannelData[1] : nil);
+//
+//    return pcmBuffer;
+//};
+
+//typedef void (^BufferRenderer)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, SampleBuffer buffer_samples, BufferRenderedCompletionBlock);
+//BufferRenderer render_buffer = ^(AVAudioSession * audioSession, AVAudioFormat * audioFormat, BufferRenderedCompletionBlock bufferRenderedCompletionBlock
+//{
+//
+//    static void (^audioBufferCreatedCompletionBlock)(void);
+//    static void (^tonePlayedCompletionBlock)(void) = ^(void) {
+//        bufferRenderedCompletionBlock();
+//    };
+//    bufferRenderedCompletionBlock = ^void(void)
+//    {
+//        createAudioBufferCompletionBlock(calculateBufferData(), ^{
+//            tonePlayedCompletionBlock();
+//        });
+//    };
+//    audioBufferCreatedCompletionBlock();
+//};
+
+//struct Buffer
+//{
+//    double duration;
+//    AVAudioFrameCount frame_count;
+//    ChannelList channel_list;
+//    __unsafe_unretained SampleBuffer buffer_samples;
+//    __unsafe_unretained BufferRenderer render_buffer;
+//};
+//typedef struct Buffer Buffer;
+
+//struct PlayerNode
+//{
+//    AVAudioSession * audio_session;
+//    AVAudioFormat * audio_format;
+//    AVAudioPlayerNode * __nonnull player_node;
+//    Buffer * __nonnull sample_buffer;
+//};
+//typedef struct PlayerNode PlayerNode;
+
+//typedef void (^BufferScheduler)(PlayerNode *, BufferConsumedCompletionBlock);
+//BufferScheduler schedule_buffer = ^(PlayerNode * player_node, ^(AVAudioPCMBuffer * _Nonnull, BufferConsumedCompletionBlock buffer_consumed)
+//{
+//
+//)};
+       
+
+//void * (^new)(const void *, const size_t *) = ^ void * (const void * node, const size_t *)
+//{
+//
+//};
+//static const size_t _PlayerNode = sizeof(struct PlayerNode);
+//
+//const void *  = & _Set;
+//
+//void * new (const void * type, ...)
+//{
+//    const size_t size = * (const size_t *) type;
+//    void * p = calloc(1, size);
+//    assert(p); return p;
+//}
+//
+//struct ToneBarrierScore
+//{
+//    char * title;
+//    int player_node_count;
+//    PlayerNode * __nonnull * playerNodes;
+//    __unsafe_unretained BufferScheduler schedule_buffer;
+//    __unsafe_unretained BufferRenderedCompletionBlock buffer_rendered;
+//};
+//typedef struct ToneBarrierScore ToneBarrierScore;
+
+//typedef void (^BufferConsumedCompletionBlock)(void);
+//typedef void (^ConsumeBufferBlock)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, BufferConsumedCompletionBlock);
+//typedef void (^BufferRenderedCompletionBlock)(ConsumeBufferBlock);
+//typedef void (^RenderBufferBlock)(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, BufferRenderedCompletionBlock);
+
+//@property (copy, nonatomic, readwrite) BufferConsumedCompletionBlock bufferConsumed;
+//@property (copy, nonatomic, readwrite)  void (^ _Nonnull (^ _Nonnull buffer_consumed)(void))(AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull /*, BufferRenderedCompletionBlock*/);
+//@property (copy, nonatomic, readwrite) ConsumeBufferBlock consumeBuffer;
+//@property (copy, nonatomic, readwrite) BufferRenderedCompletionBlock bufferRendered;
+//@property (copy, nonatomic, readwrite) RenderBufferBlock renderBuffer;
