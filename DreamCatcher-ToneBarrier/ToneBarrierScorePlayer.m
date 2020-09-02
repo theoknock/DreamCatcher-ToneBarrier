@@ -27,7 +27,7 @@
 typedef double (^Normalize)(double, double, double);
 Normalize normalize = ^double(double min, double max, double value)
 {
-    double result = (value - min) / (max - min);
+    double result = (value > 0.0) ? value / max : 1.0/max; //(value - min) / (max - min);
     
     return result;
 };
@@ -40,18 +40,18 @@ Scale scale = ^double(double min_new, double max_new, double val_old, double min
     return val_new;
 };
 
-typedef double (^FrequencySample)(double, double);
-FrequencySample sample_frequency = ^(double time, double frequency)
+typedef double (^FrequencySample)(double, double, typeof(uint32_t));
+FrequencySample sample_frequency = ^(double time, double frequency, typeof(uint32_t) unused)
 {
-    double result = sinf(M_PI * 2.0 * time * frequency);
+    double result = sinf(M_PI * time * frequency);
     
     return result;
 };
 
-typedef double (^AmplitudeSample)(double, double);
-AmplitudeSample sample_amplitude = ^(double time, double gain)
+typedef double (^AmplitudeSample)(double, double, typeof(uint32_t));
+AmplitudeSample sample_amplitude = ^(double time, double gain, AVAudioChannelCount channel_count)
 {
-    double result = pow(sinf(time * M_PI), gain);
+    double result = (sinf(time * M_PI) * pow(gain, 3.0)) / channel_count;
     
     return result;
 };
@@ -100,8 +100,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     
     self.mainNode = self.audioEngine.mainMixerNode;
     
-    double sampleRate = [self.mainNode outputFormatForBus:0].sampleRate;
-    AVAudioChannelCount channelCount = [self.mainNode outputFormatForBus:0].channelCount;
+    AVAudioChannelCount channelCount = [self.audioEngine.outputNode outputFormatForBus:0].channelCount;
+    const double sampleRate = [self.audioEngine.outputNode outputFormatForBus:0].sampleRate;
+    
+//    double sampleRate = [self.mainNode outputFormatForBus:0].sampleRate;
+//    AVAudioChannelCount channelCount = [self.mainNode outputFormatForBus:0].channelCount;
     self.audioFormat = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:channelCount];
 }
 
@@ -143,6 +146,10 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
 
 - (BOOL)play
 {
+    // TO-DO: Move the start and stop audioengine to the block chain
+    //        and toggle only a boolean value for start/stop requests
+    //        and decide after/before each buffer plays whether to stop
+    
     if ([self.audioEngine isRunning])
     {
         [self.playerNode pause];
@@ -193,6 +200,7 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
             static void(^render_buffer)(void);
             // plays tone
             render_buffer = ^{
+                
                 // creates tone
                 ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                 {   // returns buffer            // creates buffer
@@ -204,19 +212,18 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                         pcmBuffer.frameLength        = frameCount;
                         
                         AVAudioChannelCount channel_count = audio_format.channelCount;
-                        double root_freq = frequency_random_source->generate_random(frequency_random_source) /** duration*/;
+                        double root_freq = frequency_random_source->generate_random(frequency_random_source) * duration;
                         double harmonic_freq = root_freq * (5.0/4.0);
-                        NSLog(@"  dur:  %fs\tfreq(s):  %f\t%f", duration, root_freq, harmonic_freq);
-                        double device_volume = pow(audio_session.outputVolume, 3.0);
+                        double device_volume = audio_session.outputVolume;
                         
-                        buffer_sample(pcmBuffer.frameLength,
+                        buffer_sample(frameCount,
                                       root_freq,
                                       duration,
                                       device_volume,
                                       pcmBuffer.floatChannelData[0],
                                       channel_count);
                         
-                        buffer_sample(pcmBuffer.frameLength,
+                        buffer_sample(frameCount,
                                       harmonic_freq,
                                       duration,
                                       device_volume,
@@ -227,15 +234,13 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                         // buffer_sample executable
                     }(^(AVAudioFrameCount sampleCount, double frequency, double duration, double output_volume, float * samples, AVAudioChannelCount channel_count)
                       {
-                        NSLog(@"  dur:  %fs\tfreq:  %f\tvol:  %f", duration, frequency, output_volume);
-                        
                         //        for (AVAudioChannelCount channel = 0; channel < channel_count; channel++)
                         //        {
                         for (int index = 0; index < sampleCount; index++)
                         {
-                            double normalized_time = normalize(0.0, 1.0, index);
-                            double sine_frequency = sample_frequency(normalized_time, frequency);
-                            double sample = sine_frequency * sample_amplitude(normalized_time, output_volume);
+                            double normalized_time = normalize(0.0, sampleCount, index);
+                            double sine_frequency = sample_frequency(normalized_time, frequency, 0);
+                            double sample = sine_frequency * sample_amplitude(normalized_time, output_volume, channel_count);
                             
                             if (samples) samples[index] = sample;
                             //                if (samples[channel]) samples[channel][index] = sample;
