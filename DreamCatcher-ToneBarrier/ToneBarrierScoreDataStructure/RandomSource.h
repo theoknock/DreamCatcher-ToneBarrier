@@ -18,4 +18,6 @@ enum RandomNumberGeneratorFunc
     random_number_generator_func_arc4random
 };
 
+double (^_Nonnull(^ _Nonnull random_number_generator)(enum RandomNumberGeneratorFunc))(double, double);
+
 #endif /* RandomSource_h */

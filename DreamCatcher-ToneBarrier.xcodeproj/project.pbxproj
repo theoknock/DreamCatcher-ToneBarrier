@@ -27,6 +27,7 @@
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
 		B93E23B124FF58FF00A324DE /* RandomSource.c in Sources */ = {isa = PBXBuildFile; fileRef = B9E51BD424FB006700BB4EB7 /* RandomSource.c */; };
 		B93E23B224FF58FF00A324DE /* new.c in Sources */ = {isa = PBXBuildFile; fileRef = B9E51BDA24FB040900BB4EB7 /* new.c */; };
+		B93E23B424FF5F8A00A324DE /* ToneBarrierScore.m in Sources */ = {isa = PBXBuildFile; fileRef = B93E23B324FF5F8A00A324DE /* ToneBarrierScore.m */; };
 		B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -104,6 +105,8 @@
 		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
 		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScorePlayer.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B93E23B324FF5F8A00A324DE /* ToneBarrierScore.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; name = ToneBarrierScore.m; path = ToneBarrierScoreDataStructure/ToneBarrierScore.m; sourceTree = "<group>"; };
+		B93E23B524FF5FB400A324DE /* ToneBarrierScore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = ToneBarrierScore.h; path = ToneBarrierScoreDataStructure/ToneBarrierScore.h; sourceTree = "<group>"; };
 		B9E51BD324FB006700BB4EB7 /* RandomSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = RandomSource.h; path = ToneBarrierScoreDataStructure/RandomSource.h; sourceTree = "<group>"; };
 		B9E51BD424FB006700BB4EB7 /* RandomSource.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = RandomSource.c; path = ToneBarrierScoreDataStructure/RandomSource.c; sourceTree = "<group>"; wrapsLines = 0; };
 		B9E51BD624FB03C100BB4EB7 /* Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = Object.h; path = ToneBarrierScoreDataStructure/Object.h; sourceTree = "<group>"; };
@@ -165,6 +168,8 @@
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
 				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
 				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
+				B93E23B524FF5FB400A324DE /* ToneBarrierScore.h */,
+				B93E23B324FF5F8A00A324DE /* ToneBarrierScore.m */,
 				B9E51BD224FAFFD200BB4EB7 /* ToneBarrierScoreLibrary */,
 				B9259D2724F669DD00FA19FA /* Main.storyboard */,
 				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
@@ -359,6 +364,7 @@
 			files = (
 				B93E23B124FF58FF00A324DE /* RandomSource.c in Sources */,
 				B93E23B224FF58FF00A324DE /* new.c in Sources */,
+				B93E23B424FF5F8A00A324DE /* ToneBarrierScore.m in Sources */,
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,

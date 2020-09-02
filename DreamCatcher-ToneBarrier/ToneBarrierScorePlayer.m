@@ -5,13 +5,44 @@
 //  Created by Xcode Developer on 8/26/20.
 //
 
+
+//
+//  ToneBarrierScorePlayer.m
+//  DreamCatcher-ToneBarrier
+//
+//  Created by Xcode Developer on 8/26/20.
+//
+
 #import "ToneBarrierScorePlayer.h"
+
+#include "new.h"
+#include "Class.h"
+#include "RandomSource.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
 
+typedef double (^Normalize)(double, double, double);
+Normalize normalize = ^double(double min, double max, double value)
+{
+    double result = (value - min) / (max - min);
+    
+    return result;
+};
+
+typedef double (^Scale)(double, double, double, double, double);
+Scale scale = ^double(double min_new, double max_new, double val_old, double min_old, double max_old)
+{
+    double val_new = min_new + ((((val_old - min_old) * (max_new - min_new))) / (max_old - min_old));
+    
+    return val_new;
+};
+
+@interface ToneBarrierScorePlayer ()
+
+@end
 
 @implementation ToneBarrierScorePlayer
 
@@ -32,7 +63,10 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
 - (instancetype)init
 {
-    if (self == [super init]) [self setupEngine];
+    if (self == [super init])
+    {
+        [self setupEngine];
+    }
     
     return self;
 }
@@ -141,13 +175,13 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                 {   // returns buffer            // creates buffer
                     buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
                                     {
-                        double duration = random_source_drand48(0.25, 1.75);
+                        double duration = random_number_generator(random_number_generator_func_drand48)(0.25, 1.75);
                         AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                         AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
                         pcmBuffer.frameLength        = frameCount;
                         
                         AVAudioChannelCount channel_count = audio_format.channelCount;
-                        double root_freq = random_source_drand48(400.0, 2000.0) /** duration*/;
+                        double root_freq = random_number_generator(random_number_generator_func_drand48)(400.0, 2000.0) /** duration*/;
                         double harmonic_freq = root_freq * (5.0/4.0);
                         NSLog(@"  dur:  %fs\tfreq(s):  %f\t%f", duration, root_freq, harmonic_freq);
                         double device_volume = pow(audio_session.outputVolume, 3.0);
@@ -186,7 +220,7 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
                         render_buffer();
                     });
                     // render_buffer parameters                // BufferRenderedCompletionBlock executable
-                } (self.playerNode, [AVAudioSession sharedPlayer], self.audioFormat, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
+                } (self.playerNode, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
                     [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
                         played_tone();
                     }];
