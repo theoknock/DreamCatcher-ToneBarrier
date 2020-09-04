@@ -1,6 +1,6 @@
 //
 //  RandomSource.c
-//  DreamCatcher-ToneBarrier
+//  ToneBarrierScore
 //
 //  Created by Xcode Developer on 9/2/20.
 //

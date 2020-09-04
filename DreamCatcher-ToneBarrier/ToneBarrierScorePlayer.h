@@ -12,6 +12,10 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef void (^PlayedToneCompletionBlock)(void);
+typedef void (^BufferRenderedCompletionBlock)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, PlayedToneCompletionBlock _Nonnull);
+typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioSession *, AVAudioFormat *, void (^)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^)(void)));
+
 @interface ToneBarrierScorePlayer : NSObject
 
 + (nonnull ToneBarrierScorePlayer *)sharedPlayer;
@@ -22,6 +26,8 @@ NS_ASSUME_NONNULL_BEGIN
 @property (nonatomic, strong) AVAudioMixerNode * _Nullable  mixerNode;
 @property (nonatomic, strong) AVAudioFormat * _Nullable     audioFormat;
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
+
+@property (copy, nonatomic) void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioSession *, AVAudioFormat *, void (^)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^)(void)));
 
 - (BOOL)play;
 

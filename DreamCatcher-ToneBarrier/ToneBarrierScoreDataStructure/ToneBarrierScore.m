@@ -1,12 +1,12 @@
+////
+////  ToneBarrierScore.m
+////  DreamCatcher-ToneBarrier
+////
+////  Created by Xcode Developer on 9/2/20.
+////
 //
-//  ToneBarrierScore.m
-//  DreamCatcher-ToneBarrier
+//#import "ToneBarrierScore.h"
 //
-//  Created by Xcode Developer on 9/2/20.
+//@implementation ToneBarrierScore
 //
-
-#import "ToneBarrierScore.h"
-
-@implementation ToneBarrierScore
-
-@end
+//@end
