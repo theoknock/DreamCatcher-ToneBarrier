@@ -16,22 +16,22 @@
 
 extern const void * RandomSource;
 
-typedef enum RandomGenerator
-{
-    random_generator_drand48,
-    random_generator_arc4random
-} random_generator;
+//typedef enum RandomGenerator
+//{
+//    random_generator_drand48,
+//    random_generator_arc4random
+//} random_generator;
+//
+//typedef struct RandomSource
+//{
+//    enum RandomGenerator random_generator;
+//    double lower_bound;
+//    double higher_bound;
+//    double (^generate_random)(struct RandomSource *);
+//} random_source;
 
-typedef struct RandomSource
-{
-    enum RandomGenerator random_generator;
-    double lower_bound;
-    double higher_bound;
-    double (^generate_random)(struct RandomSource *);
-} random_source;
-
-struct RandomSource * new_random_source (enum RandomGenerator random_generator,
-                                         double lower_bound,
-                                         double higher_bound);
+//struct RandomSource * new_random_source (enum RandomGenerator random_generator,
+//                                         double lower_bound,
+//                                         double higher_bound);
 
 #endif /* RandomSource_h */

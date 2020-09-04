@@ -136,11 +136,14 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         if ([self.audioEngine isRunning])
         {
             [self.playerNode pause];
+            [self.playerNodeAux pause];
             
             [self.audioEngine pause];
             
             [self.audioEngine detachNode:self.playerNode];
             self.playerNode = nil;
+            [self.audioEngine detachNode:self.playerNodeAux];
+            self.playerNodeAux = nil;
             
             [self.audioEngine detachNode:self.reverb];
             self.reverb = nil;
@@ -159,6 +162,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
             [self.playerNode setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
             [self.playerNode setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
             
+            self.playerNodeAux = [[AVAudioPlayerNode alloc] init];
+            [self.playerNodeAux setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
+            [self.playerNodeAux setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
+            [self.playerNodeAux setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
+            
             self.mixerNode = [[AVAudioMixerNode alloc] init];
             
             self.reverb = [[AVAudioUnitReverb alloc] init];
@@ -167,33 +175,40 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
             
             [self.audioEngine attachNode:self.reverb];
             [self.audioEngine attachNode:self.playerNode];
+            [self.audioEngine attachNode:self.playerNodeAux];
             [self.audioEngine attachNode:self.mixerNode];
             
             [self.audioEngine connect:self.playerNode     to:self.mixerNode  format:self.audioFormat];
-            [self.audioEngine connect:self.mixerNode      to:self.reverb      format:self.audioFormat];
-            [self.audioEngine connect:self.reverb         to:self.mainNode    format:self.audioFormat];
+            [self.audioEngine connect:self.playerNodeAux  to:self.mixerNode  format:self.audioFormat];
+            [self.audioEngine connect:self.mixerNode      to:self.reverb     format:self.audioFormat];
+            [self.audioEngine connect:self.reverb         to:self.mainNode   format:self.audioFormat];
             
             if ([self startEngine])
             {
-                if (![self.playerNode isPlaying])
-                {
-                    [self.playerNode play];
-                }
+                if (![self.playerNode isPlaying]) [self.playerNode play];
+                if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
                 
+                __block int playerNodeIndex = 0;
                 struct RandomSource * duration_random_source;
                 struct RandomSource * frequency_random_source;
                 duration_random_source = new_random_source(random_generator_drand48, 0.25, 1.75);
                 frequency_random_source = new_random_source(random_generator_drand48, 400.0, 2000.0);
                 
+                struct RandomDistributor * duration_random_distributor;
+                duration_random_distributor = new_random_distributor(random_distribution_scurve, 1.0/3.0, 0.25, 1.75);
                 struct RandomDistributor * frequency_random_distributor;
                 frequency_random_distributor = new_random_distributor(random_distribution_scurve, 3.0, 400.0, 2000.0);
+                
                 static void(^render_buffer)(void);
+                static void(^play_tones)(void(^)(void), void(^)(void));
                 render_buffer = ^{
                     ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
                                         {
                             double duration = duration_random_source->generate_random(duration_random_source);
+                            double duration_distribution = duration_random_distributor->distribute_random(duration, duration_random_distributor);
+                            NSLog(@"Node %d\t\tDuration: %f", playerNodeIndex, duration);
                             AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
                             pcmBuffer.frameLength        = frameCount;
@@ -202,7 +217,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                             double random_root_freq = frequency_random_source->generate_random(frequency_random_source);
                             double root_freq = frequency_random_distributor->distribute_random(random_root_freq * duration, frequency_random_distributor);
                             NSLog(@"root_freq: %f", root_freq);
-                            double harmonic_freq = root_freq * (5.0/4.0);
+                            double harmonic_freq = root_freq;// * (5.0/4.0);
                             double device_volume = audio_session.outputVolume;
                             double gain_new_max = 1.0 / (channel_count); // 0.5
                             double gain_new_min = 1.0 / gain_new_max; // 2
@@ -234,19 +249,32 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                                 if (samples) samples[index] = sample;
                             }
                         }), ^{
-                            render_buffer();
+                            ^(void(^rb)(void), void(^rb_aux)(void)) {
+                                rb();
+                                rb_aux();
+                            }(render_buffer, render_buffer);
                         });
-                       } (self.playerNode, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
+                    } ((playerNodeIndex++ == 1) ? self.playerNode : self.playerNodeAux, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
                        {
+                        NSLog(@"playerNodeIndex == %d", playerNodeIndex);
+                        playerNodeIndex %= 2;
                         if ([player_node isPlaying])
                             [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType)
                              {
-                                played_tone();
+                                if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
+                                {
+                                    NSLog(@"PlayerNode desc: %lu", (unsigned long)[player_node hash]);
+                                    played_tone();
+                                }
                             }];
                     });
                 };
                 
-                render_buffer();
+                ^(void(^rb)(void), void(^rb_aux)(void)) {
+                    rb();
+                    rb_aux();
+                }(render_buffer, render_buffer);
+
                 
                 return TRUE;
                 

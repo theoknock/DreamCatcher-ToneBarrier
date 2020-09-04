@@ -11,7 +11,7 @@
 double (^generate_random_drand48)(struct RandomSource *) = ^double(struct RandomSource * random_source)
 {
     double random = drand48();
-    double result = (random * (random_source->higher_bound - random_source->lower_bound)) + random_source->lower_bound;
+//    double result = (random * (random_source->higher_bound - random_source->lower_bound)) + random_source->lower_bound;
     
     return random;
 };
@@ -21,7 +21,7 @@ double (^generate_random_arc4random)(struct RandomSource *) = ^double(struct Ran
     double random = ((double)arc4random() / 0x100000000) ;
     double result = (random * (random_source->higher_bound - random_source->lower_bound)) + random_source->lower_bound;
     
-    return random;
+    return result;
 };
 
 //double (^generate_random_drand48)(double, double) = ^double(double lower_bound, double higher_bound)

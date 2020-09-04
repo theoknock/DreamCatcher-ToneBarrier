@@ -28,12 +28,8 @@
 		B96EC02925006C6000F9C929 /* ToneBarrierScore.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		B96EC02C25006C6000F9C929 /* ToneBarrierScore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */; };
 		B96EC02D25006C6000F9C929 /* ToneBarrierScore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B96EC03425006C9600F9C929 /* Randomizer.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC03225006C9600F9C929 /* Randomizer.h */; };
-		B96EC03525006C9600F9C929 /* Randomizer.c in Sources */ = {isa = PBXBuildFile; fileRef = B96EC03325006C9600F9C929 /* Randomizer.c */; };
-		B96EC03825006DF300F9C929 /* RandomSource.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC03625006DF300F9C929 /* RandomSource.h */; };
-		B96EC03925006DF300F9C929 /* RandomSource.c in Sources */ = {isa = PBXBuildFile; fileRef = B96EC03725006DF300F9C929 /* RandomSource.c */; };
-		B96EC03C25006E0F00F9C929 /* RandomDistributor.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC03A25006E0F00F9C929 /* RandomDistributor.h */; };
-		B96EC03D25006E0F00F9C929 /* RandomDistributor.c in Sources */ = {isa = PBXBuildFile; fileRef = B96EC03B25006E0F00F9C929 /* RandomDistributor.c */; };
+		B96EC03425006C9600F9C929 /* Random.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC03225006C9600F9C929 /* Random.h */; };
+		B96EC03525006C9600F9C929 /* Random.c in Sources */ = {isa = PBXBuildFile; fileRef = B96EC03325006C9600F9C929 /* Random.c */; };
 		B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */; };
 /* End PBXBuildFile section */
 
@@ -132,12 +128,8 @@
 		B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ToneBarrierScore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScore.h; sourceTree = "<group>"; };
 		B96EC02825006C6000F9C929 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B96EC03225006C9600F9C929 /* Randomizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Randomizer.h; sourceTree = "<group>"; };
-		B96EC03325006C9600F9C929 /* Randomizer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Randomizer.c; sourceTree = "<group>"; };
-		B96EC03625006DF300F9C929 /* RandomSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RandomSource.h; sourceTree = "<group>"; };
-		B96EC03725006DF300F9C929 /* RandomSource.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RandomSource.c; sourceTree = "<group>"; };
-		B96EC03A25006E0F00F9C929 /* RandomDistributor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = RandomDistributor.h; sourceTree = "<group>"; };
-		B96EC03B25006E0F00F9C929 /* RandomDistributor.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = RandomDistributor.c; sourceTree = "<group>"; wrapsLines = 0; };
+		B96EC03225006C9600F9C929 /* Random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Random.h; sourceTree = "<group>"; };
+		B96EC03325006C9600F9C929 /* Random.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Random.c; sourceTree = "<group>"; wrapsLines = 0; };
 		B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
 		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -247,12 +239,8 @@
 			children = (
 				B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */,
 				B96EC02825006C6000F9C929 /* Info.plist */,
-				B96EC03225006C9600F9C929 /* Randomizer.h */,
-				B96EC03325006C9600F9C929 /* Randomizer.c */,
-				B96EC03625006DF300F9C929 /* RandomSource.h */,
-				B96EC03725006DF300F9C929 /* RandomSource.c */,
-				B96EC03A25006E0F00F9C929 /* RandomDistributor.h */,
-				B96EC03B25006E0F00F9C929 /* RandomDistributor.c */,
+				B96EC03225006C9600F9C929 /* Random.h */,
+				B96EC03325006C9600F9C929 /* Random.c */,
 			);
 			path = ToneBarrierScore;
 			sourceTree = "<group>";
@@ -272,10 +260,8 @@
 			isa = PBXHeadersBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B96EC03825006DF300F9C929 /* RandomSource.h in Headers */,
-				B96EC03C25006E0F00F9C929 /* RandomDistributor.h in Headers */,
 				B96EC02925006C6000F9C929 /* ToneBarrierScore.h in Headers */,
-				B96EC03425006C9600F9C929 /* Randomizer.h in Headers */,
+				B96EC03425006C9600F9C929 /* Random.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -465,9 +451,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B96EC03525006C9600F9C929 /* Randomizer.c in Sources */,
-				B96EC03925006DF300F9C929 /* RandomSource.c in Sources */,
-				B96EC03D25006E0F00F9C929 /* RandomDistributor.c in Sources */,
+				B96EC03525006C9600F9C929 /* Random.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
