@@ -814,4 +814,14 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode *, AVAudioSession *, AVAudioForma
     }
 }
 
+//
+//double (^random_distributor_gaussian_mean_variance)(struct RandomDistributor *) = ^double(struct RandomDistributor *)
+//{
+//    double result        = exp(-(pow((random_source(lower_bound, upper_bound) - mean), 2.0) / variance));
+//    double scaled_result = scale(0.0, 1.0, result, lower_bound, upper_bound);
+//
+//    return scaled_result;
+//};
+
+
 @end

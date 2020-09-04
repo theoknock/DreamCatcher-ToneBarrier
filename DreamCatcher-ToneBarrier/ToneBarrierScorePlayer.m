@@ -18,6 +18,7 @@
 //#include "new.h"
 //#include "Class.h"
 #include "RandomSource.h"
+#include "RandomDistributor.h"
 
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
@@ -179,12 +180,15 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                     [self.playerNode play];
                 }
                 
+                struct RandomSource * duration_random_source;
+                struct RandomSource * frequency_random_source;
+                duration_random_source = new_random_source(random_generator_drand48, 0.25, 1.75);
+                frequency_random_source = new_random_source(random_generator_drand48, 400.0, 2000.0);
+                
+                struct RandomDistributor * frequency_random_distributor;
+                frequency_random_distributor = new_random_distributor(random_distribution_scurve, 3.0, 400.0, 2000.0);
                 static void(^render_buffer)(void);
                 render_buffer = ^{
-                    struct RandomSource * duration_random_source;
-                    struct RandomSource * frequency_random_source;
-                    duration_random_source = new(random_generator_drand48, 0.25, 1.75);
-                    frequency_random_source = new(random_generator_drand48, 400.0, 2000.0);
                     ^(AVAudioPlayerNode * player_node, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         buffer_rendered(player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount))
@@ -195,7 +199,9 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                             pcmBuffer.frameLength        = frameCount;
                             
                             AVAudioChannelCount channel_count = audio_format.channelCount;
-                            double root_freq = frequency_random_source->generate_random(frequency_random_source) * duration;
+                            double random_root_freq = frequency_random_source->generate_random(frequency_random_source);
+                            double root_freq = frequency_random_distributor->distribute_random(random_root_freq * duration, frequency_random_distributor);
+                            NSLog(@"root_freq: %f", root_freq);
                             double harmonic_freq = root_freq * (5.0/4.0);
                             double device_volume = audio_session.outputVolume;
                             double gain_new_max = 1.0 / (channel_count); // 0.5

@@ -13,34 +13,29 @@
 #include <stddef.h>
 #include <stdlib.h>
 #include <assert.h>
+#include <math.h>
 
-#include "RandomSource.h"
 
 extern const void * RandomDistributor;
 
-enum random_distributor_func
+enum RandomDistribution
 {
-    random_generator_func_gaussian,
-    random_generator_func_linear,
-    random_generator_func_gamma
+    random_distribution_gamma,
+    random_distribution_scurve
 };
 
 typedef struct RandomDistributor
 {
-    struct RandomSource * random_source;
-    enum random_distributor_func distributor;
-    double mean;
-    double deviation;
+    enum RandomDistribution random_distribution;
+    double gamma; // gamma >= 1 x10 <==> gamma < 1 x.10
     double lower_bound;
-    double higher_bound;
-    double (^distribute_random)(struct RandomDistributor *);
+    double upper_bound;
+    double (^distribute_random)(double, struct RandomDistributor *);
 } random_distributor;
 
-struct RandomDistributor * new_random_distributor (enum random_distributor_func distributor,
-                                                   double mean,
-                                                   double deviation,
+struct RandomDistributor * new_random_distributor (enum RandomDistribution random_distribution,
+                                                   double gamma,
                                                    double lower_bound,
-                                                   double higher_bound,
-                                                   double (^distribute_random)(struct RandomSource *));
+                                                   double upper_bound);
 
 #endif /* RandomDistributor_h */

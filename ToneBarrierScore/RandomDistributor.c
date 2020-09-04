@@ -7,72 +7,69 @@
 
 #include "RandomDistributor.h"
 #include "time.h"
-//
-//double (^generate_random_drand48)(struct RandomSource *) = ^double(struct RandomSource * random_source)
-//{
-//    double random = drand48();
-//    double result = (random * (random_source->higher_bound - random_source->lower_bound)) + random_source->lower_bound;
-//    
-//    return result;
-//};
-//
-//double (^generate_random_arc4random)(struct RandomSource *) = ^double(struct RandomSource * random_source)
-//{
-//    double random = ((double)arc4random() / 0x100000000) ;
-//    double result = (random * (random_source->higher_bound - random_source->lower_bound)) + random_source->lower_bound;
-//    
-//    return result;
-//};
-//
-////double (^generate_random_drand48)(double, double) = ^double(double lower_bound, double higher_bound)
-////{
-////    double random = drand48();
-////    double result = (random * (higher_bound - lower_bound)) + lower_bound;
-////
-////    return result;
-////};
-//
-////double (^generate_random_arc4random)(double, double) = ^double(double lower_bound, double higher_bound)
-////{
-////    double random = ((double)arc4random() / 0x100000000) ;
-////    double result = (random * (higher_bound - lower_bound)) + lower_bound;
-////
-////    return result;
-////};
-//
-//double (^_Nonnull(^ _Nonnull set_random_generator)(enum RandomGenerator))(struct RandomSource *) = ^(enum RandomGenerator random_generator) {
-//    switch (random_generator) {
-//        case random_generator_drand48:
-//        {
-//            srand48(time(0));
-//            return generate_random_drand48;
-//            break;
-//        }
-//        case random_generator_arc4random:
-//            return generate_random_arc4random;
-//            break;
-//            
-//        default:
-//        {
-//            srand48(time(0));
-//            return generate_random_drand48;
-//            break;
-//        }
-//    }
-//};
-//
-//double (^random_distributor_gaussian_mean_variance)(struct RandomDistributor *) = ^double(struct RandomDistributor *)
-//{
-//    double result        = exp(-(pow((random_source(lower_bound, upper_bound) - mean), 2.0) / variance));
-//    double scaled_result = scale(0.0, 1.0, result, lower_bound, upper_bound);
-//
-//    return scaled_result;
-//};
-//
-//RandomDistributor random_distributor_gaussian_mean_standard_deviation = ^double(RandomSource random_source, double lower_bound, double upper_bound, double mean, double standard_deviation)
-//{
-//    double result        = sqrt(1 / (2 * M_PI * standard_deviation)) * exp(-(1 / (2 * standard_deviation)) * (random_source(lower_bound, upper_bound) - mean) * 2);
-//    double scaled_result = scale(0.0, 1.0, result, lower_bound, upper_bound);
-//
-//    return scaled_result;
-//};
+
+typedef double (^Normalize)(double, double, double);
+Normalize normalize = ^double(double min, double max, double value)
+{
+    double result = (value - min) / (max - min);
+    
+    return result;
+};
+
+typedef double (^Scale)(double, double, double, double, double);
+Scale scale = ^double(double min_new, double max_new, double val_old, double min_old, double max_old)
+{
+    double val_new = min_new + ((((val_old - min_old) * (max_new - min_new))) / (max_old - min_old));
+    
+    return val_new;
+};
+
+double (^random_distributor_gamma)(double, struct RandomDistributor *) = ^(double random, struct RandomDistributor * random_distributor)
+{
+    double result = pow(random, random_distributor->gamma);
+    result = scale(random_distributor->lower_bound, random_distributor->upper_bound, result, 0.0, 1.0);
+    
+    return result;
+};
+
+double (^random_distributor_scurve)(double, struct RandomDistributor *) = ^(double random, struct RandomDistributor * random_distributor)
+{
+    double result = (pow(random, random_distributor->gamma) + pow(random, (1.0 / random_distributor->gamma))) / 2.0;
+    result = scale(random_distributor->lower_bound, random_distributor->upper_bound, result, 0.0, 1.0);
+    
+    return result;
+};
+
+double (^_Nonnull(^ _Nonnull set_random_distribution)(enum RandomDistribution))(double random, struct RandomDistributor *) = ^(enum RandomDistribution random_distribution) {
+    switch (random_distribution) {
+        case random_distribution_gamma:
+            return random_distributor_gamma;
+            break;
+            
+        case random_distribution_scurve:
+            return random_distributor_scurve;
+            break;
+            
+        default:
+            return random_distributor_gamma;
+            break;
+    }
+};
+
+
+struct RandomDistributor * new_random_distributor (enum RandomDistribution random_distribution,
+                                double gamma,
+                                double lower_bound,
+                                double upper_bound)
+{
+    struct RandomDistributor * _random_distributor = malloc(sizeof(struct RandomDistributor));
+    _random_distributor->random_distribution = random_distribution;
+    _random_distributor->gamma = gamma;
+    _random_distributor->lower_bound = lower_bound;
+    _random_distributor->upper_bound = upper_bound;
+    _random_distributor->distribute_random = set_random_distribution(random_distribution);
+    
+    assert(_random_distributor);
+    
+    return _random_distributor;
+}
