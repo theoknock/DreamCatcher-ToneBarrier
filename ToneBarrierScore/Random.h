@@ -28,7 +28,7 @@ typedef struct Random
         enum RandomGenerator
         {
             random_generator_drand48,
-            random_generator_drand48_normalized_bounds,
+//            random_generator_drand48_normalized_bounds,
             random_generator_arc4random,
         } random_generator;
         double (^generate_random)(double, double);

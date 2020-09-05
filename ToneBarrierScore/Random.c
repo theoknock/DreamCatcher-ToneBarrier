@@ -77,18 +77,18 @@ double (^_Nonnull(^ _Nonnull set_random_generator)(enum RandomGenerator))(double
             return generate_random_arc4random;
             break;
         }
-        case random_generator_drand48_normalized_bounds:
-        {
-            srand48(time(0));
-            return generate_random_drand48_normalized_bounds;
-            break;
-        }
+//        case random_generator_drand48_normalized_bounds:
+//        {
+//            srand48(time(0));
+//            return generate_random_drand48_normalized_bounds;
+//            break;
+//        }
         
             
         default:
         {
             srand48(time(0));
-            return generate_random_drand48_normalized_bounds;
+            return generate_random_drand48;
             break;
         }
     }
@@ -126,7 +126,7 @@ double (^random_distributor_scurve)(double, double, double, double) = ^(double r
     double result = (scaled_x1 + scaled_x2) / 2.0;
 //    double scaled_func_x = pow(scaled, gamma);
 //    double result = (1.0 - scaled_func_x)) / 2.0;
-    result = range_min;//scale(range_max, range_min, result, 1.0, 0.0);
+    result = scale(range_min, range_max, result, 1.0, 0.0);
 
     
     return result;
