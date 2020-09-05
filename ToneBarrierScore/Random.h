@@ -28,7 +28,8 @@ typedef struct Random
         enum RandomGenerator
         {
             random_generator_drand48,
-            random_generator_arc4random
+            random_generator_drand48_normalized_bounds,
+            random_generator_arc4random,
         } random_generator;
         double (^generate_random)(double, double);
     } * random_source;
@@ -41,11 +42,11 @@ typedef struct Random
             random_distribution_scurve
         } random_distribution;
         double gamma; // gamma >= 1 x10 <==> gamma < 1 x.10
-        double (^distribute_random)(double, double, double);
+        double (^distribute_random)(double, double, double, double);
     } * random_distributor;
     double range_min;
     double range_max;
-    double (^random)(double (^)(double, double), double (^)(double (^)(double, double), double, double, double), double, double, double);
+    double (^generate_distributed_random)(struct Random *);
 } randomizer;
 
 struct Random * new_random (enum RandomGenerator random_generator,
@@ -53,5 +54,7 @@ struct Random * new_random (enum RandomGenerator random_generator,
                             double range_min,
                             double range_max,
                             double gamma);
+
+double (GenerateDistributedRandom)(struct Random *);
 
 #endif /* Randomizer_h */
