@@ -55,7 +55,7 @@ struct Randomizer
         double (^ _Nonnull distribute_random)(double, double, double, double);
     } * _Nonnull random_distributor;
     
-    double (^ _Nonnull generate_distributed_random)(struct Randomizer *_Nonnull);
+    double (^ _Nonnull generate_distributed_random)(struct Randomizer * _Nonnull);
 };
 
 struct Randomizer * _Nonnull new_randomizer (enum RandomGenerator random_generator,

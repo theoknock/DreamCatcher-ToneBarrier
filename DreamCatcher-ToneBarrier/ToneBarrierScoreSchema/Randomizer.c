@@ -210,6 +210,8 @@ struct Randomizer * _Nonnull new_randomizer (enum RandomGenerator random_generat
                                                         random_distribution_range_max,
                                                         random_distribution_gamma_distribution);
     
+    random->generate_distributed_random = generate_distributed_random;
+    
     assert(random);
     
     return random;

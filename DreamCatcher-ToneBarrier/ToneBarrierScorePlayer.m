@@ -113,20 +113,21 @@ Normalize normalize = ^double(double min, double max, double value)
     return result;
 };
 
-typedef double (^FrequencySample)(double, double);
-FrequencySample sample_frequency = ^(double time, double frequency)
+typedef double (^FrequencySample)(double, double, double);
+FrequencySample sample_frequency = ^(double time, double frequency, double trill)
 {
-    double result = sinf(M_PI * time * ^double(double frequency) {
-        return ((frequency / (2000.0 - 400.0) * (12.0 - 4.0)) + 4.0);
-    } (frequency));
+    double result = sinf(M_PI * time * frequency) * ^double
+                                        (double time, double trill) {
+        return (sinf(M_PI_PI * time * trill) / 2); //((frequency / (2000.0 - 400.0) * (12.0 - 4.0)) + 4.0);
+    } (time, trill);
     
     return result;
 };
 
-typedef double (^AmplitudeSample)(double, double);
-AmplitudeSample sample_amplitude = ^(double time, double gain)
+typedef double (^AmplitudeSample)(double, double, double);
+AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
 {
-    double result = sinf((M_PI_PI * time) / 2) * gain;
+    double result =  sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
     
     return result;
 };
@@ -189,10 +190,17 @@ AmplitudeSample sample_amplitude = ^(double time, double gain)
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
             
             __block int playerNodeIndex = 0;
+            double duration_tallies[2] = {2.0, 2.0};
+            void * dt = &duration_tallies;
+            struct Randomizer * duration_randomizer[2]  = {new_randomizer(random_generator_drand48, 1.00, 1.75, 1.0, random_distribution_gamma, 1.00, 1.75, 1.0),
+                new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0)};
+            struct Randomizer * frequency_randomizer[2] = {new_randomizer(random_generator_drand48, 400.0, 800.0, 1.0, random_distribution_gamma, 400.0, 800.0, 3.0),
+                new_randomizer(random_generator_drand48, 400.0, 2000.0, 1.0, random_distribution_gamma, 400.0, 2000.0, 1.0/3.0)};
             
             static void(^render_buffer[2])(AVAudioPlayerNode * __strong, struct Randomizer *, struct Randomizer *);
             for (int i = 0; i < 2; i++)
             {
+                NSLog(@"render_buffer[%d]", i);
                 render_buffer[i] = ^(AVAudioPlayerNode * __strong player_node, struct Randomizer * duration_randomizer, struct Randomizer * frequency_randomizer) {
                     
                     
@@ -209,7 +217,7 @@ AmplitudeSample sample_amplitude = ^(double time, double gain)
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioPlayerNodeIndex player_node_index, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         buffer_rendered(^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, float *))
-                                        {
+                        {
                             double duration = duration_randomizer->generate_distributed_random(duration_randomizer);
                             NSLog(@"Node %d\t\tDuration: %f", playerNodeIndex, duration);
                             AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
@@ -244,8 +252,8 @@ AmplitudeSample sample_amplitude = ^(double time, double gain)
                             {
                                 double normalized_time = normalize(0.0, sample_count, index);
                                 
-                                double sine_frequency = sample_frequency(normalized_time, frequency);
-                                double sample = sine_frequency * sample_amplitude(normalized_time, gain_adjustment);
+                                double sine_frequency = sample_frequency(normalized_time, frequency, 6.0);
+                                double sample = sine_frequency * sample_amplitude(normalized_time, gain_adjustment, normalized_time * 6.0);
                                 
                                 if (samples) samples[index] = sample;
                             }
@@ -265,10 +273,11 @@ AmplitudeSample sample_amplitude = ^(double time, double gain)
                             }];
                     });
                 };
+                
                 render_buffer[i]((i == 0) ? self.playerNode : self.playerNodeAux,
-                                 new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0),
-                                 new_randomizer(random_generator_drand48, 400.0, 2000.0, 1.0/3.0, random_distribution_gamma, 400.0, 2000.0, 1.0/3.0));
-            }
+                                 duration_randomizer[i],
+                                 frequency_randomizer[i]);
+                }
             
             
             return TRUE;
