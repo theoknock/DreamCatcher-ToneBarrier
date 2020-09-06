@@ -25,12 +25,8 @@
 		B9259D5524F669E200FA19FA /* ComplicationController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D5424F669E200FA19FA /* ComplicationController.m */; };
 		B9259D5724F669E300FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D5624F669E300FA19FA /* Assets.xcassets */; };
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
-		B96EC02925006C6000F9C929 /* ToneBarrierScore.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */; settings = {ATTRIBUTES = (Public, ); }; };
-		B96EC02C25006C6000F9C929 /* ToneBarrierScore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */; };
-		B96EC02D25006C6000F9C929 /* ToneBarrierScore.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		B96EC03425006C9600F9C929 /* Random.h in Headers */ = {isa = PBXBuildFile; fileRef = B96EC03225006C9600F9C929 /* Random.h */; };
-		B96EC03525006C9600F9C929 /* Random.c in Sources */ = {isa = PBXBuildFile; fileRef = B96EC03325006C9600F9C929 /* Random.c */; };
-		B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */; };
+		B9FAD48E2503FA3900FF4772 /* Randomizer.c in Sources */ = {isa = PBXBuildFile; fileRef = B9FAD48D2503FA3900FF4772 /* Randomizer.c */; };
+		B9FAD4912503FAF600FF4772 /* Score.c in Sources */ = {isa = PBXBuildFile; fileRef = B9FAD4902503FAF600FF4772 /* Score.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -47,13 +43,6 @@
 			proxyType = 1;
 			remoteGlobalIDString = B9259D4424F669E200FA19FA;
 			remoteInfo = "DreamCatcher-ToneBarrier WatchKit Extension";
-		};
-		B96EC02A25006C6000F9C929 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = B9259D1324F669DD00FA19FA /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = B96EC02425006C5F00F9C929;
-			remoteInfo = ToneBarrierScore;
 		};
 /* End PBXContainerItemProxy section */
 
@@ -86,7 +75,6 @@
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				B96EC02D25006C6000F9C929 /* ToneBarrierScore.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -110,7 +98,7 @@
 		B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D3C24F669E100FA19FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		B9259D3E24F669E200FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B9259D4024F669E200FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		B9259D4024F669E200FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "DreamCatcher-ToneBarrier WatchKit App/Info.plist"; sourceTree = SOURCE_ROOT; };
 		B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D4A24F669E200FA19FA /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
 		B9259D4B24F669E200FA19FA /* InterfaceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InterfaceController.m; sourceTree = "<group>"; };
@@ -125,13 +113,16 @@
 		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
 		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScorePlayer.m; sourceTree = "<group>"; wrapsLines = 0; };
-		B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = ToneBarrierScore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScore.h; sourceTree = "<group>"; };
-		B96EC02825006C6000F9C929 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		B96EC03225006C9600F9C929 /* Random.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Random.h; sourceTree = "<group>"; };
-		B96EC03325006C9600F9C929 /* Random.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Random.c; sourceTree = "<group>"; wrapsLines = 0; };
-		B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AVFoundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS14.0.sdk/System/Library/Frameworks/AVFoundation.framework; sourceTree = DEVELOPER_DIR; };
+		B96EC02725006C5F00F9C929 /* ToneBarrierScoreCodeCemetary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScoreCodeCemetary.h; sourceTree = "<group>"; };
 		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
+		B9FAD4752503D47800FF4772 /* PlayerNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerNode.h; sourceTree = "<group>"; wrapsLines = 0; };
+		B9FAD4762503D47800FF4772 /* PlayerNode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PlayerNode.c; sourceTree = "<group>"; };
+		B9FAD47A2503E3CB00FF4772 /* Tone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tone.h; sourceTree = "<group>"; };
+		B9FAD47B2503E3CB00FF4772 /* Tone.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Tone.c; sourceTree = "<group>"; };
+		B9FAD48C2503FA3900FF4772 /* Randomizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Randomizer.h; sourceTree = "<group>"; wrapsLines = 0; };
+		B9FAD48D2503FA3900FF4772 /* Randomizer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Randomizer.c; sourceTree = "<group>"; wrapsLines = 0; };
+		B9FAD48F2503FAF600FF4772 /* Score.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Score.h; sourceTree = "<group>"; };
+		B9FAD4902503FAF600FF4772 /* Score.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Score.c; sourceTree = "<group>"; wrapsLines = 0; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -139,19 +130,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				B9EF5C5F24F955F6008EC0F9 /* AVFoundation.framework in Frameworks */,
-				B96EC02C25006C6000F9C929 /* ToneBarrierScore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		B9259D4224F669E200FA19FA /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B96EC02225006C5F00F9C929 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -167,7 +149,6 @@
 				B9259D1D24F669DD00FA19FA /* DreamCatcher-ToneBarrier */,
 				B9259D3A24F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */,
 				B9259D4924F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */,
-				B96EC02625006C5F00F9C929 /* ToneBarrierScore */,
 				B9259D1C24F669DD00FA19FA /* Products */,
 				B9EF5C5D24F955F6008EC0F9 /* Frameworks */,
 			);
@@ -179,7 +160,6 @@
 				B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */,
 				B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */,
 				B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */,
-				B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -187,16 +167,18 @@
 		B9259D1D24F669DD00FA19FA /* DreamCatcher-ToneBarrier */ = {
 			isa = PBXGroup;
 			children = (
-				B9259D1E24F669DD00FA19FA /* AppDelegate.h */,
+				B9FAD47E2503F31600FF4772 /* ToneBarrierScoreSchema */,
 				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
+				B9259D1E24F669DD00FA19FA /* AppDelegate.h */,
 				B9259D2124F669DD00FA19FA /* SceneDelegate.h */,
 				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,
+				B9259D2724F669DD00FA19FA /* Main.storyboard */,
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
 				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
 				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
-				B9259D2724F669DD00FA19FA /* Main.storyboard */,
 				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
+				B9259D4024F669E200FA19FA /* Info.plist */,
 				B9259D2C24F669E000FA19FA /* Assets.xcassets */,
 				B9259D3124F669E000FA19FA /* Info.plist */,
 				B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */,
@@ -211,7 +193,6 @@
 			children = (
 				B9259D3B24F669E100FA19FA /* Interface.storyboard */,
 				B9259D3E24F669E200FA19FA /* Assets.xcassets */,
-				B9259D4024F669E200FA19FA /* Info.plist */,
 			);
 			path = "DreamCatcher-ToneBarrier WatchKit App";
 			sourceTree = "<group>";
@@ -234,38 +215,30 @@
 			path = "DreamCatcher-ToneBarrier WatchKit Extension";
 			sourceTree = "<group>";
 		};
-		B96EC02625006C5F00F9C929 /* ToneBarrierScore */ = {
-			isa = PBXGroup;
-			children = (
-				B96EC02725006C5F00F9C929 /* ToneBarrierScore.h */,
-				B96EC02825006C6000F9C929 /* Info.plist */,
-				B96EC03225006C9600F9C929 /* Random.h */,
-				B96EC03325006C9600F9C929 /* Random.c */,
-			);
-			path = ToneBarrierScore;
-			sourceTree = "<group>";
-		};
 		B9EF5C5D24F955F6008EC0F9 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
-				B9EF5C5E24F955F6008EC0F9 /* AVFoundation.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
 		};
-/* End PBXGroup section */
-
-/* Begin PBXHeadersBuildPhase section */
-		B96EC02025006C5F00F9C929 /* Headers */ = {
-			isa = PBXHeadersBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B96EC02925006C6000F9C929 /* ToneBarrierScore.h in Headers */,
-				B96EC03425006C9600F9C929 /* Random.h in Headers */,
+		B9FAD47E2503F31600FF4772 /* ToneBarrierScoreSchema */ = {
+			isa = PBXGroup;
+			children = (
+				B96EC02725006C5F00F9C929 /* ToneBarrierScoreCodeCemetary.h */,
+				B9FAD48F2503FAF600FF4772 /* Score.h */,
+				B9FAD4902503FAF600FF4772 /* Score.c */,
+				B9FAD48C2503FA3900FF4772 /* Randomizer.h */,
+				B9FAD48D2503FA3900FF4772 /* Randomizer.c */,
+				B9FAD4752503D47800FF4772 /* PlayerNode.h */,
+				B9FAD4762503D47800FF4772 /* PlayerNode.c */,
+				B9FAD47A2503E3CB00FF4772 /* Tone.h */,
+				B9FAD47B2503E3CB00FF4772 /* Tone.c */,
 			);
-			runOnlyForDeploymentPostprocessing = 0;
+			path = ToneBarrierScoreSchema;
+			sourceTree = "<group>";
 		};
-/* End PBXHeadersBuildPhase section */
+/* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
 		B9259D1A24F669DD00FA19FA /* DreamCatcher-ToneBarrier */ = {
@@ -282,7 +255,6 @@
 			);
 			dependencies = (
 				B9259D3924F669E100FA19FA /* PBXTargetDependency */,
-				B96EC02B25006C6000F9C929 /* PBXTargetDependency */,
 			);
 			name = "DreamCatcher-ToneBarrier";
 			productName = "DreamCatcher-ToneBarrier";
@@ -323,24 +295,6 @@
 			productReference = B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */;
 			productType = "com.apple.product-type.watchkit2-extension";
 		};
-		B96EC02425006C5F00F9C929 /* ToneBarrierScore */ = {
-			isa = PBXNativeTarget;
-			buildConfigurationList = B96EC02E25006C6000F9C929 /* Build configuration list for PBXNativeTarget "ToneBarrierScore" */;
-			buildPhases = (
-				B96EC02025006C5F00F9C929 /* Headers */,
-				B96EC02125006C5F00F9C929 /* Sources */,
-				B96EC02225006C5F00F9C929 /* Frameworks */,
-				B96EC02325006C5F00F9C929 /* Resources */,
-			);
-			buildRules = (
-			);
-			dependencies = (
-			);
-			name = ToneBarrierScore;
-			productName = ToneBarrierScore;
-			productReference = B96EC02525006C5F00F9C929 /* ToneBarrierScore.framework */;
-			productType = "com.apple.product-type.framework";
-		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -357,9 +311,6 @@
 						CreatedOnToolsVersion = 12.0;
 					};
 					B9259D4424F669E200FA19FA = {
-						CreatedOnToolsVersion = 12.0;
-					};
-					B96EC02425006C5F00F9C929 = {
 						CreatedOnToolsVersion = 12.0;
 					};
 				};
@@ -380,7 +331,6 @@
 				B9259D1A24F669DD00FA19FA /* DreamCatcher-ToneBarrier */,
 				B9259D3524F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App */,
 				B9259D4424F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */,
-				B96EC02425006C5F00F9C929 /* ToneBarrierScore */,
 			);
 		};
 /* End PBXProject section */
@@ -413,13 +363,6 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		B96EC02325006C5F00F9C929 /* Resources */ = {
-			isa = PBXResourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
@@ -431,8 +374,10 @@
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
+				B9FAD4912503FAF600FF4772 /* Score.c in Sources */,
 				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
 				B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */,
+				B9FAD48E2503FA3900FF4772 /* Randomizer.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -444,14 +389,6 @@
 				B9259D5524F669E200FA19FA /* ComplicationController.m in Sources */,
 				B9259D4C24F669E200FA19FA /* InterfaceController.m in Sources */,
 				B9259D5224F669E200FA19FA /* NotificationController.m in Sources */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-		B96EC02125006C5F00F9C929 /* Sources */ = {
-			isa = PBXSourcesBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				B96EC03525006C9600F9C929 /* Random.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -467,11 +404,6 @@
 			isa = PBXTargetDependency;
 			target = B9259D4424F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension */;
 			targetProxy = B9259D4724F669E200FA19FA /* PBXContainerItemProxy */;
-		};
-		B96EC02B25006C6000F9C929 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = B96EC02425006C5F00F9C929 /* ToneBarrierScore */;
-			targetProxy = B96EC02A25006C6000F9C929 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -735,61 +667,6 @@
 			};
 			name = Release;
 		};
-		B96EC02F25006C6000F9C929 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = N9987K9442;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = ToneBarrierScore/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.demonicactivity.bush.alan.james.ToneBarrierScore;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Debug;
-		};
-		B96EC03025006C6000F9C929 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 1;
-				DEFINES_MODULE = YES;
-				DEVELOPMENT_TEAM = N9987K9442;
-				DYLIB_COMPATIBILITY_VERSION = 1;
-				DYLIB_CURRENT_VERSION = 1;
-				DYLIB_INSTALL_NAME_BASE = "@rpath";
-				INFOPLIST_FILE = ToneBarrierScore/Info.plist;
-				INSTALL_PATH = "$(LOCAL_LIBRARY_DIR)/Frameworks";
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@loader_path/Frameworks",
-				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.blogspot.demonicactivity.bush.alan.james.ToneBarrierScore;
-				PRODUCT_NAME = "$(TARGET_NAME:c99extidentifier)";
-				SDKROOT = iphoneos;
-				SKIP_INSTALL = YES;
-				TARGETED_DEVICE_FAMILY = "1,2";
-				VALIDATE_PRODUCT = YES;
-				VERSIONING_SYSTEM = "apple-generic";
-				VERSION_INFO_PREFIX = "";
-			};
-			name = Release;
-		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -825,15 +702,6 @@
 			buildConfigurations = (
 				B9259D6524F669E300FA19FA /* Debug */,
 				B9259D6624F669E300FA19FA /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Release;
-		};
-		B96EC02E25006C6000F9C929 /* Build configuration list for PBXNativeTarget "ToneBarrierScore" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				B96EC02F25006C6000F9C929 /* Debug */,
-				B96EC03025006C6000F9C929 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

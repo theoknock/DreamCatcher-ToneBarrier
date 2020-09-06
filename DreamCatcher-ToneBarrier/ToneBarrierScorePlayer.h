@@ -9,20 +9,34 @@
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
 
-
 NS_ASSUME_NONNULL_BEGIN
 
-typedef void (^PlayedToneCompletionBlock)(void);
-typedef void (^BufferRenderedCompletionBlock)(AVAudioPCMBuffer * _Nonnull, PlayedToneCompletionBlock _Nonnull);
-//typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioSession *, AVAudioFormat *, void (^)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^)(void)));
+typedef void (^BufferConsumed)(
+                               void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull));
+
+typedef void (^ConsumeBuffer)(AVAudioPlayerNode * _Nonnull,
+                              void (^)(AVAudioPlayerNode * _Nonnull));
+
+typedef void (^BufferRendered)(void (^)(AVAudioPCMBuffer * _Nonnull,
+                                   void (^)(AVAudioPlayerNode * _Nonnull,
+                                            void (^)(AVAudioPlayerNode * _Nonnull))));
+                          
+typedef void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
+                          void (^)(AVAudioPCMBuffer * _Nonnull,
+                                   void (^)(AVAudioPlayerNode * _Nonnull)));
+                          
+typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
+                               void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
+                                                    void (^BufferRendered)(AVAudioPCMBuffer * _Nonnull,
+                                                             void (^ConsumeBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull,
+                                                                      void (^BufferConsumed)(AVAudioPlayerNode * _Nonnull)))));
+
 
 @interface ToneBarrierScorePlayer : NSObject
 
 + (nonnull ToneBarrierScorePlayer *)sharedPlayer;
 
 @property (nonatomic, strong) AVAudioEngine * _Nonnull audioEngine;
-@property (nonatomic, strong) AVAudioSourceNode * _Nullable sourceNode;
-@property (copy) AVAudioSourceNodeRenderBlock sourceNodeRenderBlock;
 @property (nonatomic, strong) AVAudioPlayerNode * _Nullable playerNode;
 @property (nonatomic, strong) AVAudioPlayerNode * _Nullable playerNodeAux;
 @property (nonatomic, strong) AVAudioMixerNode * _Nullable  mainNode;
@@ -30,7 +44,6 @@ typedef void (^BufferRenderedCompletionBlock)(AVAudioPCMBuffer * _Nonnull, Playe
 @property (nonatomic, strong) AVAudioFormat * _Nullable     audioFormat;
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
 
-//@property (copy, nonatomic) void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioSession *, AVAudioFormat *, void (^)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^)(void)));
 
 - (BOOL)play;
 

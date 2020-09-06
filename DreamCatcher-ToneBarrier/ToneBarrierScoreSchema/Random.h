@@ -10,8 +10,8 @@
 // ...initializes its values
 // provides accessor functions for setting/getting values of its members (where applicable)s
 
-#ifndef Randomizer_h
-#define Randomizer_h
+#ifndef Random_h
+#define Random_h
 
 #include <stdio.h>
 #include <stdarg.h>
@@ -55,6 +55,4 @@ struct Random * new_random (enum RandomGenerator random_generator,
                             double range_max,
                             double gamma);
 
-double (GenerateDistributedRandom)(struct Random *);
-
-#endif /* Randomizer_h */
+#endif /* Random_h */
