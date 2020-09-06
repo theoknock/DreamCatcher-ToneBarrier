@@ -126,7 +126,7 @@
 		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 		B9FAD4752503D47800FF4772 /* PlayerNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerNode.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FAD4762503D47800FF4772 /* PlayerNode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PlayerNode.c; sourceTree = "<group>"; };
-		B9FAD47A2503E3CB00FF4772 /* Tone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tone.h; sourceTree = "<group>"; };
+		B9FAD47A2503E3CB00FF4772 /* Tone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tone.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FAD47B2503E3CB00FF4772 /* Tone.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Tone.c; sourceTree = "<group>"; };
 		B9FAD48C2503FA3900FF4772 /* Randomizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Randomizer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FAD48D2503FA3900FF4772 /* Randomizer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Randomizer.c; sourceTree = "<group>"; wrapsLines = 0; };
