@@ -129,10 +129,10 @@ Normalize normalize = ^double(double min, double max, double value)
 typedef double (^FrequencySample)(double, double, double);
 FrequencySample sample_frequency = ^(double time, double frequency, double trill)
 {
-    double result = sinf(M_PI * time * frequency) * ^double
+    double result = sinf(M_PI * time * frequency);/* * ^double
                                         (double time, double trill) {
         return (sinf(M_PI_PI * time * trill) / 2); //((frequency / (2000.0 - 400.0) * (12.0 - 4.0)) + 4.0);
-    } (time, trill);
+    } (time, trill);*/
     
     return result;
 };
@@ -140,7 +140,9 @@ FrequencySample sample_frequency = ^(double time, double frequency, double trill
 typedef double (^AmplitudeSample)(double, double, double);
 AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
 {
-    double result =  sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
+    // ERROR: tremolo equation should be: (frequency * amplitude) * tremolo
+    //        NOT: frequency * (amplitude * tremolo)
+    double result =  sinf((M_PI_PI * time) / 2) * (time * gain);//sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
     
     return result;
 };
@@ -176,12 +178,12 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
         self.playerNode = [[AVAudioPlayerNode alloc] init];
         [self.playerNode setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
         [self.playerNode setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
-        [self.playerNode setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
+        [self.playerNode setPosition:AVAudioMake3DPoint(20.0, 0.0, 0.0)];
         
         self.playerNodeAux = [[AVAudioPlayerNode alloc] init];
         [self.playerNodeAux setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
         [self.playerNodeAux setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
-        [self.playerNodeAux setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
+        [self.playerNodeAux setPosition:AVAudioMake3DPoint(-20.0, 0.0, 0.0)];
         
         self.mixerNode = [[AVAudioMixerNode alloc] init];
         
@@ -204,10 +206,12 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
             if (![self.playerNode isPlaying]) [self.playerNode play];
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
             
-            struct Randomizer * duration_randomizer[2]  = {new_randomizer(random_generator_drand48, 1.00, 1.75, 1.0, random_distribution_gamma, 1.00, 1.75, 1.0),
+            dispatch_queue_t render_buffer_concurrent_queue = dispatch_queue_create_with_target("render_buffer_concurrent_queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
+            
+            struct Randomizer * duration_randomizer[2]  = {new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0),
                 new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0)};
             struct Randomizer * frequency_randomizer[2] = {new_randomizer(random_generator_drand48, 400.0, 800.0, 1.0, random_distribution_gamma, 400.0, 800.0, 3.0),
-                new_randomizer(random_generator_drand48, 400.0, 2000.0, 1.0, random_distribution_gamma, 400.0, 2000.0, 1.0/3.0)};
+                new_randomizer(random_generator_drand48, 1200.0, 2000.0, 1.0, random_distribution_gamma, 1200.0, 2000.0, 3.0)};
             
             static void(^render_buffer[2])(AVAudioPlayerNode * __strong,  struct Randomizer *, struct Randomizer *, struct ToneDuration *);
             for (int i = 0; i < 2; i++)
@@ -234,40 +238,45 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
                         {
                             double duration = ^double
                             (double tally) {
+                                
                                 if (tally == 2.0)
                                 {
                                     double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
                                     tone_duration->duration = 2.0 - duration_diff;
+//                                    NSLog(@"\n1. duration_diff == %f", duration_diff);
+//                                    NSLog(@"\n2. tone_duration->duration == %f", tone_duration->duration);
 //                                    printf("Index: %d\tduration_tally->duration: %f\tduration_diff: %f\n", player_node_index,
 //                                          duration_tally->duration, duration_diff);
                                     return duration_diff;
                                     
                                 } else {
                                     double duration_remainder = tone_duration->duration;
-//                                    printf("Index: %d\tduration_tally->duration: %f\tduration_remainder: %f\n", player_node_index,
-//                                          duration_tally->duration, duration_remainder);
+//                                    NSLog(@"\n3. duration_remainder == %f", duration_remainder);
                                     tone_duration->duration = 2.0;
+//                                    NSLog(@"\n4. tone_duration->duration≥÷÷≥÷ == %f", tone_duration->duration);
                                     
                                     return duration_remainder;
                                 }
                                 
                             } (tone_duration->duration);
-                        
-                            NSLog(@"Node %@\t\tDuration: %f", [player_node description], duration);
+                            printf("\n%s%s\n%sduration: %f\n\n", (tone_duration->duration == 2.0) ? "\t\t" : "", (tone_duration->duration == 2.0) ? "\t\t" : "", [[player_node description] UTF8String], duration);
+                            
+//                            NSLog(@"Node %@\t\tDuration: %f", [player_node description], duration);
                             AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
-                            [player_node prepareWithFrameCount:frameCount];
+                            [player_node prepareWithFrameCount:([audio_format sampleRate] * 2.0)];
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
                             pcmBuffer.frameLength        = frameCount;
                             
                             AVAudioChannelCount channel_count = audio_format.channelCount;
                              double root_freq = frequency_randomizer->generate_distributed_random(frequency_randomizer);
-                            NSLog(@"root_freq: %f", root_freq);
+//                            NSLog(@"\n%@\nroot_freq: %f\n\n", [player_node description], root_freq);
                             double harmonic_freq = root_freq * (5.0/4.0);
                             double device_volume = audio_session.outputVolume;
                             double gain_new_max = 1.0 / (channel_count * player_node_count); // 0.5
                             double gain_new_min = 1.0 / gain_new_max; // 2
                             double gain_adjustment = device_volume * (gain_new_max - gain_new_min) + gain_new_min;
-                            NSLog(@"gain_adjustment: %f", gain_adjustment);
+                            
+//                            NSLog(@"gain_adjustment: %f", gain_adjustment);
                             
                             buffer_sample(frameCount,
                                           root_freq,
@@ -292,7 +301,7 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
                                 if (samples) samples[index] = sample;
                             }
                         }), ^{
-                            NSLog(@"%@", [player_node description]);
+//                            NSLog(@"%@", [player_node description]);
                             render_buffer[i](player_node, duration_randomizer, frequency_randomizer, tone_duration); });
                     } ((AVAudioPlayerNodeCount)2 /*playerNodeIndex++*/, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
                        {
@@ -309,11 +318,16 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo)
                     });
                 };
                 
-                render_buffer[i]((i == 0) ? self.playerNode : self.playerNodeAux,
-                                 duration_randomizer[i],
-                                 frequency_randomizer[i],
-                                 duration_tally[i]);
-                }
+                dispatch_async(render_buffer_concurrent_queue, ^{
+                    struct Randomizer * duration_randomizer = new_randomizer(random_generator_drand48, 0.25 * (i+1), 1.75, 1.0, random_distribution_gamma, 0.25 * (i+1), 1.75, 1.0);
+                    struct Randomizer * frequency_randomizer = new_randomizer(random_generator_drand48, 400.0 * (i+1), 800.0 * (i+1), 1.0, random_distribution_gamma, 400.0 * (i+1), 800.0 * (i+1), 3.0);
+                    
+                    render_buffer[i]((i == 0) ? self.playerNode : self.playerNodeAux,
+                                     duration_randomizer,
+                                     frequency_randomizer,
+                                     ^struct ToneDuration * (struct ToneDuration * tally){ return tally; }(duration_tally[i]));
+                });
+            }
             
             
             return TRUE;
