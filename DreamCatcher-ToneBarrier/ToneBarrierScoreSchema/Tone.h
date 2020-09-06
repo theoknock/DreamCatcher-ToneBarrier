@@ -9,6 +9,7 @@
 #define Tone_h
 
 #include <stdio.h>
+#include <stddef.h>
 
 #include "Randomizer.h"
 
@@ -17,30 +18,37 @@ extern const void * Tone;
 static double consonant_harmonic_interval_ratios[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
 static double dissonant_harmonic_interval_ratios[5] = {1.0, 2.0, 3.0, 4.0, 5.0}; // TO-DO: Find the ratios for the notes in the comments for each dissonant harmonic interval
 
-//#include <Random.h>
-//
-//typedef double (^FrequencySamplerModifier)(double, double frequency_sample);
-//FrequencySamplerModifier modify_frequency_sample = ^(double time, double frequency_sample)
-//{
-//    return 0.0;
-//};
-//
-//typedef double (^FrequencySampler)(double, double, FrequencySamplerModifier);
-//FrequencySampler sample_frequency = ^(double time, double frequency, FrequencySamplerModifier modify_frequency_sample)
-//{
-//    double result = modify_frequency_sample(time, sinf(M_PI * time * frequency));
-//    
-//    return result;
-//};
-//
-//typedef double (^AmplitudeSampler)(double, double);
-//AmplitudeSampler sample_amplitude = ^(double time, double gain)
-//{
-//    double result = pow(sin(time * M_PI), gain);
-//    
-//    return result;
-//};
-//
+typedef struct FrequencySamplers
+{
+    FrequencySampler frequency_sampler;
+    struct FrequencySamplerModifiers
+    {
+        int frequency_sampler_modifier_count;
+        FrequencySamplerModifier * frequency_sampler_modifiers_arr[];
+    } * frequency_sampler_modifiers;
+} frequency_sampler_modifier;
+
+typedef double (^FrequencySamplerModifier)(double, double frequency_sample, ...);
+FrequencySamplerModifier modify_frequency_sample = ^(double time, double frequency_sample, ...)
+{
+    return 0.0;
+};
+
+typedef double (^FrequencySampler)(double, double, ...);
+FrequencySampler sample_frequency = ^(double time, double frequency, ...)
+{
+    double result = modify_frequency_sample(time, sinf(M_PI * time * frequency));
+    
+    return result;
+};
+
+typedef double (^AmplitudeSampler)(double, double, ...);
+AmplitudeSampler sample_amplitude = ^(double time, double gain, ...)
+{
+    double result = pow(sin(time * M_PI), gain);
+    
+    return result;
+};
 
 typedef enum HarmonicAlignment) {
     HarmonicAlignmentConsonant,
@@ -69,6 +77,8 @@ typedef enum typeof(HarmonicInterval) {
     HarmonicIntervalDissonantRandomize
 } HarmonicIntervalDissonantInterval;
 
+// TO-DO: Make this a typeof(FrequencySamplerModifier)
+//        Change the FrequencySamplerModifier parameters to a variadic argument
 double (^harmonize)(double, HarmonicAlignment, typeof(HarmonicInterval)))
 {
     return ^double(double frequency, HarmonicAlignment harmonic_alignment, typeof(HarmonicInterval) harmonic_interval)
@@ -90,7 +100,7 @@ struct Tone
     struct Samplers
     {
         __unsafe_unretained FrequencySampler sample_frequency;
-        __unsafe_unretained FrequencySamplerModifier modify_frequency_sampler;
+        __unsafe_unretained FrequencySamplerModifier * modify_frequency_sampler;
         __unsafe_unretained AmplitudeSampler sample_amplitude;
     } * samplers;
     
