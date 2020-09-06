@@ -14,6 +14,9 @@
 
 extern const void * Tone;
 
+static double consonant_harmonic_interval_ratios[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
+static double dissonant_harmonic_interval_ratios[5] = {1.0, 2.0, 3.0, 4.0, 5.0}; // TO-DO: Find the ratios for the notes in the comments for each dissonant harmonic interval
+
 //#include <Random.h>
 //
 //typedef double (^FrequencySamplerModifier)(double, double frequency_sample);
@@ -40,68 +43,47 @@ extern const void * Tone;
 //
 
 typedef enum HarmonicAlignment) {
-    HarmonicAlignmentConsonance,
-    HarmonicAlignmentDissonance,
-    HarmonicAlignmentRandom
-} harmonic_alignment;
+    HarmonicAlignmentConsonant,
+    HarmonicAlignmentDissonant,
+    HarmonicAlignmentRandomize
+} HarmonicAlignment;
 
-typedef enum HarmonicAlignmentConsonantInterval {
-    HarmonicAlignmentConsonanceIntervalUnison,
-    HarmonicAlignmentConsonanceIntervalOctave,
-    HarmonicAlignmentConsonanceIntervalMajorSixth,
-    HarmonicAlignmentConsonanceIntervalPerfectFifth,
-    HarmonicAlignmentConsonanceIntervalPerfectFourth,
-    HarmonicAlignmentConsonanceIntervalMajorThird,
-    HarmonicAlignmentConsonanceIntervalMinorThird,
-    HarmonicAlignmentConsonanceIntervalRandom
-} harmonic_alignment_consonant_interval;
+typedef enum HarmonicInterval;
 
-typedef enum HarmonicAlignmentDissonantInterval {
+typedef enum typeof(HarmonicInterval) {
+    HarmonicIntervalConsonantUnison,
+    HarmonicIntervalConsonantOctave,
+    HarmonicIntervalConsonantMajorSixth,
+    HarmonicIntervalConsonantPerfectFifth,
+    HarmonicIntervalConsonantPerfectFourth,
+    HarmonicIntervalConsonantMajorThird,
+    HarmonicIntervalConsonantMinorThird,
+    HarmonicIntervalConsonantRandomize
+} HarmonicIntervalConsonant;
+
+typedef enum typeof(HarmonicInterval) {
     HarmonicIntervalDissonantMinorSecond,                       // C/C sharp
     HarmonicIntervalDissonantMajorSecond,                       // C/D
     HarmonicIntervalDissonantMinorSevenths,                     // C/B flat
-    HarmonicIntervalDissonantMajor sevenths                     // C/B
-} harmonic_alignment_dissonant_interval;
+    HarmonicIntervalDissonantMajorSevenths,                     // C/B
+    HarmonicIntervalDissonantRandomize
+} HarmonicIntervalDissonantInterval;
 
-double (^harmonic_alignment_consonant_interval)(double, HarmonicAlignmentConsonantInterval))Interval
+double (^harmonize)(double, HarmonicAlignment, typeof(HarmonicInterval)))
 {
-    return ^double(double frequency, HarmonicAlignmentConsonantInterval harmonic_alignment_consonant_interval)
+    return ^double(double frequency, HarmonicAlignment harmonic_alignment, typeof(HarmonicInterval) harmonic_interval)
     {
-        double new_frequency = frequency * ^double(HarmonicAlignmentConsonantInterval harmonic_alignment_consonant_interval_) {
-            double consonant_harmonic_interval_ratios[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
+        double harmonized_frequency = frequency * ^double(HarmonicAlignment harmonic_alignment_, typeof(HarmonicInterval) harmonic_interval_) {
+            double * harmonic_alignment_intervals[2] = {consonant_harmonic_interval_ratios, dissonant_harmonic_interval_ratios};
             
-            return (harmonic_alignment_consonant_interval_ == 8)
-            ? consonant_harmonic_interval_ratios[arc4random_uniform(7)]
-            : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_];
-        } (harmonic_alignment_consonant_interval);
+            return (harmonic_alignment_   == HarmonicAlignmentConsonant)
+            ? ((harmonic_interval_ == HarmonicIntervalConsonantRandomize) ? consonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(7)] : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]))
+            : ((harmonic_interval_ == HarmonicIntervalDissonantRandomize) ? dissonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(4)] : dissonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]);
+        } (harmonic_alignment, harmonic_interval);
 
-        return new_frequency;
+        return harmonized_frequency;
     };
 };
-
-double Harmonicity(double frequency, HarmonicInterval interval, HarmonicHarmony harmony)
-{
-    double new_frequency = frequency;
-    switch (harmony) {
-        case HarmonicHarmonyDissonance:
-            new_frequency *= (1.1 + drand48());
-            break;
-            
-        case HarmonicHarmonyConsonance:
-            new_frequency = ToneBarrierGenerator.Interval(frequency, interval);
-            break;
-            
-        case HarmonicHarmonyRandom:
-            new_frequency = Harmonicity(frequency, interval, (HarmonicHarmony)arc4random_uniform(2));
-            break;
-            
-        default:
-            break;
-    }
-    
-    return new_frequency;
-}
-
 
 struct Tone
 {
@@ -114,7 +96,7 @@ struct Tone
     
     struct Random * randomizer;
     
-    enum HarmonicAlignment harmonic_alignment;
+    enum HarmonicInterval harmonic_Interval;
     enum ConsonantHarmonicInterval harmonic_interval;
     
 };
