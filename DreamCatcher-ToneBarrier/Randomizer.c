@@ -58,8 +58,8 @@ double (^generate_random_drand48)(double, double, double) = ^double(double range
 };
 
 double (^generate_random_drand48_normalized_bounds)(double, double, double) = ^double(double range_min,
-                                                                               double range_max,
-                                                                               double gamma_distribution)
+                                                                                      double range_max,
+                                                                                      double gamma_distribution)
 {
     double random = drand48();
     double result = pow(linearize(0.0, 1.0, random), gamma_distribution);
@@ -68,8 +68,8 @@ double (^generate_random_drand48_normalized_bounds)(double, double, double) = ^d
 };
 
 double (^generate_random_arc4random)(double, double, double) = ^double(double range_min,
-                                                                double range_max,
-                                                                double gamma_distribution)
+                                                                       double range_max,
+                                                                       double gamma_distribution)
 {
     double random = ((double)arc4random() / 0x100000000);
     double result = pow(linearize(range_min, range_max, random), gamma_distribution);
@@ -118,7 +118,7 @@ struct RandomSource * new_random_source (enum RandomGenerator random_generator,
 
 double (^random_distributor_gamma)(double, double, double, double) = ^(double random, double range_min, double range_max, double gamma_distribution)
 {
-//    double random = random_source->generate_random(range_min, range_max);
+    //    double random = random_source->generate_random(range_min, range_max);
     double scaled = scale(1.0, 0.0, random, range_min, range_max);
     double result = pow(scaled, gamma_distribution);
     result = linearize(range_min, range_max, result);
@@ -130,15 +130,15 @@ double (^random_distributor_gamma)(double, double, double, double) = ^(double ra
 
 double (^random_distributor_scurve)(double, double, double, double) = ^(double random, double range_min, double range_max, double gamma_distribution)
 {
-//    double random = random_source->generate_random(range_min, range_max);
-    
+    //    double random = random_source->generate_random(range_min, range_max);
+    // The inverse is not necessarily 1/gamma; but, is gamma * 1/frequency
     double scaled_x1 = pow(random, gamma_distribution);
     double scaled_x2 = linearize(1.0, 0.0, scaled_x1);
     double result = (scaled_x1 + scaled_x2) / 2.0;
-//    double scaled_func_x = pow(scaled, gamma);
-//    double result = (1.0 - scaled_func_x)) / 2.0;
+    //    double scaled_func_x = pow(scaled, gamma);
+    //    double result = (1.0 - scaled_func_x)) / 2.0;
     result = scale(range_min, range_max, result, 1.0, 0.0);
-
+    
     
     return result;
 };
@@ -181,13 +181,26 @@ struct RandomDistributor * new_random_distributor (enum RandomDistribution rando
 
 
 double (^ _Nonnull generate_distributed_random)(struct Randomizer *) = ^(struct Randomizer * randomizer) {
-    double result = randomizer->random_distributor->distribute_random(randomizer->random_source->generate_random(randomizer->random_source->random_generator_parameters->range_min,
-                                                                                                                 randomizer->random_source->random_generator_parameters->range_max,
-                                                                                                                 randomizer->random_source->random_generator_parameters->gamma_distribution),
-                                                                      randomizer->random_distributor->random_distributor_parameters->range_min, randomizer->random_distributor->random_distributor_parameters->range_max, randomizer->random_distributor->random_distributor_parameters->gamma_distribution);
-
-    return result;
+    double generated_random = randomizer->random_source->generate_random(randomizer->random_source->random_generator_parameters->range_min,
+                                                                         randomizer->random_source->random_generator_parameters->range_max,
+                                                                         randomizer->random_source->random_generator_parameters->gamma_distribution);
+    randomizer->random_source->last_generator_value = generated_random;
+    
+    
+    double distributed_random = randomizer->random_distributor->distribute_random(generated_random,
+                                                                                  randomizer->random_distributor->random_distributor_parameters->range_min,
+                                                                                  randomizer->random_distributor->random_distributor_parameters->range_max,
+                                                                                  randomizer->random_distributor->random_distributor_parameters->gamma_distribution);
+    randomizer->random_distributor->last_distributor_value = distributed_random;
+    
+    return distributed_random;
 };
+
+
+
+
+
+
 
 
 
@@ -205,6 +218,7 @@ struct Randomizer * _Nonnull new_randomizer (enum RandomGenerator random_generat
                                               random_generator_range_min,
                                               random_generator_range_max,
                                               random_generator_gamma_distribution);
+    
     random->random_distributor = new_random_distributor(random_distribution,
                                                         random_distribution_range_min,
                                                         random_distribution_range_max,

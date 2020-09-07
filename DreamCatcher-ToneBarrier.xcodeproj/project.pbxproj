@@ -7,9 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		8AFCCA3B250517D8001427D2 /* new.c in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCCA30250517D8001427D2 /* new.c */; };
-		8AFCCA422505188D001427D2 /* Tone.c in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCCA412505188D001427D2 /* Tone.c */; };
-		8AFCCA43250519A3001427D2 /* Class.h in Sources */ = {isa = PBXBuildFile; fileRef = 8AFCCA35250517D8001427D2 /* Class.h */; };
 		B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D1F24F669DD00FA19FA /* AppDelegate.m */; };
 		B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2224F669DD00FA19FA /* SceneDelegate.m */; };
 		B9259D2624F669DD00FA19FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2524F669DD00FA19FA /* ViewController.m */; };
@@ -29,7 +26,6 @@
 		B9259D5724F669E300FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D5624F669E300FA19FA /* Assets.xcassets */; };
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
 		B9FAD48E2503FA3900FF4772 /* Randomizer.c in Sources */ = {isa = PBXBuildFile; fileRef = B9FAD48D2503FA3900FF4772 /* Randomizer.c */; };
-		B9FAD4912503FAF600FF4772 /* Score.c in Sources */ = {isa = PBXBuildFile; fileRef = B9FAD4902503FAF600FF4772 /* Score.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -89,8 +85,6 @@
 		8AFCCA32250517D8001427D2 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		8AFCCA35250517D8001427D2 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
 		8AFCCA36250517D8001427D2 /* new.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = new.h; sourceTree = "<group>"; };
-		8AFCCA402505188D001427D2 /* Tone.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Tone.h; sourceTree = "<group>"; };
-		8AFCCA412505188D001427D2 /* Tone.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Tone.c; sourceTree = "<group>"; };
 		B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D1E24F669DD00FA19FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B9259D1F24F669DD00FA19FA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -156,8 +150,6 @@
 			isa = PBXGroup;
 			children = (
 				8AFCCA2E250517D8001427D2 /* OOC Source */,
-				8AFCCA402505188D001427D2 /* Tone.h */,
-				8AFCCA412505188D001427D2 /* Tone.c */,
 				8AFCCA30250517D8001427D2 /* new.c */,
 				8AFCCA35250517D8001427D2 /* Class.h */,
 				8AFCCA32250517D8001427D2 /* Object.h */,
@@ -208,6 +200,8 @@
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
 				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
 				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
+				B9FAD47A2503E3CB00FF4772 /* Tone.h */,
+				B9FAD47B2503E3CB00FF4772 /* Tone.c */,
 				B9FAD48C2503FA3900FF4772 /* Randomizer.h */,
 				B9FAD48D2503FA3900FF4772 /* Randomizer.c */,
 				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
@@ -264,8 +258,6 @@
 				B9FAD4902503FAF600FF4772 /* Score.c */,
 				B9FAD4752503D47800FF4772 /* PlayerNode.h */,
 				B9FAD4762503D47800FF4772 /* PlayerNode.c */,
-				B9FAD47A2503E3CB00FF4772 /* Tone.h */,
-				B9FAD47B2503E3CB00FF4772 /* Tone.c */,
 			);
 			path = ToneBarrierScoreSchema;
 			sourceTree = "<group>";
@@ -402,14 +394,10 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				8AFCCA43250519A3001427D2 /* Class.h in Sources */,
-				8AFCCA3B250517D8001427D2 /* new.c in Sources */,
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
-				B9FAD4912503FAF600FF4772 /* Score.c in Sources */,
-				8AFCCA422505188D001427D2 /* Tone.c in Sources */,
 				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
 				B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */,
 				B9FAD48E2503FA3900FF4772 /* Randomizer.c in Sources */,

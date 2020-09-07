@@ -131,34 +131,91 @@ typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
     StereoChannelOutputRight,
     StereoChannelOutputMono
 };
-typedef double (^FrequencySample)(double, double, double);
-FrequencySample sample_frequency = ^(double time, double frequency, double trill)
+//typedef double (^FrequencySample)(double, double, ...);
+// TO-DO: Cut normalized time into three segments, each corresponding to attack, sustain and release;
+//        Distribute time in proportion to the relative duration of each segment;
+//        Use the lowest and highest values in each segment to normalize the values from the amplitude envelope function
+//        Calculate the weighted sum of the three sinusoids to create a amplitude sinusoid that conforms to [what you wanted for the attack, sustain and release]
+
+// TO-DO: To rescale a sine curve period into a 0 to 1 frame,
+//  use 0 to 1/frequency as the new minimum and new maximum, respectively
+typedef double (^FrequencySample)(double time, double frequency);//, int argument_count, ...);// , double trill_min, double trill_max, double trill_gamma);
+FrequencySample sample_frequency_vibrato = ^(double time, double frequency)//, int argument_count, ...)
 {
-    double result = sinf(M_PI * time * frequency);/* * ^double
-                                                   (double time, double trill) {
-                                                   return (sinf(M_PI_PI * time * trill) / 2); //((frequency / (2000.0 - 400.0) * (12.0 - 4.0)) + 4.0);
-                                                   } (time, trill);*/
+    //    va_list ap;
+    //    double gamma, trill_min, trill_max;
+    //    va_start(ap, argument_count);
+    //
+    //    gamma = va_arg (ap, double);
+    //    trill_min = va_arg (ap, double);
+    //    trill_max = va_arg (ap, double);
     
+    //    va_end (ap);
+    
+    double result = sinf(2.0 * M_PI * time * frequency);/*^double(double time_, double trill_max_, double trill_min_, double gamma_)
+                                                         {
+                                                         return ((trill_max_ - trill_min_) * pow(time_, gamma_)) + trill_min_;
+                                                         } (frequency, trill_min, trill_max, gamma));/* * ^double(double time, double trill) {
+                                                         return sinf(M_PI * time * trill);
+                                                         } (time, trill);*/
     return result;
 };
 
-typedef double (^AmplitudeSample)(double, double, double, double, StereoChannelOutput);
-AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo, double gamma, StereoChannelOutput stereo_channel_output)
+//FrequencySampleModifier harmonize_frequency_sample = ^{
+//    return ^double(double frequency_sample, int argument_count, ...) {
+//        va_list ap;
+//        enum HarmonicAlignment harmonic_alignment, typeof(HarmonicInterval) harmonic_interval;
+//        va_start (ap, argument_count);
+//
+//        va_arg (ap, enum HarmonicAlignment);
+//        va_arg (ap, typeof(HarmonicInterval) harmonic_interval);
+//
+//        va_end (ap);
+//
+//        double harmonized_frequency = frequency * ^double(HarmonicAlignment harmonic_alignment_, typeof(HarmonicInterval) harmonic_interval_) {
+//            double * harmonic_alignment_intervals[2] = {consonant_harmonic_interval_ratios, dissonant_harmonic_interval_ratios};
+//
+//            return (harmonic_alignment_   == HarmonicAlignmentConsonant)
+//            ? ((harmonic_interval_ == HarmonicIntervalConsonantRandomize) ? consonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(7)] : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]))
+//            : ((harmonic_interval_ == HarmonicIntervalDissonantRandomize) ? dissonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(4)] : dissonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]);
+//        } (harmonic_alignment, harmonic_interval);
+//
+//        return harmonized_frequency;
+//    };
+//};
+
+// TO-DO: Modify the amplitude to account for any changes in the mean
+//        See https://en.wikipedia.org/wiki/Least_squares
+typedef double (^AmplitudeSample)(double, double);//, int, ...);//double, double, StereoChannelOutput);
+AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int argument_count, ...) // double tremolo, double gamma, StereoChannelOutput stereo_channel_output)
 {
     // ERROR: tremolo equation should be: (frequency * amplitude) * tremolo
     //        NOT: frequency * (amplitude * tremolo)
-    double result =  (sinf((M_PI_PI * time) / 2) * sinf((M_PI * time * tremolo)));//sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
-    result = result * ^double(double gamma_, double time_, StereoChannelOutput stereo_channel_output_)
+    //    va_list ap;
+    //    double tremolo, gamma;
+    //    int stereo_channel_output;
+    //    va_start(ap, argument_count);
+    //
+    //    tremolo = va_arg (ap, double);
+    //    gamma = va_arg (ap, double);
+    //
+    //    va_end (ap);
+    //
+    double result = ^double(double time_, double gain_)
     {
-        double a = pow(time_, gamma_);
-        double b = 1.0 - a;
-        double c = a * b;
-        c = (stereo_channel_output_ == StereoChannelOutputRight)
-        ? 1.0 - c : c;
-        
-        return c;
-    } (gamma, time, stereo_channel_output);
-    result *= gain;
+        return sinf(M_PI * time) * gain;//pow(sinf(time_ * M_PI), (stereo_channel_output_) ? 10.0 : 0.1);
+    } (time, gain); //(sinf(M_PI  * time * tremolo) * sinf(M_PI_PI * time) / 2.0);// * sinf((M_PI * time * tremolo)));//sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
+    //    result = result * ^double(double gamma_, double time_)
+    //    {
+    //        double a = pow(time_, gamma_);
+    //        double b = 1.0 - a;
+    //        double c = a * b;
+    ////        c = (stereo_channel_output_ == StereoChannelOutputRight)
+    ////        ? 1.0 - c : c;
+    //
+    //        return c;
+    //    } (gamma, time);
+    //    result *= gain;
     
     return result;
 };
@@ -222,23 +279,18 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo, d
             if (![self.playerNode isPlaying]) [self.playerNode play];
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
             
-            //            dispatch_queue_t render_buffer_concurrent_queue = dispatch_queue_create_with_target("render_buffer_concurrent_queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
-            dispatch_queue_t player_nodes_concurrent_queue = dispatch_queue_create("player_nodes_concurrent_queue", DISPATCH_QUEUE_CONCURRENT);
-            
+            dispatch_queue_t player_nodes_concurrent_queue = dispatch_queue_create_with_target("render_buffer_concurrent_queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
             dispatch_queue_t player_node_serial_queue = dispatch_queue_create("player_node_serial_queue", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue_aux = dispatch_queue_create("player_node_serial_queue_aux", DISPATCH_QUEUE_SERIAL);
             
             static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer * __strong, struct Randomizer * __strong, struct ToneDuration * __strong);
             for (int i = 0; i < 2; i++)
             {
-                // TO-DO: Store the player node description with and for every object/class that is unique to that player node
                 duration_tally[i] = (struct ToneDuration *)malloc(sizeof(struct ToneDuration *));
                 duration_tally[i]->duration = 2.0;
                 render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * __strong duration_randomizer, struct Randomizer * __strong frequency_randomizer, struct ToneDuration *__strong tone_duration) {
                     
-                    
-                    // TO-DO: Write a block that returns four consomamt frequencies, one at a time, to each channel of
-                    // each player nodep and, that replemishes its supply when all four are exhausted
+                    // Pitch Set - Major Seventh
                     //                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
                     //                double root_frequency = random_frequency->generate_distributed_random(random_frequency) / majorSeventhFrequencyRatios[0];
                     //                double frequencies[4] = {root_frequency * majorSeventhFrequencyRatios[0] * durations[0],
@@ -251,8 +303,7 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo, d
                     {
                         buffer_rendered(^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, double, float *))
                                         {
-                            double duration = ^double
-                            (double tally) {
+                            double duration = ^double (double tally) {
                                 
                                 if (tally == 2.0)
                                 {
@@ -275,70 +326,63 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo, d
                             pcmBuffer.frameLength        = frameCount;
                             
                             AVAudioChannelCount channel_count = audio_format.channelCount;
-                            double root_freq = frequency_randomizer->generate_distributed_random(frequency_randomizer);
+                            double root_freq = frequency_randomizer->generate_distributed_random(frequency_randomizer) * duration;
                             NSLog(@"\n%@\nroot_freq: %f\n\n", [player_node description], root_freq);
                             double harmonic_freq = root_freq * (5.0/4.0); // TO-DO: Run the sine wave calculation for the root frequency first...
-                                                                          //        ...and then multiply each sample by 5.0/4.0 (more_accurate...
-                                                                          //        ...when amplitude or distribution curve alters the pitch slightly)
+                            //        ...and then multiply each sample by 5.0/4.0 (more_accurate...
+                            //        ...when amplitude or distribution curve alters the pitch slightly)
+                            double amplitude_volume_adj = ^double (AVAudioSession * audio_session_) {
+                                return audio_session_.outputVolume;
+                            } (audio_session);
                             double device_volume = audio_session.outputVolume;
                             double gain_new_max = 1.0 / (channel_count * player_node_count); // 0.5
                             double gain_new_min = 1.0 / gain_new_max; // 2
                             double gain_adjustment = device_volume * (gain_new_max - gain_new_min) + gain_new_min;
                             
                             dispatch_async(serial_queue, ^{
-                                dispatch_async(concurrent_queue, ^{
-                                    buffer_sample(frameCount,
-                                                  root_freq,
-                                                  gain_adjustment,
-                                                  StereoChannelOutputLeft,
-                                                  gain_new_min,
-                                                  pcmBuffer.floatChannelData[0]);
-                                });
+                                buffer_sample(frameCount,
+                                              root_freq,
+                                              gain_adjustment,
+                                              StereoChannelOutputLeft,
+                                              1.0/3.0,
+                                              pcmBuffer.floatChannelData[0]);
                                 
-                                dispatch_async(concurrent_queue, ^{
-                                    buffer_sample(frameCount,
-                                                  harmonic_freq,
-                                                  gain_adjustment,
-                                                  StereoChannelOutputRight,
-                                                  gain_new_max,
-                                                  (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
-                                });
+                                buffer_sample(frameCount,
+                                              harmonic_freq,
+                                              gain_adjustment,
+                                              StereoChannelOutputRight,
+                                              1.0/3.0,
+                                              (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
                             });
                             
                             return pcmBuffer;
-                        } (^(AVAudioFrameCount sample_count, double frequency, double gain_adjustment, StereoChannelOutput stereo_channel_output, double gamma_adjustment, float * samples)
-                           {
-                            int trill_direction = rand() % 2;
+                        } (^(AVAudioFrameCount sample_count, double frequency, double gain_adjustment, StereoChannelOutput stereo_channel_output, double gamma, float * samples) {
                             for (int index = 0; index < sample_count; index++)
-                            {
-                                double normalized_time = normalize(0.0, sample_count, index);
-                                double sine_frequency = sample_frequency(normalized_time, frequency, (trill_direction == 1)
-                                                                         ? normalize(400.0, 1200.0, frequency) * 12.0
-                                                                         : 12.0 / normalize(400.0, 1200.0, frequency));
-                                double sine_amplitude = sample_amplitude(normalized_time, gain_adjustment, normalized_time * 6.0, gamma_adjustment, stereo_channel_output);
-                                double sample = sine_frequency * sine_amplitude;
-                                
-                                if (samples) samples[index] = sample;
-                                
-                                if (index == sample_count - 1)
-                                {
-                                    NSString *channel_descriptor = [NSString stringWithString:(stereo_channel_output == StereoChannelOutputRight) ? @"Channel (R)" : @"Channel (L)"];
-                                }
-                            }
-                        }), ^{
-                            dispatch_async(serial_queue, ^{
-                                render_buffer[i](concurrent_queue, serial_queue, player_node, duration_randomizer, frequency_randomizer, tone_duration);}); });
+                                if (samples) samples[index] =
+                                    ^ double (double xt, double frequency) {
+                                        return sinf(2.0 * M_PI * frequency * xt) * (^ double(void) {
+                                            return sinf(M_PI * xt) / (2.0 * (^ double(AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                                double gain_new_min    = 1.0 / (channel_count * player_node_count);
+                                                double gain_new_max    = 1.0 / gain_new_min;
+                                                return ((^double(float output_volume) {
+                                                    return sinf(M_PI * xt) / (2.0 * output_volume);
+                                                  } (audio_session.outputVolume)) * (gain_new_max - gain_new_min)) + gain_new_min;
+                                            } (audio_format.channelCount, player_node_count)));
+                                        } ());
+                                    } (^double(double range_min, double range_max, double range_value) {
+                                        return (range_value - range_min) / (range_max - range_min);
+                                    } (0.0, sample_count, index), frequency);
+                            }), ^{
+                            dispatch_async(concurrent_queue, ^{
+                                render_buffer[i](concurrent_queue, serial_queue, player_node, duration_randomizer, frequency_randomizer, tone_duration);
+                            });
+                        });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
                        {
                         if ([player_node isPlaying])
-                            [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType)
-                             {
+                            [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
                                 if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                                {
-                                    dispatch_sync(concurrent_queue, ^{
-                                        played_tone();
-                                    });
-                                }
+                                    dispatch_sync(serial_queue, ^{ played_tone(); });
                             }];
                     });
                 };
@@ -346,8 +390,8 @@ AmplitudeSample sample_amplitude = ^(double time, double gain, double tremolo, d
                 dispatch_async(player_nodes_concurrent_queue, ^{
                     srand(time(0));
                     struct Randomizer * duration_randomizer = (i == 0)
-                    ? new_randomizer(random_generator_drand48, 0.25, 1.0, 1.0, random_distribution_gamma, 0.25, 1.0, 1.0)
-                    : new_randomizer(random_generator_drand48, 0.75, 1.75, 1.0, random_distribution_gamma, 0.75, 1.75, 2.0);
+                    ? new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0)
+                    : new_randomizer(random_generator_drand48, 0.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0);
                     struct Randomizer * frequency_randomizer = (i ==0)
                     ? new_randomizer(random_generator_drand48, 400.0, 2000.0, 1.0, random_distribution_gamma, 400.0, 1200.0, 3.0)
                     : new_randomizer(random_generator_drand48, 1000.0, 2000.0, 1.0, random_distribution_gamma, 1000.0, 2000.0, 1.0/3.0);
