@@ -8,6 +8,7 @@
 #import <Foundation/Foundation.h>
 #import <AVFoundation/AVFoundation.h>
 #import <UIKit/UIKit.h>
+#import <MediaPlayer/MediaPlayer.h>
 
 NS_ASSUME_NONNULL_BEGIN
 
@@ -43,6 +44,8 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
 @property (nonatomic, strong) AVAudioMixerNode * _Nullable  mixerNode;
 @property (nonatomic, strong) AVAudioFormat * _Nullable     audioFormat;
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
+
+@property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
 
 
 - (BOOL)play;

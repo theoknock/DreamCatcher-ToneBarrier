@@ -37,7 +37,7 @@ struct RandomizerParameters * new_randomizer_parameters(double range_min,
                                                         double range_max,
                                                         double gamma_distribution)
 {
-    struct RandomizerParameters * parameters = calloc(3, sizeof(double));
+    struct RandomizerParameters * parameters = malloc(sizeof(RandomizerParameters));
     parameters->range_min = range_min;
     parameters->range_max = range_max;
     parameters->gamma_distribution = gamma_distribution;

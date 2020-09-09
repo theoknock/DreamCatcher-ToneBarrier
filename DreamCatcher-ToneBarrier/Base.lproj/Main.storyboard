@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina6_1" orientation="landscape" appearance="dark"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17124"/>
         <capability name="Image references" minToolsVersion="12.0"/>
@@ -14,11 +14,11 @@
             <objects>
                 <viewController modalPresentationStyle="fullScreen" interfaceStyle="dark" id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCT-a9-qbI">
-                                <rect key="frame" x="95" y="324" width="224" height="248"/>
+                                <rect key="frame" x="387.5" y="128.5" width="121.5" height="136.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal">
@@ -29,22 +29,22 @@
                                     <action selector="playToneBarrierScore:forEvent:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bbo-3M-VTr"/>
                                 </connections>
                             </button>
-                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
-                                <rect key="frame" x="0.0" y="223.5" width="414" height="449.5"/>
+                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
+                                <rect key="frame" x="44" y="-0.5" width="808" height="395"/>
                                 <color key="tintColor" systemColor="systemBlueColor"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="26"/>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="5eL-6S-IU0"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="Bld-W4-kjP"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" multiplier="0.5" id="Of4-5p-lp3"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="QQZ-Pd-bhb"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="height" secondItem="MdB-Vf-a99" secondAttribute="width" multiplier="0.6" id="YnN-nT-HbO"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerX" id="fiP-br-Jhm"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="width" secondItem="MdB-Vf-a99" secondAttribute="height" multiplier="0.5" id="hYj-Lp-hoJ"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="nOA-KG-qWL"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="MdB-Vf-a99" secondAttribute="bottom" id="0jV-10-YNN"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="MdB-Vf-a99" secondAttribute="trailing" id="5zF-oH-1Xf"/>
+                            <constraint firstItem="MdB-Vf-a99" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="aMd-DB-g0z"/>
+                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="ct6-iP-OPf"/>
+                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="dA2-om-Hcq"/>
+                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="erl-Ov-c0y"/>
+                            <constraint firstItem="MdB-Vf-a99" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="sxI-GU-h2N"/>
                         </constraints>
                     </view>
                     <connections>

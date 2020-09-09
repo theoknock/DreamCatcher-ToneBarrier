@@ -72,6 +72,29 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     if (self == [super init])
     {
         [self setupEngine];
+        self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
+
+        // Add a handler for the play command.
+        [self.commandCenter.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+            if ([self play])
+                return MPRemoteCommandHandlerStatusSuccess;
+            else
+                return MPRemoteCommandHandlerStatusCommandFailed;
+        }];
+        
+        [self.commandCenter.stopCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+            if ([self play])
+                return MPRemoteCommandHandlerStatusSuccess;
+            else
+                return MPRemoteCommandHandlerStatusCommandFailed;
+        }];
+        
+        [self.commandCenter.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+            if ([self play])
+                return MPRemoteCommandHandlerStatusSuccess;
+            else
+                return MPRemoteCommandHandlerStatusCommandFailed;
+        }];
     }
     
     return self;
@@ -301,13 +324,14 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                     //                                         root_frequency * majorSeventhFrequencyRatios[3] * durations[3]};
                     
                     // This is the buffer_renderer
-                    ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
+//                    dispatch_async(concurrent_queue, ^{
+                        ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
-                        dispatch_async(concurrent_queue, ^{
+//                        dispatch_sync(serial_queue, ^{
                             buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, double, float *)) {
                                 double fundamental_frequency = distributed * duration;
                                 double harmonic_frequency = fundamental_frequency * (4.0/5.0);
-                                NSLog(@"\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency * (4/5), harmonic_frequency * (4/5));
+                                NSLog(@"\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
                                 
                                 AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                                 [player_node prepareWithFrameCount:frameCount];
@@ -352,13 +376,14 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     return duration_remainder;
                                 }
                             } (&tone_duration->duration), (^(AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, double gamma, float * samples) {
+                                NSLog(@"FREQ:\t%f", fundamental_frequency);
                                 for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
                                     ^ float (float xt, float frequency) {
                                         return sinf(2.0 * M_PI * frequency * xt) * (^ float (void) {
-                                            return sinf(M_PI * xt) / (2.0 * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                                return ((^ float (float output_volume) { return sinf(M_PI * xt) / (2.0 * output_volume); } (audio_session.outputVolume)));
-                                            } (audio_format.channelCount, player_node_count)));
+                                            return sinf(M_PI * xt) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                                return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
+                                            } (audio_format.channelCount, player_node_count));
                                         } ());
                                     } (^ float (float range_min, float range_max, float range_value) {
                                         return (range_value - range_min) / (range_max - range_min);
@@ -368,7 +393,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     render_buffer[i](concurrent_queue, serial_queue, player_node, duration_randomizer, frequency_randomizer, tone_duration);
                                 });
                             });
-                        });
+//                        });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
                        ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
                         if ([player_node isPlaying])
@@ -378,7 +403,8 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     dispatch_sync(serial_queue, ^{ played_tone(); });
                             }];
                     });
-                };
+//                });
+            };
                 
                 dispatch_async(player_nodes_concurrent_queue, ^{
                     srand((unsigned int)time(0));
