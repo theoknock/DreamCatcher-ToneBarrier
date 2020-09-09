@@ -329,7 +329,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                     {
 //                        dispatch_sync(serial_queue, ^{
                             buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, double, float *)) {
-                                double fundamental_frequency = distributed * duration;
+                                double fundamental_frequency = distributed;//,er, * duration;
                                 double harmonic_frequency = fundamental_frequency * (4.0/5.0);
                                 NSLog(@"\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
                                 
@@ -348,19 +348,27 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                               pcmBuffer.floatChannelData[0]);
                                 
                                 buffer_sample(frameCount,
-                                              fundamental_frequency,
                                               harmonic_frequency,
+                                              fundamental_frequency,
                                               StereoChannelOutputRight,
                                               1.0/3.0,
                                               (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
                                 return pcmBuffer;
                             } (^ double (double random) {
-                                double distributed = random;
-                                NSLog(@"DIST:\t%f\t\tRND:\t%f", distributed, random);
-                                return distributed;
+                                
+//                                NSLog(@"DIST:\t%f\t\tRND:\t%f", distributed, random);
+//                                double scaled = 400.0 + ((((random - 400.0) * (1.0 - 0.0))) / (2000.0 - 400.0));
+                                double result = pow(random., 1.0/3.0);
+                                result = (result * (2000.0 - 400.0)) + 400.0;
+                                return result;
                             } (^ double (uint32_t n, uint32_t m) {
-                                double random = ((drand48() * (m - n)) + n);
-                                NSLog(@"RND:\t%f", random);
+                                double random = drand48();
+                                
+                                
+                                double result = (random * (m - n)) + n;
+                                
+//                                double random = ((drand48() * (m - n)) + n);
+//                                NSLog(@"RND:\t%f", random);
                                 return random;
                             } (400, 2000)), ^ double (double * tally) {
                                 if (*tally == 2.0)
