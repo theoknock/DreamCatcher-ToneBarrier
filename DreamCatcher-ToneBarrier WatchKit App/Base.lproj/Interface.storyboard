@@ -1,17 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="14256" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="AgC-eL-Hgc">
+<document type="com.apple.InterfaceBuilder.WatchKit.Storyboard" version="3.0" toolsVersion="17154" targetRuntime="watchKit" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES" initialViewController="vrk-CY-AVf">
+    <device id="watch38"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14243"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="14219"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17124"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBWatchKitPlugin" version="17034"/>
     </dependencies>
     <scenes>
-        <!--Interface Controller-->
-        <scene sceneID="aou-V4-d1y">
-            <objects>
-                <controller id="AgC-eL-Hgc" customClass="InterfaceController" customModuleProvider=""/>
-            </objects>
-            <point key="canvasLocation" x="220" y="345"/>
-        </scene>
         <!--Static Notification Interface Controller-->
         <scene sceneID="AEw-b0-oYE">
             <objects>
@@ -32,16 +26,47 @@
         <!--Notification Controller-->
         <scene sceneID="ZPc-GJ-vnh">
             <objects>
-                <controller id="4sK-HA-Art" customClass="NotificationController" customModuleProvider=""/>
+                <controller id="4sK-HA-Art" customClass="NotificationController"/>
             </objects>
             <point key="canvasLocation" x="468" y="643"/>
+        </scene>
+        <!--waveform.path-->
+        <scene sceneID="vtv-d5-Lqn">
+            <objects>
+                <controller backgroundImage="waveform.path" catalog="system" contentMode="scaleAspectFill" fullBounds="YES" fullScreen="YES" id="vrk-CY-AVf" customClass="InterfaceController">
+                    <items>
+                        <group width="1" height="1" alignment="center" verticalAlignment="center" layout="overlap" id="04R-Ao-h9x">
+                            <items>
+                                <group width="1" height="1" alignment="center" verticalAlignment="center" alpha="0.75" contentMode="scaleAspectFill" layout="overlap" id="JpH-Gy-vTS">
+                                    <color key="backgroundColor" white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </group>
+                                <group width="1" height="1" alignment="center" verticalAlignment="center" layout="overlap" id="zBK-tg-SjR">
+                                    <items>
+                                        <button width="0.5" height="0.5" alignment="center" verticalAlignment="center" backgroundImage="play" catalog="system" id="ejk-yd-opg">
+                                            <color key="backgroundColor" red="0.0" green="0.47843137250000001" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                        </button>
+                                    </items>
+                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                </group>
+                            </items>
+                        </group>
+                    </items>
+                    <color key="backgroundColor" white="0.0" alpha="0.79105908203124997" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                    <edgeInsets key="margins" left="0.0" right="0.0" top="0.0" bottom="0.0"/>
+                </controller>
+            </objects>
+            <point key="canvasLocation" x="187" y="354"/>
         </scene>
         <!--Notification Controller-->
         <scene sceneID="Niz-AI-uX2">
             <objects>
-                <controller id="eXb-UN-Cd0" customClass="NotificationController" customModuleProvider=""/>
+                <controller id="eXb-UN-Cd0" customClass="NotificationController"/>
             </objects>
             <point key="canvasLocation" x="468" y="345"/>
         </scene>
     </scenes>
+    <resources>
+        <image name="play" catalog="system" width="119" height="128"/>
+        <image name="waveform.path" catalog="system" width="128" height="116"/>
+    </resources>
 </document>
