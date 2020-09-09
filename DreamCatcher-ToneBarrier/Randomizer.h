@@ -55,6 +55,8 @@ struct Randomizer
         struct RandomizerParameters * _Nonnull random_distributor_parameters;
         
         double (^ _Nonnull distribute_random)(double, double, double, double);
+        
+        
         double last_distributor_value;
     } * _Nonnull random_distributor;
     
