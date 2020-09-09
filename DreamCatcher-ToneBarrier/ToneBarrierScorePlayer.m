@@ -328,7 +328,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
 //                        dispatch_sync(serial_queue, ^{
-                            buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, double, float *)) {
+                            buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
                                 double fundamental_frequency = distributed;//,er, * duration;
                                 double harmonic_frequency = fundamental_frequency * (4.0/5.0);
                                 if (harmonic_frequency < 500.0)
@@ -350,7 +350,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                               fundamental_frequency,
                                               harmonic_frequency,
                                               StereoChannelOutputLeft,
-                                              1.0/3.0,
                                               pcmBuffer.floatChannelData[0]);
                                 
                                 buffer_sample(duration,
@@ -358,7 +357,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                               harmonic_frequency,
                                               fundamental_frequency,
                                               StereoChannelOutputRight,
-                                              1.0/3.0,
                                               (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
                                 return pcmBuffer;
                             } (^ double (double random, uint32_t n, uint32_t m, double gamma) {
@@ -368,7 +366,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             } (^ double () {
                                 double random = drand48();
                                 return random;
-                            } (), 500, 2000, 3.0), ^ double (double * tally) {
+                            } (), 500, 2000, 2.0), ^ double (double * tally) {
                                 if (*tally == 2.0)
                                 {
                                     double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
@@ -381,13 +379,17 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     
                                     return duration_remainder;
                                 }
-                            } (&tone_duration->duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, double gamma, float * samples) {
+                            } (&tone_duration->duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
 //                                NSLog(@"FREQ:\t%f", fundamental_frequency);
                                 for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
                                     ^ float (float xt, float frequency) {
-                                        return sinf(M_PI * frequency * xt) * (^ float (void) {
-                                            return sinf(M_PI * xt * ((((xt - 0.0) * (8.0 - 2.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                        return (frequency < 600.0) ? sinf(M_PI * frequency * xt) * (^ float (void) {
+                                            return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                                return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
+                                            } (audio_format.channelCount, player_node_count));
+                                        } ()) : cosf(M_PI * frequency * xt) * (^ float (void) {
+                                            return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
                                                 return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
                                             } (audio_format.channelCount, player_node_count));
                                         } ());
@@ -406,7 +408,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:
                              ^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
                                 if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                                    dispatch_sync(serial_queue, ^{ played_tone(); });
+                                    /*dispatch_sync(serial_queue, ^{ */played_tone();/* });*/
                             }];
                     });
 //                });
