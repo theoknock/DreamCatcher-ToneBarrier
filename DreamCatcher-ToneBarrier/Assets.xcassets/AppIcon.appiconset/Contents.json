@@ -22,6 +22,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-4.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
@@ -48,6 +49,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-6.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
@@ -74,6 +76,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-5.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
@@ -87,6 +90,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-1.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
@@ -100,6 +104,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-2.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
@@ -149,6 +154,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-7.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "29x29"
@@ -174,6 +180,7 @@
     },
     {
       "display-gamut" : "display-P3",
+      "filename" : "AppIcon-Wave-Regular-M-8.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
@@ -289,6 +296,7 @@
       "subtype" : "44mm"
     },
     {
+      "filename" : "AppIcon-Wave-Regular-M.png",
       "idiom" : "watch-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
@@ -412,53 +420,6 @@
       "idiom" : "mac",
       "scale" : "2x",
       "size" : "512x512"
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-1.png",
-      "idiom" : "universal",
-      "scale" : "1x"
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-2.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-4.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-5.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-6.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-7.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M-8.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
-    },
-    {
-      "filename" : "AppIcon-Wave-Regular-M.png",
-      "idiom" : "universal",
-      "scale" : "1x",
-      "unassigned" : true
     }
   ],
   "info" : {

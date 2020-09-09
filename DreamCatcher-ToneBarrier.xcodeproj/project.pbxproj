@@ -194,8 +194,8 @@
 			isa = PBXGroup;
 			children = (
 				B9FAD47E2503F31600FF4772 /* ToneBarrierScoreSchema */,
-				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
 				B9259D1E24F669DD00FA19FA /* AppDelegate.h */,
+				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
 				B9259D2124F669DD00FA19FA /* SceneDelegate.h */,
 				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,

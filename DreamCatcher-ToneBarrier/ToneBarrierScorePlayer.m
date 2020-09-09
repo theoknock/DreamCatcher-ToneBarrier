@@ -76,21 +76,29 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
         // Add a handler for the play command.
         [self.commandCenter.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
+            NSLog(@"PLAY");
             if ([self play])
+            {
+                [self nowPlayingInfo];
+                
                 return MPRemoteCommandHandlerStatusSuccess;
-            else
+            } else {
                 return MPRemoteCommandHandlerStatusCommandFailed;
+            }
         }];
         
         [self.commandCenter.stopCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            if ([self play])
+            NSLog(@"STOP");
+            if (![self play])
                 return MPRemoteCommandHandlerStatusSuccess;
             else
                 return MPRemoteCommandHandlerStatusCommandFailed;
         }];
         
         [self.commandCenter.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            if ([self play])
+            NSLog(@"PAUSE");
+            
+            if (![self play])
                 return MPRemoteCommandHandlerStatusSuccess;
             else
                 return MPRemoteCommandHandlerStatusCommandFailed;
@@ -99,6 +107,23 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     
     return self;
 }
+
+- (void)nowPlayingInfo
+{
+    // Define Now Playing Info
+    NSMutableDictionary<NSString *, id> * nowPlayingInfo = nil;
+         
+    [nowPlayingInfo setObject:@"ToneBarrier" forKey:MPMediaItemPropertyTitle];
+
+    UIImage * image = [UIImage systemImageNamed:@"waveform.path"];
+    CGSize imageBounds = CGSizeMake(180.0, 180.0);
+    MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:imageBounds requestHandler:^UIImage * _Nonnull(CGSize size) {
+        return image;
+    }];
+    
+    [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:(NSDictionary *)nowPlayingInfo];
+}
+
 
 - (BOOL)setupEngine
 {
