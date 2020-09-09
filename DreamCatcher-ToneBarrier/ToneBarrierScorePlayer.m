@@ -328,10 +328,15 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
 //                        dispatch_sync(serial_queue, ^{
-                            buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, double, float *)) {
+                            buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, double, float *)) {
                                 double fundamental_frequency = distributed;//,er, * duration;
                                 double harmonic_frequency = fundamental_frequency * (4.0/5.0);
-                                NSLog(@"\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
+                                if (harmonic_frequency < 500.0)
+                                {
+                                    harmonic_frequency = fundamental_frequency;
+                                    fundamental_frequency = fundamental_frequency * (5.0/4.0);
+                                }
+                                printf("\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
                                 
                                 AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                                 [player_node prepareWithFrameCount:frameCount];
@@ -340,37 +345,30 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 AVAudioChannelCount channel_count = audio_format.channelCount;
                                 
                                 
-                                buffer_sample(frameCount,
+                                buffer_sample(duration,
+                                              frameCount,
                                               fundamental_frequency,
                                               harmonic_frequency,
                                               StereoChannelOutputLeft,
                                               1.0/3.0,
                                               pcmBuffer.floatChannelData[0]);
                                 
-                                buffer_sample(frameCount,
+                                buffer_sample(duration,
+                                              frameCount,
                                               harmonic_frequency,
                                               fundamental_frequency,
                                               StereoChannelOutputRight,
                                               1.0/3.0,
                                               (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
                                 return pcmBuffer;
-                            } (^ double (double random) {
-                                
-//                                NSLog(@"DIST:\t%f\t\tRND:\t%f", distributed, random);
-//                                double scaled = 400.0 + ((((random - 400.0) * (1.0 - 0.0))) / (2000.0 - 400.0));
-                                double result = pow(random., 1.0/3.0);
-                                result = (result * (2000.0 - 400.0)) + 400.0;
+                            } (^ double (double random, uint32_t n, uint32_t m, double gamma) {
+                                double result = pow(random, gamma);
+                                result = (result * (m - n)) + n;
                                 return result;
-                            } (^ double (uint32_t n, uint32_t m) {
+                            } (^ double () {
                                 double random = drand48();
-                                
-                                
-                                double result = (random * (m - n)) + n;
-                                
-//                                double random = ((drand48() * (m - n)) + n);
-//                                NSLog(@"RND:\t%f", random);
                                 return random;
-                            } (400, 2000)), ^ double (double * tally) {
+                            } (), 500, 2000, 3.0), ^ double (double * tally) {
                                 if (*tally == 2.0)
                                 {
                                     double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
@@ -383,13 +381,13 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     
                                     return duration_remainder;
                                 }
-                            } (&tone_duration->duration), (^(AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, double gamma, float * samples) {
-                                NSLog(@"FREQ:\t%f", fundamental_frequency);
+                            } (&tone_duration->duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, double gamma, float * samples) {
+//                                NSLog(@"FREQ:\t%f", fundamental_frequency);
                                 for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
                                     ^ float (float xt, float frequency) {
-                                        return sinf(2.0 * M_PI * frequency * xt) * (^ float (void) {
-                                            return sinf(M_PI * xt) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                        return sinf(M_PI * frequency * xt) * (^ float (void) {
+                                            return sinf(M_PI * xt * ((((xt - 0.0) * (8.0 - 2.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
                                                 return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
                                             } (audio_format.channelCount, player_node_count));
                                         } ());
@@ -420,7 +418,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                     ? new_randomizer(random_generator_drand48, 1.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0)
                     : new_randomizer(random_generator_drand48, 0.25, 0.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0);
                     struct Randomizer * frequency_randomizer = (i ==0)
-                    ? new_randomizer(random_generator_drand48, 400.0, 2000.0, 1.0, random_distribution_gamma, 400.0, 1200.0, 3.0)
+                    ? new_randomizer(random_generator_drand48, 500.0, 2000.0, 1.0, random_distribution_gamma, 500.0, 1200.0, 3.0)
                     : new_randomizer(random_generator_drand48, 1000.0, 2000.0, 1.0, random_distribution_gamma, 1000.0, 2000.0, 1.0/3.0);
                     
                     dispatch_sync((i == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
@@ -515,7 +513,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
 //    struct RandomSource * duration_random_source;
 //    struct RandomSource * frequency_random_source;
 //    duration_random_source = new(random_generator_drand48, 0.25, 1.75);
-//    frequency_random_source = new(random_generator_drand48, 400.0, 2000.0);
+//    frequency_random_source = new(random_generator_drand48, 500.0, 2000.0);
 //
 //    ^ void (AVAudioPlayerNode * _Nonnull __strong player_node, AVAudioSession * _Nonnull __strong audio_session, AVAudioFormat * _Nonnull __strong audio_format, void (^ _Nonnull __strong buffer_rendered)(AVAudioPlayerNode * _Nonnull __strong, AVAudioPCMBuffer * _Nonnull __strong, void (^ _Nonnull __strong)(void)))
 //    {
