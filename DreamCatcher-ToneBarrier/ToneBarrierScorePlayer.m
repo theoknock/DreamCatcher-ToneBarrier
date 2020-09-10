@@ -32,7 +32,7 @@ typedef struct ToneDuration
 {
     double tone_pair_duration;
     double pair_count;
-    double tally;
+    double duration_tally;
     __unsafe_unretained double(^next_duration)(struct ToneDuration *);
 } * ToneDuration;
 
