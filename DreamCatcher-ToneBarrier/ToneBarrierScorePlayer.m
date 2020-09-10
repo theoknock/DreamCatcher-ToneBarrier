@@ -30,23 +30,106 @@ typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex;
 
 typedef struct ToneDuration
 {
-    double duration;
-    double sum;
-    double count;
+    double tone_pair_duration;
+    double pair_count;
+    double tally;
+    __unsafe_unretained double(^next_duration)(struct ToneDuration *);
 } * ToneDuration;
 
+typedef struct FrequencyChord
+{
+    double frequencies[4];
+    double ratios[4];
+    int frequency_tally;
+} * FrequencyChord;
 
-//- (double(^)(double, double))Trill
-//{
-//    return ^double(double time, double trill)
-//    {
-//        return pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
-//    };
-//}
+// Pitch Set - Major Seventh
+//                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
+//                double root_frequency = random_frequency->generate_distributed_random(random_frequency) / majorSeventhFrequencyRatios[0];
+//                double frequencies[4] = {root_frequency * majorSeventhFrequencyRatios[0] * durations[0],
+//                                         root_frequency * majorSeventhFrequencyRatios[1] * durations[1],
+//                                         root_frequency * majorSeventhFrequencyRatios[2] * durations[2],
+//                                         root_frequency * majorSeventhFrequencyRatios[3] * durations[3]};
+
+typedef enum HarmonicAlignment {
+    HarmonicAlignmentConsonant,
+    HarmonicAlignmentDissonant,
+    HarmonicAlignmentRandomize,
+} HarmonicAlignment;
+
+typedef int HarmonicInterval;
+
+typedef typeof(HarmonicInterval) HarmonicIntervalConsonance;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantUnison = 0;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantOctave = 1;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorSixth = 2;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFifth = 3;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFourth = 4;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorThird = 5;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantMinorThird = 6;
+static HarmonicIntervalConsonance HarmonicIntervalConsonantRandomize = 7;
+
+typedef typeof(HarmonicInterval) HarmonicIntervalDissonance;
+static HarmonicIntervalConsonance HarmonicIntervalDissonantMinorSecond = 8;                    // C/C sharp
+static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSecond = 9;                       // C/D
+static HarmonicIntervalDissonance HarmonicIntervalDissonantMinorSevenths = 10;                    // C/B flat
+static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSevenths = 11;                     // C/B
+static HarmonicIntervalDissonance HarmonicIntervalDissonantRandomize = 12;
+
+typedef enum Chord
+{
+    ChordRandomize,
+    ChordMonad,
+    ChordDyad,
+    ChordTriad,
+    ChordTetrad,
+    ChordPentad,
+    ChordHexad,
+    ChordHeptad
+} Chord;
+
+static double harmonic_alignment_ratios_consonant[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
+static double harmonic_alignment_ratios_dissonant[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+
+typedef double * (^FrequencyModulator)(double, int, ...);
+static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum typeof(HarmonicInterval)));
+^ double * (double root_frequency, int argument_count, ... /*enum HarmonicAlignment harmonic_alignment, enum typeof(HarmonicInterval) harmonic_interval*/)
+{
+    va_list ap;
+    HarmonicAlignment harmonic_alignment;
+    //        typeof(HarmonicInterval) harmonic_interval;
+    va_start (ap, argument_count);
+    
+    harmonic_alignment = va_arg (ap, HarmonicAlignment);
+    //        harmonic_interval  = va_arg (ap, typeof(HarmonicInterval));
+    
+    va_end (ap);
+    
+    double harmonized_frequency[harmonic_alignment];
+    for (int i = 0; i < (harmonic_alignment + 1); i++)
+    harmonized_frequency[i] = (harmonic_alignment == HarmonicAlignmentConsonant) ? harmonic_alignment_ratios_consonant[i] : harmonic_alignment_ratios_dissonant[i];
+    //        double harmonized_frequency = frequency * ^double(HarmonicAlignment harmonic_alignment_, typeof(HarmonicInterval) harmonic_interval_) {
+    //            double * harmonic_alignment_intervals[2] = {consonant_harmonic_interval_ratios, dissonant_harmonic_interval_ratios};
+    //
+    //            return (harmonic_alignment_   == HarmonicAlignmentConsonant)
+    //            ? ((harmonic_interval_ == HarmonicIntervalConsonantRandomize) ? consonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(7)] : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]))
+    //            : ((harmonic_interval_ == HarmonicIntervalDissonantRandomize) ? dissonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(4)] : dissonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]);
+    //        } (harmonic_alignment, harmonic_interval);
+    //
+    //        return harmonized_frequency;
+    double ratios_values[4] = {0.0, 1.0, 2.0, 3.0};
+    double *ratios = malloc(sizeof(double) * 4);
+    ratios = ratios_values;
+    
+    return ratios;
+};
+
+
 
 @interface ToneBarrierScorePlayer ()
 {
-    struct  ToneDuration * duration_tally[2];
+    struct ToneDuration * duration_tally[2];
+    struct FrequencyChord * frequency_chord;
 }
 
 @end
@@ -73,36 +156,20 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     {
         [self setupEngine];
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
-
-        // Add a handler for the play command.
-        [self.commandCenter.playCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            NSLog(@"PLAY");
-            if ([self play])
-            {
-                [self nowPlayingInfo];
-                
-                return MPRemoteCommandHandlerStatusSuccess;
-            } else {
-                return MPRemoteCommandHandlerStatusCommandFailed;
-            }
-        }];
         
-        [self.commandCenter.stopCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            NSLog(@"STOP");
-            if (![self play])
-                return MPRemoteCommandHandlerStatusSuccess;
-            else
-                return MPRemoteCommandHandlerStatusCommandFailed;
-        }];
-        
-        [self.commandCenter.pauseCommand addTargetWithHandler:^MPRemoteCommandHandlerStatus(MPRemoteCommandEvent * _Nonnull event) {
-            NSLog(@"PAUSE");
-            
-            if (![self play])
-                return MPRemoteCommandHandlerStatusSuccess;
-            else
-                return MPRemoteCommandHandlerStatusCommandFailed;
-        }];
+        MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
+                if ([self play])
+                {
+                    [self nowPlayingInfo];
+                    return MPRemoteCommandHandlerStatusSuccess;
+                } else {
+                    return MPRemoteCommandHandlerStatusCommandFailed;
+                }
+        };
+    
+        [self.commandCenter.playCommand addTargetWithHandler:remoteCommandHandler];
+        [self.commandCenter.stopCommand addTargetWithHandler:remoteCommandHandler];
+        [self.commandCenter.pauseCommand addTargetWithHandler:remoteCommandHandler];
     }
     
     return self;
@@ -111,15 +178,18 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 - (void)nowPlayingInfo
 {
     // Define Now Playing Info
-    NSMutableDictionary<NSString *, id> * nowPlayingInfo = nil;
-         
+    NSMutableDictionary<NSString *, id> * nowPlayingInfo = [[NSMutableDictionary alloc] initWithCapacity:2];
+    
     [nowPlayingInfo setObject:@"ToneBarrier" forKey:MPMediaItemPropertyTitle];
-
+    
     UIImage * image = [UIImage systemImageNamed:@"waveform.path"];
     CGSize imageBounds = CGSizeMake(180.0, 180.0);
+    
     MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:imageBounds requestHandler:^UIImage * _Nonnull(CGSize size) {
         return image;
     }];
+    
+    [nowPlayingInfo setObject:(MPMediaItemArtwork *)artwork forKey:MPMediaItemPropertyArtwork];
     
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:(NSDictionary *)nowPlayingInfo];
 }
@@ -333,111 +403,105 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             dispatch_queue_t player_node_serial_queue = dispatch_queue_create("player_node_serial_queue", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue_aux = dispatch_queue_create("player_node_serial_queue_aux", DISPATCH_QUEUE_SERIAL);
             
-            static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer * __strong, struct Randomizer * __strong, struct ToneDuration * __strong);
+            static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer *, struct Randomizer *, struct ToneDuration *);
             for (int i = 0; i < 2; i++)
             {
                 duration_tally[i] = (struct ToneDuration *)malloc(sizeof(struct ToneDuration *));
-                duration_tally[i]->duration = 2.0;
-                render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * __strong duration_randomizer, struct Randomizer * __strong frequency_randomizer, struct ToneDuration *__strong tone_duration) {
-                    
-                    // Pitch Set - Major Seventh
-                    //                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
-                    //                double root_frequency = random_frequency->generate_distributed_random(random_frequency) / majorSeventhFrequencyRatios[0];
-                    //                double frequencies[4] = {root_frequency * majorSeventhFrequencyRatios[0] * durations[0],
-                    //                                         root_frequency * majorSeventhFrequencyRatios[1] * durations[1],
-                    //                                         root_frequency * majorSeventhFrequencyRatios[2] * durations[2],
-                    //                                         root_frequency * majorSeventhFrequencyRatios[3] * durations[3]};
-                    
-                    // This is the buffer_renderer
-//                    dispatch_async(concurrent_queue, ^{
-                        ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
+                duration_tally[i]->tone_pair_duration = 2.0;
+                
+                frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
+                //                frequency_chord->ratios[0] = 8.0;
+                //                frequency_chord->ratios[0] = 10.0;
+                //                frequency_chord->ratios[0] = 12.0;
+                //                frequency_chord->ratios[0] = 15.0;
+                
+                render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * duration_randomizer, struct Randomizer * frequency_randomizer, struct ToneDuration * tone_duration) {
+                    ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
-//                        dispatch_sync(serial_queue, ^{
-                            buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
-                                double fundamental_frequency = distributed;//,er, * duration;
-                                double harmonic_frequency = fundamental_frequency * (4.0/5.0);
-                                if (harmonic_frequency < 500.0)
-                                {
-                                    harmonic_frequency = fundamental_frequency;
-                                    fundamental_frequency = fundamental_frequency * (5.0/4.0);
-                                }
-                                printf("\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
+                        buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
+                            double fundamental_frequency = distributed;//,er, * duration;
+                            double harmonic_frequency = fundamental_frequency * (4.0/5.0);
+                            if (harmonic_frequency < 500.0)
+                            {
+                                harmonic_frequency = fundamental_frequency;
+                                fundamental_frequency = fundamental_frequency * (5.0/4.0);
+                            }
+                            printf("\nDUR:\t%f\tFREQ\t%f\tHARM:\t%f\n\n", duration, fundamental_frequency, harmonic_frequency);
+                            
+                            AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
+                            [player_node prepareWithFrameCount:frameCount];
+                            AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+                            pcmBuffer.frameLength        = frameCount;
+                            AVAudioChannelCount channel_count = audio_format.channelCount;
+                            
+                            
+                            buffer_sample(duration,
+                                          frameCount,
+                                          fundamental_frequency,
+                                          harmonic_frequency,
+                                          StereoChannelOutputLeft,
+                                          pcmBuffer.floatChannelData[0]);
+                            
+                            buffer_sample(duration,
+                                          frameCount,
+                                          harmonic_frequency,
+                                          fundamental_frequency,
+                                          StereoChannelOutputRight,
+                                          (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
+                            return pcmBuffer;
+                        } (^ double (double random, uint32_t n, uint32_t m, double gamma) {
+                            double result = pow(random, gamma);
+                            result = (result * (m - n)) + n;
+                            return result;
+                        } (^ double () {
+                            double random = drand48();
+                            return random;
+                        } (), 500, 2000, 2.0), ^ double (double * tally) {
+                            if (*tally == 2.0)
+                            {
+                                double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
+                                tone_duration->tone_pair_duration = 2.0 - duration_diff;
                                 
-                                AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
-                                [player_node prepareWithFrameCount:frameCount];
-                                AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
-                                pcmBuffer.frameLength        = frameCount;
-                                AVAudioChannelCount channel_count = audio_format.channelCount;
+                                return duration_diff;
+                            } else {
+                                double duration_remainder = tone_duration->tone_pair_duration;
+                                tone_duration->tone_pair_duration = 2.0;
                                 
-                                
-                                buffer_sample(duration,
-                                              frameCount,
-                                              fundamental_frequency,
-                                              harmonic_frequency,
-                                              StereoChannelOutputLeft,
-                                              pcmBuffer.floatChannelData[0]);
-                                
-                                buffer_sample(duration,
-                                              frameCount,
-                                              harmonic_frequency,
-                                              fundamental_frequency,
-                                              StereoChannelOutputRight,
-                                              (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
-                                return pcmBuffer;
-                            } (^ double (double random, uint32_t n, uint32_t m, double gamma) {
-                                double result = pow(random, gamma);
-                                result = (result * (m - n)) + n;
-                                return result;
-                            } (^ double () {
-                                double random = drand48();
-                                return random;
-                            } (), 500, 2000, 2.0), ^ double (double * tally) {
-                                if (*tally == 2.0)
-                                {
-                                    double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
-                                    tone_duration->duration = 2.0 - duration_diff;
-                                    
-                                    return duration_diff;
-                                } else {
-                                    double duration_remainder = tone_duration->duration;
-                                    tone_duration->duration = 2.0;
-                                    
-                                    return duration_remainder;
-                                }
-                            } (&tone_duration->duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
-//                                NSLog(@"FREQ:\t%f", fundamental_frequency);
-                                for (int index = 0; index < sample_count; index++)
-                                if (samples) samples[index] =
-                                    ^ float (float xt, float frequency) {
-                                        return (frequency < 600.0) ? sinf(M_PI * frequency * xt) * (^ float (void) {
-                                            return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                                return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
-                                            } (audio_format.channelCount, player_node_count));
-                                        } ()) : cosf(M_PI * frequency * xt) * (^ float (void) {
-                                            return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                                return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
-                                            } (audio_format.channelCount, player_node_count));
-                                        } ());
-                                    } (^ float (float range_min, float range_max, float range_value) {
-                                        return (range_value - range_min) / (range_max - range_min);
-                                    } (0.0, sample_count, index), fundamental_frequency);
-                            })), ^{
-                                dispatch_async(concurrent_queue, ^{
-                                    render_buffer[i](concurrent_queue, serial_queue, player_node, duration_randomizer, frequency_randomizer, tone_duration);
-                                });
+                                return duration_remainder;
+                            }
+                        } (&tone_duration->tone_pair_duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                            for (int index = 0; index < sample_count; index++)
+                            if (samples) samples[index] =
+                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
+                                    return (frequency < 600.0)
+                                    ? sinf(M_PI * frequency * xt) * (^ float (void) {
+                                        return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                            return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
+                                        } (audio_format.channelCount, player_node_count));
+                                    } ())
+                                    : cosf(M_PI * frequency * xt) * (^ float (void) {
+                                        return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+                                            return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
+                                        } (audio_format.channelCount, player_node_count));
+                                    } ());
+                                } (^ float (float range_min, float range_max, float range_value) {
+                                    return (range_value - range_min) / (range_max - range_min);
+                                } (0.0, sample_count, index), fundamental_frequency);
+                        })), ^{
+                            dispatch_async(concurrent_queue, ^{
+                                render_buffer[i](concurrent_queue, serial_queue, player_node, duration_randomizer, frequency_randomizer, tone_duration);
                             });
-//                        });
+                        });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
                        ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
                         if ([player_node isPlaying])
                             [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:
                              ^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
                                 if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                                    /*dispatch_sync(serial_queue, ^{ */played_tone();/* });*/
+                                /*dispatch_sync(serial_queue, ^{ */played_tone();/* });*/
                             }];
                     });
-//                });
-            };
+                };
                 
                 dispatch_async(player_nodes_concurrent_queue, ^{
                     srand((unsigned int)time(0));
@@ -459,7 +523,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 });
             }
             
-            
             return TRUE;
             
         } else {
@@ -468,75 +531,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
     }
 }
 
-//- (void (^)(AVAudioPlayerNode * _Nonnull, AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, void (^ _Nonnull)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^ _Nonnull)(void))))RenderBuffer
-//{
-//    ^(AVAudioPlayerNode * _Nonnull player_node, AVAudioPCMBuffer * _Nonnull audio_buffer, AVAudioFormat * _Nonnull audio_format, void (^ _Nonnull blk)(int))
-//    {
-//
-//    } ([AVAudioPlayerNode new], [AVAudioPCMBuffer new], [AVAudioFormat new],
-//    ^ (int x){
-//
-//     }(1));
-//}
-////
-////
-//- (BOOL)play
-//{
-////    // TO-DO: Move the start and stop audioengine to the block chain
-////    //        and toggle only a boolean value for start/stop requests
-////    //        and decide after/before each buffer plays whether to stop
-////    static void (^render_buffer)(AVAudioPlayerNode * _Nonnull, AVAudioSession * _Nonnull, AVAudioFormat * _Nonnull, void (^ _Nonnull)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^ _Nonnull)(void)));
-////
-////    ^(AVAudioPlayerNode * _Nonnull player_node, AVAudioPCMBuffer * _Nonnull audio_buffer, void (^ _Nonnull blk)(void))
-////    {
-////
-////    } ([AVAudioPlayerNode new], [AVAudioPCMBuffer new], [AVAudioFormat new],
-////    ^{
-////
-////     });
-////
-////    dispatch_block_t render_buffer = dispatch_block_create(DISPATCH_BLOCK_BARRIER, ^{
-////
-////        ^(AVAudioPlayerNode * _Nonnull player_node, AVAudioPCMBuffer * _Nonnull audio_buffer, void (^ _Nonnull blk)(void))
-////        {
-////            blk();
-////        } ([AVAudioPlayerNode new], [AVAudioPCMBuffer new], [AVAudioFormat new],
-////           ^{
-////
-////        }());
-////
-////    });
-////
-////    // render_buffer: supply properties needed to create a buffer of the specified kind...
-////    //              ...and return a block to create it (buffer_renderer)
-////    // buffer_renderer: accepts the properties, uses them to create a buffer...
-////    //              ...and then returns a block with the buffer (buffer_rendered)
-////    // buffer_rendered: returns the buffer and a reference to the player node that will use it...
-////    //              ...and then returns a block to schedule the buffer for playback (schedule_buffer)
-////    // schedule_buffer: schedules the buffer...
-////    //              ...and returns a block to indicate that the buffer has been scheduled and then request another buffer (buffer_scheduled)
-////    //
-////
-////    ^{
-////        ^void (AVAudioPlayerNode * _Nonnull player_node, AVAudioSession * _Nonnull audio_session, AVAudioFormat * _Nonnull audio_format,
-////               void(^buffer_rendered)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^ _Nonnull)(void))) { };
-////    };
-////
-////
-////    ^{
-////        ^void (AVAudioPlayerNode * _Nonnull player_node, AVAudioSession * _Nonnull audio_session, AVAudioFormat * _Nonnull audio_format,
-////               void(^buffer_rendered)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^ _Nonnull)(void)))
-////        {
-////
-////        }([AVAudioPlayerNode new], [AVAudioSession new], [AVAudioFormat new],
-////          ^void (AVAudioPlayerNode * _Nonnull player_node, AVAudioSession * _Nonnull audio_session, AVAudioFormat * _Nonnull audio_format,
-////                     void(^)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull, void (^ _Nonnull)(void)))
-////              {
-////
-////              };
-////    }());
-//    
-//    
 //    struct RandomSource * duration_random_source;
 //    struct RandomSource * frequency_random_source;
 //    duration_random_source = new(random_generator_drand48, 0.25, 1.75);
