@@ -8,7 +8,6 @@
 #include "Randomizer.h"
 
 
-#include "Score.h"
 typedef double (^Percentage)(double, double, double);
 Percentage percentage = ^double(double min, double max, double value)
 {
@@ -33,21 +32,40 @@ Linearize linearize = ^double(double range_min, double range_max, double value)
     return result;
 };
 
-struct RandomizerParameters * new_randomizer_parameters(double range_min,
-                                                        double range_max,
-                                                        double gamma_distribution)
+//static void (^index_calculator)(double element_count, int value_count)
+
+struct RandomGeneratorParameters * new_random_generator_parameters(int range_min,
+                                                                   int range_max,
+                                                                   int random_count,
+                                                                   unsigned seed)
 {
-    struct RandomizerParameters * parameters = malloc(sizeof(RandomizerParameters));
-    parameters->range_min = range_min;
-    parameters->range_max = range_max;
-    parameters->gamma_distribution = gamma_distribution;
-    
+    struct RandomGeneratorParameters * random_generator_parameters = malloc(sizeof(RandomGeneratorParameters));
+    random_generator_parameters->range_min = range_min;
+    random_generator_parameters->range_max = range_max;
+    random_generator_parameters->seed = seed;
+    // 68-95-99.7 Rule
+//    size_t size = ^ size_t(double range_width, int random_count) {  };
+//    random_generator_parameters->size =
+//
+//    random_generator_parameters->size
+//    random_generator_parameters->state = malloc(size);
+//
     assert(parameters);
     
     return parameters;
 }
 
 double (^generate_random_drand48)(double, double, double) = ^double(double range_min,
+                                                                    double range_max,
+                                                                    double gamma_distribution)
+{
+    double random = drand48();
+    double result = pow(linearize(range_min, range_max, random), gamma_distribution);
+    
+    return result;
+};
+
+double (^generate_random_3(double, double, double) = ^double(double range_min,
                                                                     double range_max,
                                                                     double gamma_distribution)
 {

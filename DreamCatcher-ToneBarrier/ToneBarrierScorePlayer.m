@@ -13,34 +13,39 @@
 //  Created by Xcode Developer on 8/26/20.
 //
 
-#import "ToneBarrierScorePlayer.h"
-#include "Randomizer.h"
-#include "Score.h"
-#include "Tone.h"
-#include "new.h"
-#include "Class.h"
-#include "Object.h"
-
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
 
+#import "ToneBarrierScorePlayer.h"
+
+#include "Randomizer.h"
+#include "Tone.h"
+
+
+
 typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex;
 
-typedef struct ToneDuration
+// Classification of structs:
+// - some organize properties and methods that relate to software design and architecture (computer science, hardware considerations, best practices, provisions)
+// - some organize methods and properties to affect or ensure tone barrier specifications
+// - some organize methods and properties relating to the mathematics (statistics)
+// - some organize methods and properties relating to the science (music and sound theory and practice)
+// - some organize methods and properties relating to expediency (driven by external and personal concerns, urgency of demand)
+
+typedef struct DurationTally
 {
-    double tone_pair_duration;
-    double pair_count;
-    double duration_tally;
-    __unsafe_unretained double(^next_duration)(struct ToneDuration *);
-} * ToneDuration;
+    double total;
+    double tally;
+    double(^next_duration)(double * tally, double * total);
+} * DurationTally;
 
 typedef struct FrequencyChord
 {
-    double frequencies[4];
     double ratios[4];
-    int frequency_tally;
+    int frequency_count;
+    double frequencies[4];
 } * FrequencyChord;
 
 // Pitch Set - Major Seventh
@@ -51,72 +56,87 @@ typedef struct FrequencyChord
 //                                         root_frequency * majorSeventhFrequencyRatios[2] * durations[2],
 //                                         root_frequency * majorSeventhFrequencyRatios[3] * durations[3]};
 
-typedef enum HarmonicAlignment {
-    HarmonicAlignmentConsonant,
-    HarmonicAlignmentDissonant,
-    HarmonicAlignmentRandomize,
-} HarmonicAlignment;
+//typedef enum HarmonicAlignment {
+//    HarmonicAlignmentConsonant,
+//    HarmonicAlignmentDissonant,
+//    HarmonicAlignmentRandomize,
+//} HarmonicAlignment;
 
-typedef int HarmonicInterval;
+//typedef NSUInteger HarmonicInterval;
 
-typedef typeof(HarmonicInterval) HarmonicIntervalConsonance;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantUnison = 0;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantOctave = 1;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorSixth = 2;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFifth = 3;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFourth = 4;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorThird = 5;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantMinorThird = 6;
-static HarmonicIntervalConsonance HarmonicIntervalConsonantRandomize = 7;
+//typedef typeof(HarmonicInterval) HarmonicIntervalConsonance;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantUnison = 0;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantOctave = 1;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorSixth = 2;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFifth = 3;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFourth = 4;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorThird = 5;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantMinorThird = 6;
+//static HarmonicIntervalConsonance HarmonicIntervalConsonantRandomize = 7;
+//
+//typedef typeof(HarmonicInterval) HarmonicIntervalDissonance;
+//static HarmonicIntervalConsonance HarmonicIntervalDissonantMinorSecond = 8;                    // C/C sharp
+//static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSecond = 9;                       // C/D
+//static HarmonicIntervalDissonance HarmonicIntervalDissonantMinorSevenths = 10;                    // C/B flat
+//static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSevenths = 11;                     // C/B
+//static HarmonicIntervalDissonance HarmonicIntervalDissonantRandomize = 12;
 
-typedef typeof(HarmonicInterval) HarmonicIntervalDissonance;
-static HarmonicIntervalConsonance HarmonicIntervalDissonantMinorSecond = 8;                    // C/C sharp
-static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSecond = 9;                       // C/D
-static HarmonicIntervalDissonance HarmonicIntervalDissonantMinorSevenths = 10;                    // C/B flat
-static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSevenths = 11;                     // C/B
-static HarmonicIntervalDissonance HarmonicIntervalDissonantRandomize = 12;
-
-typedef enum Chord
-{
-    ChordRandomize,
-    ChordMonad,
-    ChordDyad,
-    ChordTriad,
-    ChordTetrad,
-    ChordPentad,
-    ChordHexad,
-    ChordHeptad
-} Chord;
-
-static double harmonic_alignment_ratios_consonant[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
-static double harmonic_alignment_ratios_dissonant[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
+//typedef NSUInteger Harmonics;
+//
+//typedef NS_OPTIONS(Harmonics, HarmonicAlignment) {
+//    HarmonicAlignmentConsonant = 1 << 0,
+//    HarmonicAlignmentDissonant = 2 << 0,
+//    HarmonicAlignmentRandom    = 3 << 0,
+//};
+//
+//typedef NS_OPTIONS(Harmonics, HarmonicInterval) {
+//    Unison = 1 << 0,
+//    Octave = 1 << 1,
+//    MajorSixth = 1 << 2,
+//    PerfectFifth = 1 << 3,
+//    PerfectFourth = 1 << 4,
+//    MajorThird = 1 << 5,
+//    MinorThird = 1 << 6,
+//    Random = 1 << 7,
+//    MinorSecond = 2 << 0,
+//    MajorSecond = 2 << 1,
+//    MinorSevenths = 2 << 2,
+//    MajorSevenths = 2 << 3,
+//    Random = 2 << 4
+//};
+//
+//typedef enum Chord
+//{
+//    ChordRandomize,
+//    ChordMonad,
+//    ChordDyad,
+//    ChordTriad,
+//    ChordTetrad,
+//    ChordPentad,
+//    ChordHexad,
+//    ChordHeptad
+//} Chord;
+//
+//static double harmonic_alignment_ratios_consonant[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
+//static double harmonic_alignment_ratios_dissonant[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
 
 typedef double * (^FrequencyModulator)(double, int, ...);
 static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum typeof(HarmonicInterval)));
 ^ double * (double root_frequency, int argument_count, ... /*enum HarmonicAlignment harmonic_alignment, enum typeof(HarmonicInterval) harmonic_interval*/)
 {
     va_list ap;
-    HarmonicAlignment harmonic_alignment;
-    //        typeof(HarmonicInterval) harmonic_interval;
+    double * harmonic_pitch;
+    int harmonic_pitch_ratio_count;
     va_start (ap, argument_count);
-    
-    harmonic_alignment = va_arg (ap, HarmonicAlignment);
-    //        harmonic_interval  = va_arg (ap, typeof(HarmonicInterval));
-    
+    harmonic_pitch = va_arg (ap, double *);
+    harmonic_pitch_ratio_count = va_arg (ap, int);
     va_end (ap);
     
-    double harmonized_frequency[harmonic_alignment];
-    for (int i = 0; i < (harmonic_alignment + 1); i++)
-    harmonized_frequency[i] = (harmonic_alignment == HarmonicAlignmentConsonant) ? harmonic_alignment_ratios_consonant[i] : harmonic_alignment_ratios_dissonant[i];
-    //        double harmonized_frequency = frequency * ^double(HarmonicAlignment harmonic_alignment_, typeof(HarmonicInterval) harmonic_interval_) {
-    //            double * harmonic_alignment_intervals[2] = {consonant_harmonic_interval_ratios, dissonant_harmonic_interval_ratios};
-    //
-    //            return (harmonic_alignment_   == HarmonicAlignmentConsonant)
-    //            ? ((harmonic_interval_ == HarmonicIntervalConsonantRandomize) ? consonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(7)] : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]))
-    //            : ((harmonic_interval_ == HarmonicIntervalDissonantRandomize) ? dissonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(4)] : dissonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]);
-    //        } (harmonic_alignment, harmonic_interval);
-    //
-    //        return harmonized_frequency;
+    double ratio_1[4] = {8.0, 10.0, 12.0, 15.0};
+    double * majorSeventhFrequencyRatios = &ratio_1[0];
+    
+//    for (int i = 0; i < (harmonic_pitch_ratio_count); i++)
+//        harmonized_frequency[i] = (harmonic_alignment == HarmonicAlignmentConsonant) ? harmonic_alignment_ratios_consonant[i] : harmonic_alignment_ratios_dissonant[i];
     double ratios_values[4] = {0.0, 1.0, 2.0, 3.0};
     double *ratios = malloc(sizeof(double) * 4);
     ratios = ratios_values;
@@ -128,7 +148,7 @@ static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum t
 
 @interface ToneBarrierScorePlayer ()
 {
-    struct ToneDuration * duration_tally[2];
+    struct DurationTally * duration_tally[2];
     struct FrequencyChord * frequency_chord;
 }
 
@@ -403,11 +423,26 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             dispatch_queue_t player_node_serial_queue = dispatch_queue_create("player_node_serial_queue", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue_aux = dispatch_queue_create("player_node_serial_queue_aux", DISPATCH_QUEUE_SERIAL);
             
-            static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer *, struct Randomizer *, struct ToneDuration *);
+            static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer *, struct Randomizer *, struct DurationTally *);
             for (int i = 0; i < 2; i++)
             {
-                duration_tally[i] = (struct ToneDuration *)malloc(sizeof(struct ToneDuration *));
-                duration_tally[i]->tone_pair_duration = 2.0;
+                duration_tally[i] = (struct DurationTally *)malloc(sizeof(struct DurationTally *));
+                duration_tally[i]->tally = 2.0;
+                duration_tally[i]->total = 2.0;
+                duration_tally[i]->next_duration = ^ double (double * tally, double *total) {
+                    if (*tally == *total)
+                    {
+                        double duration_diff = 1.0; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
+                        *tally = *total - duration_diff;
+                        
+                        return duration_diff;
+                    } else {
+                        double duration_remainder = *tally;
+                        *tally = *total;
+                        
+                        return duration_remainder;
+                    }
+                };
                 
                 frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
                 //                frequency_chord->ratios[0] = 8.0;
@@ -415,7 +450,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 //                frequency_chord->ratios[0] = 12.0;
                 //                frequency_chord->ratios[0] = 15.0;
                 
-                render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * duration_randomizer, struct Randomizer * frequency_randomizer, struct ToneDuration * tone_duration) {
+                render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * duration_randomizer, struct Randomizer * frequency_randomizer, struct DurationTally * tone_duration) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
@@ -456,23 +491,23 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         } (^ double () {
                             double random = drand48();
                             return random;
-                        } (), 500, 2000, 2.0), ^ double (double * tally) {
-                            if (*tally == 2.0)
+                        } (), 500, 2000, 2.0), ^ double (double * tally, double *total) {
+                            if (*tally == *total)
                             {
-                                double duration_diff = duration_randomizer->generate_distributed_random(duration_randomizer);
-                                tone_duration->tone_pair_duration = 2.0 - duration_diff;
+                                double duration_diff = 1.0; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
+                                *tally = *total - duration_diff;
                                 
                                 return duration_diff;
                             } else {
-                                double duration_remainder = tone_duration->tone_pair_duration;
-                                tone_duration->tone_pair_duration = 2.0;
+                                double duration_remainder = *tally;
+                                *tally = *total;
                                 
                                 return duration_remainder;
                             }
-                        } (&tone_duration->tone_pair_duration), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                        } (&tone_duration->tally, &tone_duration->total), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
                             for (int index = 0; index < sample_count; index++)
                             if (samples) samples[index] =
-                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
+                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0); // (-(1 - xt) * log2(1 - xt) - xt * log2(xt));
                                     return (frequency < 600.0)
                                     ? sinf(M_PI * frequency * xt) * (^ float (void) {
                                         return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
@@ -518,7 +553,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                          (i == 0) ? self.playerNode : self.playerNodeAux,
                                          duration_randomizer,
                                          frequency_randomizer,
-                                         ^struct ToneDuration * (struct ToneDuration * tally){ return tally; }(self->duration_tally[i]));
+                                         ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[i]));
                     });
                 });
             }

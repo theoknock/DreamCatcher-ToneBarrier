@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8A410892250AE3D80004FD0E /* New.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A410891250AE3D80004FD0E /* New.c */; };
+		8A410895250AE5280004FD0E /* Set.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A410894250AE5280004FD0E /* Set.c */; };
+		8A410898250AE5B70004FD0E /* Bag.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A410897250AE5B70004FD0E /* Bag.c */; };
+		8A41089B250AE6300004FD0E /* String.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A41089A250AE6300004FD0E /* String.c */; };
+		8A4108C3250C61580004FD0E /* Score.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A4108C2250C61580004FD0E /* Score.c */; };
+		8AF985E4250ACA14004900DA /* Randomizers.c in Sources */ = {isa = PBXBuildFile; fileRef = 8AF985E3250ACA14004900DA /* Randomizers.c */; };
 		B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D1F24F669DD00FA19FA /* AppDelegate.m */; };
 		B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2224F669DD00FA19FA /* SceneDelegate.m */; };
 		B9259D2624F669DD00FA19FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2524F669DD00FA19FA /* ViewController.m */; };
@@ -82,6 +88,20 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8A41088F250AE1EA0004FD0E /* New.r */ = {isa = PBXFileReference; explicitFileType = sourcecode.c.h; path = New.r; sourceTree = "<group>"; };
+		8A410890250AE3D80004FD0E /* New.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = New.h; sourceTree = "<group>"; };
+		8A410891250AE3D80004FD0E /* New.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = New.c; sourceTree = "<group>"; };
+		8A410893250AE5280004FD0E /* Set.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Set.h; sourceTree = "<group>"; };
+		8A410894250AE5280004FD0E /* Set.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Set.c; sourceTree = "<group>"; };
+		8A410896250AE5B70004FD0E /* Bag.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Bag.h; sourceTree = "<group>"; };
+		8A410897250AE5B70004FD0E /* Bag.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Bag.c; sourceTree = "<group>"; };
+		8A410899250AE6300004FD0E /* String.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = String.h; sourceTree = "<group>"; };
+		8A41089A250AE6300004FD0E /* String.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = String.c; sourceTree = "<group>"; };
+		8A4108C1250C61580004FD0E /* Score.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Score.h; sourceTree = "<group>"; };
+		8A4108C2250C61580004FD0E /* Score.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Score.c; sourceTree = "<group>"; };
+		8AF985E2250ACA14004900DA /* Randomizers.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Randomizers.h; sourceTree = "<group>"; };
+		8AF985E3250ACA14004900DA /* Randomizers.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Randomizers.c; sourceTree = "<group>"; };
+		8AF985F1250ADEE7004900DA /* Object.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		8AFCCA30250517D8001427D2 /* new.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = new.c; sourceTree = "<group>"; };
 		8AFCCA32250517D8001427D2 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		8AFCCA35250517D8001427D2 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
@@ -102,7 +122,7 @@
 		B9259D3624F669E100FA19FA /* DreamCatcher-ToneBarrier WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D3C24F669E100FA19FA /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Interface.storyboard; sourceTree = "<group>"; };
 		B9259D3E24F669E200FA19FA /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
-		B9259D4024F669E200FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; name = Info.plist; path = "DreamCatcher-ToneBarrier WatchKit App/Info.plist"; sourceTree = SOURCE_ROOT; };
+		B9259D4024F669E200FA19FA /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B9259D4524F669E200FA19FA /* DreamCatcher-ToneBarrier WatchKit Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "DreamCatcher-ToneBarrier WatchKit Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D4A24F669E200FA19FA /* InterfaceController.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = InterfaceController.h; sourceTree = "<group>"; };
 		B9259D4B24F669E200FA19FA /* InterfaceController.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = InterfaceController.m; sourceTree = "<group>"; };
@@ -165,9 +185,8 @@
 			isa = PBXGroup;
 			children = (
 			);
-			name = "OOC Source";
-			path = "DreamCatcher-ToneBarrier/ToneBarrierScoreSchema/OOC Source";
-			sourceTree = SOURCE_ROOT;
+			path = "OOC Source";
+			sourceTree = "<group>";
 		};
 		B9259D1224F669DD00FA19FA = {
 			isa = PBXGroup;
@@ -205,8 +224,22 @@
 				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
 				B9763DFC250822B5003DB662 /* test.h */,
 				B9763DFD250822B5003DB662 /* test.m */,
+				8A410890250AE3D80004FD0E /* New.h */,
+				8A410891250AE3D80004FD0E /* New.c */,
+				8A41088F250AE1EA0004FD0E /* New.r */,
+				8AF985F1250ADEE7004900DA /* Object.h */,
+				8A410893250AE5280004FD0E /* Set.h */,
+				8A410894250AE5280004FD0E /* Set.c */,
+				8A410896250AE5B70004FD0E /* Bag.h */,
+				8A410897250AE5B70004FD0E /* Bag.c */,
+				8A410899250AE6300004FD0E /* String.h */,
+				8A41089A250AE6300004FD0E /* String.c */,
+				8A4108C1250C61580004FD0E /* Score.h */,
+				8A4108C2250C61580004FD0E /* Score.c */,
 				B9FAD47A2503E3CB00FF4772 /* Tone.h */,
 				B9FAD47B2503E3CB00FF4772 /* Tone.c */,
+				8AF985E2250ACA14004900DA /* Randomizers.h */,
+				8AF985E3250ACA14004900DA /* Randomizers.c */,
 				B9FAD48C2503FA3900FF4772 /* Randomizer.h */,
 				B9FAD48D2503FA3900FF4772 /* Randomizer.c */,
 				B9259D2A24F669DD00FA19FA /* ContentView.swift */,
@@ -399,8 +432,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8A410898250AE5B70004FD0E /* Bag.c in Sources */,
+				8A410895250AE5280004FD0E /* Set.c in Sources */,
+				8A4108C3250C61580004FD0E /* Score.c in Sources */,
+				8A410892250AE3D80004FD0E /* New.c in Sources */,
+				8A41089B250AE6300004FD0E /* String.c in Sources */,
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,
 				B9763DFE250822B5003DB662 /* test.m in Sources */,
+				8AF985E4250ACA14004900DA /* Randomizers.c in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
@@ -624,7 +663,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N9987K9442;
 				IBSC_MODULE = DreamCatcher_ToneBarrier_WatchKit_Extension;
-				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit App/Info.plist";
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
@@ -642,7 +681,7 @@
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = N9987K9442;
 				IBSC_MODULE = DreamCatcher_ToneBarrier_WatchKit_Extension;
-				INFOPLIST_FILE = "DreamCatcher-ToneBarrier WatchKit App/Info.plist";
+				INFOPLIST_FILE = "DreamCatcher-ToneBarrier/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.blogspot.demonicactivity.bush.alan.james.DreamCatcher-ToneBarrier.watchkitapp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
