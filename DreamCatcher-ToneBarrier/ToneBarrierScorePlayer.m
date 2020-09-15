@@ -498,6 +498,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             return result;
                         } (^ double (double random,  double n, double m, double gamma) {
                             // ignore gamma for now
+                            // -57.0, 50.0 
                             double result = ((random / RAND_MAX) * (m - n)) + n;
                             return ceil(result);
                         } (random(), -57.0, 50.0, 1.0)), ^ double (double * tally, double *total, double random) {
