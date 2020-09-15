@@ -512,7 +512,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     (^ float (float trill_calc) {
                                         return sinf(2.0 * xt * M_PI * trill_calc) *
                                         (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1)));
+                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
                                         } (audio_format.channelCount, player_node_count));
                                     } (((player_node_channel_index == 0 || player_node_channel_index == 2) ? trill - (xt * trill) : (xt * trill))))
                                     // BEGIN
