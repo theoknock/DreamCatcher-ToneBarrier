@@ -8,6 +8,8 @@
 #include "Bag.h"
 
 #include "New.h"
+
+#include "New.r"
 #include "Set.h"
 #include "Object.h"
 
