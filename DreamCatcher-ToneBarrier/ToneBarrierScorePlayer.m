@@ -18,6 +18,8 @@
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
 
+#include <stdlib.h>
+
 #import "ToneBarrierScorePlayer.h"
 
 #include "Randomizer.h"
@@ -423,9 +425,20 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             dispatch_queue_t player_node_serial_queue = dispatch_queue_create("player_node_serial_queue", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue_aux = dispatch_queue_create("player_node_serial_queue_aux", DISPATCH_QUEUE_SERIAL);
             
+            unsigned int seed = (unsigned int)time(0);
+            size_t buffer_size = 256 * sizeof(char *);
+            char * random_buffer_duration      = (char *)malloc(buffer_size);
+            char * random_buffer_frequency     = (char *)malloc(buffer_size);
+            char * random_buffer_duration_aux  = (char *)malloc(buffer_size);
+            char * random_buffer_frequency_aux = (char *)malloc(buffer_size);
+            
+            initstate(seed, , buffer_size);
+            
             static void(^render_buffer[2])(dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong,  struct Randomizer *, struct Randomizer *, struct DurationTally *);
             for (int i = 0; i < 2; i++)
             {
+                
+                
                 duration_tally[i] = (struct DurationTally *)malloc(sizeof(struct DurationTally *));
                 duration_tally[i]->tally = 2.0;
                 duration_tally[i]->total = 2.0;
@@ -453,7 +466,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 render_buffer[i] = ^(dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct Randomizer * duration_randomizer, struct Randomizer * frequency_randomizer, struct DurationTally * tone_duration) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
-                        buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(double, AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
+                        buffer_rendered(^ AVAudioPCMBuffer * (double distributed, double duration, void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
                             double fundamental_frequency = distributed;//,er, * duration;
                             double harmonic_frequency = fundamental_frequency * (4.0/5.0);
                             if (harmonic_frequency < 500.0)
@@ -470,15 +483,13 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             AVAudioChannelCount channel_count = audio_format.channelCount;
                             
                             
-                            buffer_sample(duration,
-                                          frameCount,
+                            buffer_sample(frameCount,
                                           fundamental_frequency,
                                           harmonic_frequency,
                                           StereoChannelOutputLeft,
                                           pcmBuffer.floatChannelData[0]);
                             
-                            buffer_sample(duration,
-                                          frameCount,
+                            buffer_sample(frameCount,
                                           harmonic_frequency,
                                           fundamental_frequency,
                                           StereoChannelOutputRight,
@@ -494,7 +505,8 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         } (), 500, 2000, 2.0), ^ double (double * tally, double *total) {
                             if (*tally == *total)
                             {
-                                double duration_diff = 1.0; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
+                                double random = drand48();
+                                double duration_diff = *total * random; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
                                 *tally = *total - duration_diff;
                                 
                                 return duration_diff;
@@ -504,7 +516,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 
                                 return duration_remainder;
                             }
-                        } (&tone_duration->tally, &tone_duration->total), (^(double duration, AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                        } (&tone_duration->tally, &tone_duration->total), (^(AVAudioFrameCount sample_count, double fundamental_frequency, double harmonic_frequency, StereoChannelOutput stereo_channel_output, float * samples) {
                             for (int index = 0; index < sample_count; index++)
                             if (samples) samples[index] =
                                 ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0); // (-(1 - xt) * log2(1 - xt) - xt * log2(xt));
@@ -539,20 +551,12 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 };
                 
                 dispatch_async(player_nodes_concurrent_queue, ^{
-                    srand((unsigned int)time(0));
-                    struct Randomizer * duration_randomizer = (i == 0)
-                    ? new_randomizer(random_generator_drand48, 1.25, 1.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0)
-                    : new_randomizer(random_generator_drand48, 0.25, 0.75, 1.0, random_distribution_gamma, 0.25, 1.75, 1.0);
-                    struct Randomizer * frequency_randomizer = (i ==0)
-                    ? new_randomizer(random_generator_drand48, 500.0, 2000.0, 1.0, random_distribution_gamma, 500.0, 1200.0, 3.0)
-                    : new_randomizer(random_generator_drand48, 1000.0, 2000.0, 1.0, random_distribution_gamma, 1000.0, 2000.0, 1.0/3.0);
-                    
                     dispatch_sync((i == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
                         render_buffer[i](player_nodes_concurrent_queue,
                                          (i == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
                                          (i == 0) ? self.playerNode : self.playerNodeAux,
-                                         duration_randomizer,
-                                         frequency_randomizer,
+                                         (i == 0) ? random_buffer_duration : random_buffer_duration_aux,
+                                         (i == 0) ? random_buffer_frequency : random_buffer_frequency_aux,
                                          ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[i]));
                     });
                 });

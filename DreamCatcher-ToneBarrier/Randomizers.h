@@ -21,16 +21,5 @@
 
 extern const void * _Nonnull Randomizers;
 
-typedef struct PlayerNodes
-{
-    struct random_data * buf;
-} PlayerNodes;
-
-struct Randomizers
-{
-    int randomizer_count;
-    struct Randomizer * randomizers;
-};
-
 
 #endif /* Randomizers_h */

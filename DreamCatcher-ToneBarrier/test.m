@@ -10,6 +10,20 @@
 typedef double (^Randomizer)(void);
 typedef double (^Distributor)(Randomizer);
 typedef Distributor (^Calculator)(double, double);
+
+
+typedef enum RandomParametersType
+{
+    RandomParametersTypeSource,
+    RandomParametersTypeFunction,
+    RandomParametersTypeDistributor
+} RandomParametersType;
+typedef struct Parameters RandomGeneratorParameters;
+typedef typeof(struct Parameters) RandomSourceParameters;
+typedef typeof(struct Parameters) RandomFunctionParameters;
+typedef typeof(struct Parameters) RandomDistributorParameters;
+typedef typeof(struct Parameters) (^RandomParameters)(struct Parameters);
+typedef double (^RandomGenerator)(struct Parameters);
                 
 @implementation test
 {
@@ -31,8 +45,8 @@ typedef Distributor (^Calculator)(double, double);
     // Distributor takes a double from Randomizer and returns a double as a value
     // Fandomizer takes nothing and returns a double when called
     
-    ^ double (double distributed, double duration) {
-        return distributed * duration;
+    ^ double (double distributed_random, double random_duration) {
+        return distributed_random * random_duration;
     } (^ double (double random, double gamma) {
         return pow(random, gamma);
     } (^ double (uint32_t m, uint32_t n) {

@@ -14,4 +14,6 @@ extern const void * Object;        /* new(Object); */
 
 int differ (const void * a, const void * b);
 
+size_t sizeOf (const void * a);
+
 #endif /* Object_h */

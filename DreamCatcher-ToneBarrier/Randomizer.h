@@ -12,7 +12,7 @@
 //  - some organize methods and properties relating to the science (music and sound theory and practice)
 //  - some organize methods and properties relating to expediency (driven by external and personal concerns, urgency of demand)
 //
-//  Together, these all match the intended usage of the methods anc properties,
+//  Together, these all match the intended usage of the methods ; properties,
 //
 //  The Randomizer struct organizes the properties and methods relating to the following:
 //  - Tone barrier specifications:
@@ -49,67 +49,59 @@
 #define Randomizer_h
 
 #include <stdio.h>
-#include <stdarg.h>
-#include <stddef.h>
-#include <stdlib.h>
-#include <assert.h>
-
-#include "time.h"
-#include "math.h"
 
 extern const void * _Nonnull Randomizer;
 
-struct Randomizer
+typedef enum RandomSourceFunction
 {
-    struct RandomizerParameters
+    random_generator_rand_r,
+    random_generator_rand_r_boolean
+} RandomSourceFunction;
+
+typedef struct RandomGeneratorParameters RandomParameters;
+typedef struct RandomSourceParameters RandomSourceParameters;
+typedef struct RandomFunctionParameters RandomFunctionParameters;
+typedef struct RandomDistributorParameters RandomDistributorParameters;
+
+typedef double (^ _Nonnull RandomSource)(struct RandomFunctionParameters random_function_parameters);
+
+typedef double (^ _Nonnull RandomDistributor)(double random,
+                                              double range_min,
+                                              double range_max,
+                                              double mean,
+                                              double standard_deviation,
+                                              double median,
+                                              double mode);
+
+typedef struct RandomGeneratorParameters
+{
+    struct RandomSourceParameters
     {
-        double range_min;
-        double range_max;
-        double exp;
-        double mean;
-        double median;
-        double standard_deviation;
-        unsigned seed;
+        RandomSource generate_random;
+        RandomSourceFunction random_source_function;
+    } * _Nonnull random_source_parameters;
+    
+    struct RandomFunctionParameters
+    {
+        const unsigned seed;
         char * _Nullable state;
         size_t size;
-        double (^ _Nonnull generate_linear_random_for_non_linear_distribution)(int, int, int, int);
-    } * _Nonnull randomizer_parameters;
+    } * _Nonnull random_function_parameters;
     
-    struct RandomSource
+    struct RandomDistributorParameters
     {
-        enum RandomGenerator
-        {
-            random_generator_drand48,
-            random_generator_arc4random_3_r,
-            random_generator_random_3_r,
-            random_generator_random_3_r_boolean
-        } random_generator;
+        RandomDistributor distribute_random;
+        double range_min;
+        double range_max;
+        double standard_deviation;
+        double median;
+        double mean;
+        double mode;
         
-        double (^ _Nonnull generate_linear_random)(struct RandomizerParameters * _Nonnull);
-
-    } * _Nonnull random_source;
+    } * _Nonnull random_distributor_parameters;
     
-    struct RandomDistributor
-    {
-        double (^ _Nonnull distribute_random)(struct RandomizerParameters * _Nonnull randomizer_parameters);
-    } * _Nonnull random_distributor;
-    
-    double (^ _Nonnull generate_distributed_random)(struct RandomizerParameters * _Nonnull);
-};
+} * _Nonnull random_generator_parameters;
 
-struct RandomizerParameters * _Nonnull new_randomizer_parameters (int range_min,
-                                                         int range_max,
-                                                         int mean,
-                                                         int standard_deviation);
-
-struct Randomizer * _Nonnull new_randomizer (enum RandomGenerator random_generator,
-                                             struct RandomizerParameters randomizer_parameters,
-                                             double random_distribution_range_min,
-                                             double random_distribution_range_max,
-                                             double range_min,
-                                             double range_max,
-                                             int mean,
-                                             int standard_deviation);
-
+typedef double (^ _Nonnull RandomGenerator)(struct RandomGeneratorParameters * _Nonnull random_generator_parameters);
 
 #endif /* Randomizer_h */

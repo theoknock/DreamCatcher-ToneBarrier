@@ -10,6 +10,8 @@
 
 #include <stdio.h>
 
+#include "String.h"
+
 extern const void * _Nonnull Score;
 
 

@@ -9,17 +9,18 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "Score.h"
-
-#include "String.h"
 #include "New.h"
 #include "New.r"
+
+#include "String.h"
+
+#include "Score.h"
 
 
 struct Score
 {
     const void * class;
-    char * title;
+    void * title;
     struct Tempo
     {
         int session_period;     // 8 hours
@@ -32,11 +33,11 @@ struct Score
 static void * Score_ctor (void * _self, va_list * app)
 {
     struct Score * self = _self;
-    
-    const char * title = va_arg(* app, const char *);
-    self -> title = malloc(strlen(title) + 1);
+    void * title = new(String, va_arg(* app, const char *));
+//    const char * title = va_arg(* app, const char *);
+//    self -> title = malloc(strlen(title) + 1);
+//    strcpy(self -> title, title);
     assert(self -> title);
-    strcpy(self -> title, title);
     
     int session_period = va_arg(* app, int);
     int event_frequency = va_arg(* app, int);
@@ -62,7 +63,8 @@ static void * Score_ctor (void * _self, va_list * app)
 static void *Score_dtor (void * _self)
 {
     struct Score * self = _self;
-    free(self -> title), self -> title = 0;
+//    free(self -> title), self -> title = 0;
+    delete(self -> title);
     free(self->tempo), self->tempo = 0;
     
     return self;
@@ -87,11 +89,20 @@ static int Score_differ (const void * _self, const void * _b)
     return strcmp(self -> title, b -> title);
 }
 
+static size_t Score_sizeof (const void * _self)
+{
+    const struct Score * self = _self;
+    
+    return sizeof(self);
+}
+
+
 static const struct Class _Score =
 {
     sizeof(struct Score),
     Score_ctor, Score_dtor,
-    Score_clone, Score_differ
+    Score_clone, Score_differ,
+    Score_sizeof
 };
 
 const void * Score = & _Score;

@@ -17,6 +17,7 @@ struct Class {
     void * (* dtor) (void * self);
     void * (* clone) (const void * self);
     int (* differ) (const void * self, const void * b);
+    size_t (* sizeOf) (const void * self);
 };
 
 #endif

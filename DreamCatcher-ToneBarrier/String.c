@@ -51,10 +51,18 @@ static int String_differ (const void * _self, const void * _b)
     return strcmp(self -> text, b -> text);
 }
 
+static size_t String_sizeof (const void * _self)
+{
+    const struct String * self = _self;
+    
+    return sizeof(self);
+}
+
 static const struct Class _String = {
     sizeof(struct String),
     String_ctor, String_dtor,
-    String_clone, String_differ
+    String_clone, String_differ,
+    String_sizeof
 };
 
 const void * String = & _String;
