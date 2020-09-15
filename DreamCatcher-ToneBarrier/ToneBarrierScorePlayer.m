@@ -461,7 +461,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 // -57.0, 50.0
                                 double result = ((random / RAND_MAX) * (m - n)) + n;
                                 return ceil(result);
-                            } (random(), 0.0/*-57.0*/, 50.0, 1.0)) * duration /*this is where the randomizer block will be called*/ : frequency_chord->root_frequency;
+                            } (random(), 0.0    /*-57.0*/, /*50.0*/30.0, 1.0)) * duration /*this is where the randomizer block will be called*/ : frequency_chord->root_frequency;
                             AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                             [player_node prepareWithFrameCount:frameCount];
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
@@ -501,7 +501,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             }
                         } (&tone_duration->tally, &tone_duration->total, ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)), (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
                             printf("\nFREQ\t%f\tIDX:\t%f\n",frequency, frequency_chord->ratios[player_node_channel_index]);
-                            
+                            NSLog(@"Amplitude == %f", (1.0 - audio_session.outputVolume + .1) * (1.0 / (player_node_count * 2)));
                             player_node_channel_index = (player_node_channel_index + 1) % 4;
                             double trill = ceil(0.00625 * frequency);
                             
@@ -510,9 +510,9 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
                                     return sinf(M_PI * frequency * xt) *
                                     (^ float (float trill_calc) {
-                                        return sinf(2.0 * xt * M_PI * trill_calc) /
+                                        return sinf(2.0 * xt * M_PI * trill_calc) *
                                         (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                            return ((^ float (float output_volume) { return (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
+                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1)));
                                         } (audio_format.channelCount, player_node_count));
                                     } (((player_node_channel_index == 0 || player_node_channel_index == 2) ? trill - (xt * trill) : (xt * trill))))
                                     // BEGIN
