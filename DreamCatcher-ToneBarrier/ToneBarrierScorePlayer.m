@@ -18,7 +18,15 @@
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
 
+#include <stdio.h>
+#include <stdarg.h>
+#include <stddef.h>
 #include <stdlib.h>
+#include <assert.h>
+
+#include "time.h"
+#include "math.h"
+
 
 #import "ToneBarrierScorePlayer.h"
 
@@ -27,7 +35,7 @@
 
 
 
-typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNodeChannelIndex;
+typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
 
 // Classification of structs:
 // - some organize properties and methods that relate to software design and architecture (computer science, hardware considerations, best practices, provisions)
@@ -267,6 +275,14 @@ Normalize normalize = ^double(double min, double max, double value)
     return result;
 };
 
+typedef double (^Scale)(double, double, double, double, double);
+Scale scale = ^double(double min_new, double max_new, double val_old, double min_old, double max_old)
+{
+    double val_new = min_new + ((((val_old - min_old) * (max_new - min_new))) / (max_old - min_old));
+
+    return val_new;
+};
+
 typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
     StereoChannelOutputLeft,
     StereoChannelOutputRight,
@@ -421,6 +437,8 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
             
             dispatch_queue_t player_nodes_concurrent_queue = dispatch_queue_create_with_target("render_buffer_concurrent_queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
+            dispatch_queue_t render_buffer_serial_queue = dispatch_queue_create("render_buffer_serial_queue", DISPATCH_QUEUE_SERIAL);
+            dispatch_queue_t render_buffer_serial_queue_apply = dispatch_queue_create("render_buffer_serial_queue_apply", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue = dispatch_queue_create("player_node_serial_queue", DISPATCH_QUEUE_SERIAL);
             dispatch_queue_t player_node_serial_queue_aux = dispatch_queue_create("player_node_serial_queue_aux", DISPATCH_QUEUE_SERIAL);
             
@@ -430,6 +448,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             initstate(seed, random_buffer, buffer_size);
             
             __block AVAudioPlayerNodeChannelIndex player_node_channel_index = 0;
+            __block AVAudioPlayerNodeDurationIndex player_node_duration_index = 0;
             
             static void(^render_buffer[2])(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, struct DurationTally *, struct FrequencyChord *);
             for (int i = 0; i < 2; i++)
@@ -450,24 +469,27 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 render_buffer[i] = ^(AVAudioPlayerNodeIndex player_node_index, dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct DurationTally * tone_duration, struct FrequencyChord * frequency_chord) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
+                        //                        dispatch_async(serial_queue, ^{
                         buffer_rendered(^ AVAudioPCMBuffer * (double duration, void (^buffer_sample)(AVAudioFrameCount, double, StereoChannelOutput, float *)) {
-                            printf("\nDUR:\t%f\n",duration);
+                            if (player_node_duration_index == 0)
+                            {
+                                ^ void (double * root_frequency, double duration, double random) {
+                                    *root_frequency = (pow(1.059463094, (int)random) * 440.0) * duration;
+                                } (&frequency_chord->root_frequency, duration, ^ double (double random,  double n, double m, double gamma) {
+                                    // ignore gamma for now
+                                    // -57.0, 50.0
+                                    double result = scale(n, m, random, 0, RAND_MAX);
+                                    NSLog(@"%f", result);
+                                    return result;
+                                } (random(), 0.0, 24.0, 1.0));
+                            }
                             
-                            frequency_chord->root_frequency = (player_node_channel_index == 0) ? ^ double (double random) { // TO-DO: change this randomizer and the duration randomizer to set their values in their respective structs (instead of returning values in the block)
-                                frequency_chord->root_frequency = pow(2.0, (random) / 12.0) * 440.0;
-                                return frequency_chord->root_frequency;
-                            } (^ double (double random,  double n, double m, double gamma) {
-                                // ignore gamma for now
-                                // -57.0, 50.0
-                                double result = ((random / RAND_MAX) * (m - n)) + n;
-                                return ceil(result);
-                            } (random(), 0.0    /*-57.0*/, /*50.0*/30.0, 1.0)) * duration /*this is where the randomizer block will be called*/ : frequency_chord->root_frequency;
+                            
                             AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
                             [player_node prepareWithFrameCount:frameCount];
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
                             pcmBuffer.frameLength        = frameCount;
                             AVAudioChannelCount channel_count = audio_format.channelCount;
-                            
                             
                             buffer_sample(frameCount,
                                           ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
@@ -485,6 +507,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[player_node_channel_index]),
                                           StereoChannelOutputRight,
                                           (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
+                         
                             return pcmBuffer;
                         } (^ double (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
                             if (*tally == *total)
@@ -500,10 +523,11 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 return duration_remainder;
                             }
                         } (&tone_duration->tally, &tone_duration->total, ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)), (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
-                            printf("\nFREQ\t%f\tIDX:\t%f\n",frequency, frequency_chord->ratios[player_node_channel_index]);
-                            NSLog(@"Amplitude == %f", (1.0 - audio_session.outputVolume + .1) * (1.0 / (player_node_count * 2)));
-                            player_node_channel_index = (player_node_channel_index + 1) % 4;
-                            double trill = ceil(0.00625 * frequency);
+//                            printf("\nFREQ\t%f\tIDX:\t%f\n",frequency, frequency_chord->ratios[player_node_channel_index]);
+//                            NSLog(@"Amplitude == %f", (1.1 - audio_session.outputVolume) * (1.0 / (player_node_count * 2)));
+                            player_node_channel_index++;
+                            player_node_channel_index = player_node_channel_index % 4;
+                            double trill = ceil(0.003125 * frequency);
                             
                             for (int index = 0; index < sample_count; index++)
                             if (samples) samples[index] =
@@ -529,37 +553,71 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     //                                    } ())
                                     // END
                                     ;
+                                    // (endValue – startValue) × time + startValue; Time = 1/number of points * point
+
                                 } (^ float (float range_min, float range_max, float range_value) {
                                     return (range_value - range_min) / (range_max - range_min);
                                 } (0.0, sample_count, index), frequency);
                         })), ^{
-                            dispatch_async(concurrent_queue, ^{
-                                render_buffer[i](player_node_index, concurrent_queue, serial_queue, player_node, tone_duration, frequency_chord);
-                            });
+//                            dispatch_async(serial_queue, ^{
+                            CMTime current_time = CMClockGetTime(CMClockGetHostTimeClock());
+                            if (player_node_duration_index == 0 || player_node_duration_index == 1) printf("\n--------------%d\t%f", player_node_duration_index, frequency_chord->root_frequency); // supposed to appear simultaneously, 1 and 0, should end at different times
+                            if (player_node_duration_index == 2 || player_node_duration_index == 3) printf("\n\t--------------%d\t%f", player_node_duration_index, frequency_chord->root_frequency); // appear after above, also 1 and 0, but staggered appearance with same ending
+                            
+                            player_node_duration_index = (player_node_duration_index + 1) % 4;
+                            
+                            render_buffer[i](player_node_index, concurrent_queue, serial_queue, player_node, tone_duration, frequency_chord);
+//                            });
                         });
+//                    });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
                        ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
+                        dispatch_async(serial_queue, ^{
                         if ([player_node isPlaying])
                             [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:
                              ^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+                                CMTime current_time = CMClockGetTime(CMClockGetHostTimeClock());
+                                
                                 if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                                /*dispatch_sync(serial_queue, ^{ */played_tone();/* });*/
+                                    dispatch_sync(serial_queue, ^{
+//
+                                        played_tone();
+                                        
+                                    });
                             }];
+                        });
                     });
                 };
-                
-                dispatch_async(player_nodes_concurrent_queue, ^{
-                    srand((unsigned int)time(0));
-                    dispatch_sync((i == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
-                        render_buffer[i](i,
-                                         player_nodes_concurrent_queue,
-                                         (i == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
-                                         (i == 0) ? self.playerNode : self.playerNodeAux,
-                                         ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[i]),
-                                         ^struct FrequencyChord * (struct FrequencyChord * frequency_chord){ return frequency_chord; }(self->frequency_chord));
-                    });
-                });
             }
+            
+            int j = 2;
+            dispatch_async(render_buffer_serial_queue, ^{
+                    srand((unsigned int)time(0));
+                    dispatch_apply(j, render_buffer_serial_queue_apply, ^(size_t index){
+//                        dispatch_sync((index == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
+                            render_buffer[index](index,
+                                             player_nodes_concurrent_queue,
+                                             (index == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
+                                             (index == 0) ? self.playerNode : self.playerNodeAux,
+                                             ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[index]),
+                                             ^struct FrequencyChord * (struct FrequencyChord * frequency_chord){ return frequency_chord; }(self->frequency_chord));
+//                        });
+                    });
+                    
+                });
+            
+//            dispatch_async(player_nodes_concurrent_queue, ^{
+//
+//                dispatch_sync((j == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
+//                    render_buffer[j](j,
+//                                     player_nodes_concurrent_queue,
+//                                     (j == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
+//                                     (j == 0) ? self.playerNode : self.playerNodeAux,
+//                                     ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[j]),
+//                                     ^struct FrequencyChord * (struct FrequencyChord * frequency_chord){ return frequency_chord; }(self->frequency_chord));
+//                });
+//            });
+            
             
             return TRUE;
             
