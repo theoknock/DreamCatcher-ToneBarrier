@@ -29,6 +29,7 @@
 
 
 #import "ToneBarrierScorePlayer.h"
+#import "ToneBarrierScoreDispatchObjects.h"
 
 #include "Randomizer.h"
 #include "Tone.h"
