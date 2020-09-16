@@ -49,6 +49,18 @@ typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNo
 // - some organize methods and properties relating to the mathematics (statistics)
 // - some organize methods and properties relating to the science (music and sound theory and practice)
 // - some organize methods and properties relating to expediency (driven by external and personal concerns, urgency of demand)
+//typedef int (^next_ratio_index)(int * total, int * tally);
+//next_ratio_index next_ratio = ^ int (int * total, int * tally) {
+//    if (*tally == *total)
+//    {
+//        *tally = *total - *tally;
+//        return *tally;
+//    } else {
+//        int diff = *total - *tally;
+//        *tally = *tally + 1;
+//        return diff;
+//    }
+//};
 
 typedef struct DurationTally
 {
@@ -63,7 +75,7 @@ typedef struct FrequencyChord
     int total;
     int tally;
     double ratios[4];
-    int (^next_ratio_index)(int * total, int * tally);
+//    int (^next_ratio)(int * total, int * tally);
 } * FrequencyChord;
 
 // Pitch Set - Major Seventh
@@ -471,6 +483,15 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             __block AVAudioPlayerNodeChannelIndex player_node_channel_index = 0;
             __block AVAudioPlayerNodeDurationIndex player_node_duration_index = 0;
             
+            frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
+            frequency_chord->root_frequency = 440.0;
+            frequency_chord->total = 3;
+            frequency_chord->tally = 0;
+            frequency_chord->ratios[0] = 8.0;
+            frequency_chord->ratios[1] = 10.0;
+            frequency_chord->ratios[2] = 12.0;
+            frequency_chord->ratios[3] = 15.0;
+
             static void(^render_buffer[2])(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, struct DurationTally *, struct FrequencyChord *);
             for (int i = 0; i < 2; i++)
             {
@@ -480,25 +501,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 duration_tally[i]->tally = 2.0;
                 duration_tally[i]->total = 2.0;
                 
-                frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
-                frequency_chord->root_frequency = 440.0;
-                frequency_chord->total = 3;
-                frequency_chord->tally = 0;
-                frequency_chord->ratios[0] = 8.0;
-                frequency_chord->ratios[1] = 10.0;
-                frequency_chord->ratios[2] = 12.0;
-                frequency_chord->ratios[3] = 15.0;
-                frequency_chord->next_ratio_index = ^ int (int * total, int * tally) {
-                    if (*tally == *total)
-                    {
-                        *tally = *total - *tally;
-                        return *tally;
-                    } else {
-                        int diff = *total - *tally;
-                        *tally = *tally + 1;
-                        return diff;
-                    }
-                };
+                
                 
                 render_buffer[i] = ^(AVAudioPlayerNodeIndex player_node_index, dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct DurationTally * tone_duration, struct FrequencyChord * frequency_chord) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
@@ -508,7 +511,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             if (player_node_duration_index == 0)
                             {
                                 ^ void (double * root_frequency, double duration, double random) {
-                                    *root_frequency = pow(1.059463094, (int)random) * (440.0 * duration);
+                                    *root_frequency = pow(1.059463094, (int)random) * 440.0;
                                 } (&frequency_chord->root_frequency, duration, ^ double (double random,  double n, double m, double gamma) {
                                     // ignore gamma for now
                                     // -57.0, 50.0
@@ -525,22 +528,29 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             pcmBuffer.frameLength        = frameCount;
                             AVAudioChannelCount channel_count = audio_format.channelCount;
                             
-                            buffer_sample(frameCount,
-                                          ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
-                                          {
-                                return (*fundamental_frequency / *fundamental_ratio) * *frequency_ratio;
-                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[frequency_chord->next_ratio_index(&frequency_chord->total, &frequency_chord->tally)]),
-                                          
-                                          StereoChannelOutputLeft,
-                                          pcmBuffer.floatChannelData[0]);
                             
-                            buffer_sample(frameCount,
-                                          ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
-                                          {
-                                return (*fundamental_frequency / *fundamental_ratio) * *frequency_ratio;
-                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[frequency_chord->next_ratio_index(&frequency_chord->total, &frequency_chord->tally)]),
-                                          StereoChannelOutputRight,
-                                          (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
+                            dispatch_async(render_buffer_serial_queue, ^{
+                                dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index) {
+                                    buffer_sample(frameCount,
+                                                  ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
+                                                  {
+                                        return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio) * duration;
+                                    } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[^ int (int * total, int * tally) {
+                                        if (*tally == *total)
+                                        {
+                                            *tally = *total - *tally;
+                                            return *tally;
+                                        } else {
+                                            int diff = *total - *tally;
+                                            *tally = *tally + 1;
+                                            return diff;
+                                        }
+                                    }(&frequency_chord->total, &frequency_chord->tally)]),
+                                                  
+                                                  StereoChannelOutputLeft,
+                                                  pcmBuffer.floatChannelData[index]);
+                                });
+                            });
                          
                             return pcmBuffer;
                         } (^ double (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
@@ -557,10 +567,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 return duration_remainder;
                             }
                         } (&tone_duration->tally, &tone_duration->total, ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)), (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
-//                            printf("\nFREQ\t%f\tIDX:\t%f\n",frequency, frequency_chord->ratios[player_node_channel_index]);
-//                            NSLog(@"Amplitude == %f", (1.1 - audio_session.outputVolume) * (1.0 / (player_node_count * 2)));
-//                            player_node_channel_index++;
-                            printf("%d", player_node_channel_index);
                             player_node_channel_index = player_node_channel_index % 4;
                             for (int index = 0; index < sample_count; index++)
                             if (samples) samples[index] =
@@ -571,7 +577,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                         (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
                                             return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
                                         } (audio_format.channelCount, player_node_count));
-                                    } (((player_node_duration_index == 0) ? (6.0 - (xt * (6.0 - 4.0))) : (xt * (6.0 - 4.0) + 4.0))))
+                                    } (((player_node_duration_index == 0) ? (4.0 - (xt * (4.0 - 2.0))) : (xt * (4.0 - 2.0) + 2.0))))
                                     // BEGIN
                                     //                                    return (frequency < 600.0)
                                     //                                    ? sinf(M_PI * frequency * xt) * (^ float (void) {
@@ -614,10 +620,9 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 };
             }
             
-            int j = 2;
             dispatch_async(render_buffer_serial_queue, ^{
                     srand((unsigned int)time(0));
-                    dispatch_apply(j, render_buffer_serial_queue_apply, ^(size_t index){
+                    dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index){
 //                        dispatch_sync((index == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
                             render_buffer[index](index,
                                              player_nodes_concurrent_queue,
