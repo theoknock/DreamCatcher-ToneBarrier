@@ -531,9 +531,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             
                             dispatch_async(render_buffer_serial_queue, ^{
                                 dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index) {
-                                    buffer_sample(frameCount,
-                                                  ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
-                                                  {
+                                    buffer_sample(frameCount, ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio) {
                                         return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio) * duration;
                                     } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[^ int (int * total, int * tally) {
                                         if (*tally == *total)
@@ -546,7 +544,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                             return diff;
                                         }
                                     }(&frequency_chord->total, &frequency_chord->tally)]),
-                                                  
                                                   StereoChannelOutputLeft,
                                                   pcmBuffer.floatChannelData[index]);
                                 });
@@ -577,7 +574,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                         (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
                                             return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
                                         } (audio_format.channelCount, player_node_count));
-                                    } (((player_node_duration_index == 0) ? (4.0 - (xt * (4.0 - 2.0))) : (xt * (4.0 - 2.0) + 2.0))))
+                                    } ((/**/ (xt / (sample_count * 2.0) * 4.0) + 4.0 /**/))) // (player_node_duration_index == 0) ? (4.0 - (xt * (4.0 - 2.0))) : (xt * (4.0 - 2.0) + 2.0)
                                     // BEGIN
                                     //                                    return (frequency < 600.0)
                                     //                                    ? sinf(M_PI * frequency * xt) * (^ float (void) {
