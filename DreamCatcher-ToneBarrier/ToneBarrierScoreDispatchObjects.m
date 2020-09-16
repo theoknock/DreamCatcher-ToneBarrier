@@ -27,34 +27,11 @@ static ToneBarrierScoreDispatchObjects * sharedDispatchObjects = NULL;
 {
     if (self == [super init])
     {
+        self.tone_barrier_dispatch_queue = dispatch_queue_create("Tone Barrier Dispatch Queue", DISPATCH_QUEUE_CONCURRENT);
+        self.tone_barrier_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.tone_barrier_dispatch_queue);
     }
     
     return self;
-}
-
-
-static dispatch_queue_t _tone_barrier_dispatch_queue = nil;
-
-+ (void)setTone_barrier_dispatch_queue:(dispatch_queue_t)tone_barrier_dispatch_queue
-{
-    _tone_barrier_dispatch_queue = dispatch_queue_create("Tone Barrier Dispatch Queue", DISPATCH_QUEUE_CONCURRENT);
-}
-
-+ (dispatch_queue_t)tone_barrier_dispatch_queue
-{
-    return _tone_barrier_dispatch_queue;
-}
-
-static dispatch_source_t _tone_barrier_dispatch_source = nil;
-
-+ (void)setTone_barrier_dispatch_source:(dispatch_source_t)tone_barrier_dispatch_source
-{
-    _tone_barrier_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, _tone_barrier_dispatch_queue);
-}
-
-+ (dispatch_source_t)tone_barrier_dispatch_source
-{
-    return _tone_barrier_dispatch_source;
 }
 
 @end

@@ -34,6 +34,11 @@
 #include "Randomizer.h"
 #include "Tone.h"
 
+typedef struct ContextData
+{
+    double x;
+} ContextData;
+
 
 
 typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
@@ -184,6 +189,18 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 {
     if (self == [super init])
     {
+        dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
+                struct ContextData * data = dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
+                printf("x = %f", data->x);
+            });
+            
+            dispatch_resume(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
+            
+            struct ContextData *context_data = malloc(sizeof(struct ContextData));
+            context_data->x = 2.0;
+            dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, context_data);
+            dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
+        
         [self setupEngine];
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
