@@ -60,7 +60,10 @@ typedef struct DurationTally
 typedef struct FrequencyChord
 {
     double root_frequency;
+    int total;
+    int tally;
     double ratios[4];
+    int (^next_ratio_index)(int * total, int * tally);
 } * FrequencyChord;
 
 // Pitch Set - Major Seventh
@@ -479,10 +482,23 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                 
                 frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
                 frequency_chord->root_frequency = 440.0;
+                frequency_chord->total = 3;
+                frequency_chord->tally = 0;
                 frequency_chord->ratios[0] = 8.0;
                 frequency_chord->ratios[1] = 10.0;
                 frequency_chord->ratios[2] = 12.0;
                 frequency_chord->ratios[3] = 15.0;
+                frequency_chord->next_ratio_index = ^ int (int * total, int * tally) {
+                    if (*tally == *total)
+                    {
+                        *tally = *total - *tally;
+                        return *tally;
+                    } else {
+                        int diff = *total - *tally;
+                        *tally = *tally + 1;
+                        return diff;
+                    }
+                };
                 
                 render_buffer[i] = ^(AVAudioPlayerNodeIndex player_node_index, dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct DurationTally * tone_duration, struct FrequencyChord * frequency_chord) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
@@ -492,7 +508,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             if (player_node_duration_index == 0)
                             {
                                 ^ void (double * root_frequency, double duration, double random) {
-                                    *root_frequency = (pow(1.059463094, (int)random) * 440.0) * duration;
+                                    *root_frequency = pow(1.059463094, (int)random) * (440.0 * duration);
                                 } (&frequency_chord->root_frequency, duration, ^ double (double random,  double n, double m, double gamma) {
                                     // ignore gamma for now
                                     // -57.0, 50.0
@@ -513,7 +529,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                           ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
                                           {
                                 return (*fundamental_frequency / *fundamental_ratio) * *frequency_ratio;
-                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[player_node_channel_index]),
+                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[frequency_chord->next_ratio_index(&frequency_chord->total, &frequency_chord->tally)]),
                                           
                                           StereoChannelOutputLeft,
                                           pcmBuffer.floatChannelData[0]);
@@ -522,7 +538,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                           ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio)
                                           {
                                 return (*fundamental_frequency / *fundamental_ratio) * *frequency_ratio;
-                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[player_node_channel_index]),
+                            } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[frequency_chord->next_ratio_index(&frequency_chord->total, &frequency_chord->tally)]),
                                           StereoChannelOutputRight,
                                           (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil);
                          
@@ -543,20 +559,19 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         } (&tone_duration->tally, &tone_duration->total, ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)), (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
 //                            printf("\nFREQ\t%f\tIDX:\t%f\n",frequency, frequency_chord->ratios[player_node_channel_index]);
 //                            NSLog(@"Amplitude == %f", (1.1 - audio_session.outputVolume) * (1.0 / (player_node_count * 2)));
-                            player_node_channel_index++;
+//                            player_node_channel_index++;
+                            printf("%d", player_node_channel_index);
                             player_node_channel_index = player_node_channel_index % 4;
-                            double trill = ceil(0.003125 * frequency);
-                            
                             for (int index = 0; index < sample_count; index++)
                             if (samples) samples[index] =
                                 ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
                                     return sinf(M_PI * frequency * xt) *
                                     (^ float (float trill_calc) {
-                                        return sinf(2.0 * xt * M_PI * trill_calc) *
+                                        return sinf(2.0 * xt * M_PI * trill_calc) /*(2 / M_PI) * asinf(sinf(((2 * M_PI) / (xt * (.35 - .25) + .25)) * xt))*/ *
                                         (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
                                             return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
                                         } (audio_format.channelCount, player_node_count));
-                                    } (((player_node_channel_index == 0 || player_node_channel_index == 2) ? trill - (xt * trill) : (xt * trill))))
+                                    } (((player_node_duration_index == 0) ? (6.0 - (xt * (6.0 - 4.0))) : (xt * (6.0 - 4.0) + 4.0))))
                                     // BEGIN
                                     //                                    return (frequency < 600.0)
                                     //                                    ? sinf(M_PI * frequency * xt) * (^ float (void) {
@@ -577,28 +592,19 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     return (range_value - range_min) / (range_max - range_min);
                                 } (0.0, sample_count, index), frequency);
                         })), ^{
-//                            dispatch_async(serial_queue, ^{
-                            CMTime current_time = CMClockGetTime(CMClockGetHostTimeClock());
-                            if (player_node_duration_index == 0 || player_node_duration_index == 1) printf("\n--------------%d\t%f", player_node_duration_index, frequency_chord->root_frequency); // supposed to appear simultaneously, 1 and 0, should end at different times
-                            if (player_node_duration_index == 2 || player_node_duration_index == 3) printf("\n\t--------------%d\t%f", player_node_duration_index, frequency_chord->root_frequency); // appear after above, also 1 and 0, but staggered appearance with same ending
-                            
                             player_node_duration_index = (player_node_duration_index + 1) % 4;
                             
                             render_buffer[i](player_node_index, concurrent_queue, serial_queue, player_node, tone_duration, frequency_chord);
-//                            });
+
                         });
-//                    });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
                        ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
                         dispatch_async(serial_queue, ^{
                         if ([player_node isPlaying])
                             [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:
                              ^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-                                CMTime current_time = CMClockGetTime(CMClockGetHostTimeClock());
-                                
                                 if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
                                     dispatch_sync(serial_queue, ^{
-//
                                         played_tone();
                                         
                                     });
