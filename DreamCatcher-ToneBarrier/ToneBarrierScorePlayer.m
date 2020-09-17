@@ -508,12 +508,13 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         //                        dispatch_async(serial_queue, ^{
-                        buffer_rendered(^ AVAudioPCMBuffer * (double duration, void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
+                        buffer_rendered(^ AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, AVAudioChannelCount, double, StereoChannelOutput, float *)) {
+                            
                             if (player_node_duration_index == 0)
                             {
-                                ^ void (double * root_frequency, double duration, double random) {
+                                ^ void (double * root_frequency, double random) {
                                     *root_frequency = pow(1.059463094, (int)random) * 440.0;
-                                } (&frequency_chord->root_frequency, duration, ^ double (double random,  double n, double m, double gamma) {
+                                } (&frequency_chord->root_frequency, ^ double (double random, double n, double m, double gamma) {
                                     // ignore gamma for now
                                     // -57.0, 50.0
                                     double result = scale(n, m, random, 0, RAND_MAX);
@@ -521,10 +522,24 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 } (random(), 0.0, 24.0, 1.0));
                             }
                             
-                            printf("duration == %f\n", duration);
-                            AVAudioChannelCount channel_count = audio_format.channelCount;
+                            ^ (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
+                                if (*tally == *total)
+                                {
+                                    double duration_diff = random;//random() / RAND_MAX; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
+                                    *tally = *total - duration_diff;
+                                } else {
+                                    *tally = *total - *tally;
+                                }
+                            } (&tone_duration->tally, &tone_duration->total,
+                               ^ double (double random, double n, double m, double gamma) {
+                                   double result = scale(n, m, random, 0, RAND_MAX);
+                                   return result;
+                               } (random(), 0.25, 1.75, 1.0));
+                            
+                            printf("duration == %f\n", tone_duration->tally);
                             double sample_rate = [audio_format sampleRate];
-                            AVAudioFrameCount frame_length = [audio_format sampleRate] * duration;
+                            AVAudioChannelCount channel_count = audio_format.channelCount;
+                            AVAudioFrameCount frame_length = sample_rate * tone_duration->tally;
                             AVAudioFrameCount frame_count  = frame_length * channel_count;
                             [player_node prepareWithFrameCount:frame_length];
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frame_count];
@@ -534,6 +549,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 dispatch_apply(channel_count, render_buffer_serial_queue_apply, ^(size_t index) {
                                     buffer_sample(frame_length,
                                                   sample_rate,
+                                                  channel_count,
                                                   ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio) {
                                         return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio);
                                     } (&frequency_chord->root_frequency, &frequency_chord->ratios[0],
@@ -554,22 +570,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             });
                          
                             return pcmBuffer;
-                        } (^ double (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
-                            if (*tally == *total)
-                            {
-                                double duration_diff = random;//random() / RAND_MAX; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
-                                *tally = *total - duration_diff;
-                                
-                                return duration_diff;
-                            } else {
-                                double duration_remainder = *tally;
-                                *tally = *total;
-                                
-                                return duration_remainder;
-                            }
-                        } (&tone_duration->tally, &tone_duration->total,
-                           ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)),
-                           (^(AVAudioFrameCount sample_count, double sample_rate, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                        } ((^(AVAudioFrameCount sample_count, double sample_rate, AVAudioChannelCount channel_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
                             
@@ -578,7 +579,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             double twopi = 2 * M_PI; //8*atan(-1.); /* 2*PI, a constant */
                             phase *= twopi;             /* phase in radians */
                             for (int index = 0; index < sample_count; index++)
-                            if (samples) samples[index] = (float32_t)(amp / 2 * cos((twopi * index * (frequency / sample_rate)) + phase));
+                            if (samples) samples[index] = (float32_t)(amp * cos((twopi * index * (frequency / sample_rate)) + phase));
 //                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
 //                                    return ;
 ////                                    sinf(M_PI * frequency * xt) *
