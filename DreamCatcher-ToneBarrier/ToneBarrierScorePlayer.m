@@ -319,7 +319,8 @@ Scale scale = ^double(double min_new, double max_new, double val_old, double min
 typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
     StereoChannelOutputLeft,
     StereoChannelOutputRight,
-    StereoChannelOutputMono
+    StereoChannelOutputMono,
+    StereoChannelOutputUnspecified
 };
 //typedef double (^FrequencySample)(double, double, ...);
 // TO-DO: Cut normalized time into three segments, each corresponding to attack, sustain and release;
@@ -516,24 +517,24 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                     // ignore gamma for now
                                     // -57.0, 50.0
                                     double result = scale(n, m, random, 0, RAND_MAX);
-                                    NSLog(@"%f", result);
                                     return result;
                                 } (random(), 0.0, 24.0, 1.0));
                             }
                             
-                            
-                            AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
-                            [player_node prepareWithFrameCount:frameCount];
-                            AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
-                            pcmBuffer.frameLength        = frameCount;
+                            printf("duration == %f\n", duration);
                             AVAudioChannelCount channel_count = audio_format.channelCount;
-                            
+                            AVAudioFrameCount frameLength = [audio_format sampleRate] * duration;
+                            AVAudioFrameCount frameCount  = frameLength * channel_count;
+                            [player_node prepareWithFrameCount:frameLength];
+                            AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
+                            pcmBuffer.frameLength        = frameLength;
                             
                             dispatch_async(render_buffer_serial_queue, ^{
-                                dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index) {
-                                    buffer_sample(frameCount, ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio) {
-                                        return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio) * duration;
-                                    } (&frequency_chord->root_frequency, &frequency_chord->ratios[0], &frequency_chord->ratios[^ int (int * total, int * tally) {
+                                dispatch_apply(channel_count, render_buffer_serial_queue_apply, ^(size_t index) {
+                                    buffer_sample(frameLength, ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio) {
+                                        return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio);
+                                    } (&frequency_chord->root_frequency, &frequency_chord->ratios[0],
+                                       &frequency_chord->ratios[^ int (int * total, int * tally) {
                                         if (*tally == *total)
                                         {
                                             *tally = *total - *tally;
@@ -543,8 +544,8 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                             *tally = *tally + 1;
                                             return diff;
                                         }
-                                    }(&frequency_chord->total, &frequency_chord->tally)]),
-                                                  StereoChannelOutputLeft,
+                                    } (&frequency_chord->total, &frequency_chord->tally)]),
+                                                  StereoChannelOutputUnspecified,
                                                   pcmBuffer.floatChannelData[index]);
                                 });
                             });
@@ -563,37 +564,32 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 
                                 return duration_remainder;
                             }
-                        } (&tone_duration->tally, &tone_duration->total, ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)), (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                        } (&tone_duration->tally, &tone_duration->total,
+                           ^ double (double random, double n, double m, double gamma) { return random / RAND_MAX; } (random(), 0.25, 1.75, 1.0)),
+                           (^(AVAudioFrameCount sample_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                            player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
+                            
+                            float32_t amp = 2147483647.f, freq = (player_node_channel_index == 0 || player_node_channel_index == 2) ? 440.f : 440.f, sr = 44100.f; /* signal params */
+                            float32_t phase = 0.0;         /* phase, in fractions of a cycle */
+                            double twopi = 2 * M_PI; //8*atan(-1.); /* 2*PI, a constant */
+                            phase *= twopi;             /* phase in radians */
                             for (int index = 0; index < sample_count; index++)
-                            if (samples) samples[index] =
-                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
-                                    return sinf(M_PI * frequency * xt) *
-                                    (^ float (float trill_calc) {
-                                        return sinf(2.0 * xt * M_PI * trill_calc) /*(2 / M_PI) * asinf(sinf(((2 * M_PI) / (xt * (.35 - .25) + .25)) * xt))*/ *
-                                        (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
-                                        } (audio_format.channelCount, player_node_count));
-                                    } ((/**/ (xt / (sample_count * 2.0) * 4.0) + 4.0 /**/))) // (player_node_duration_index == 0) ? (4.0 - (xt * (4.0 - 2.0))) : (xt * (4.0 - 2.0) + 2.0)
-                                    // BEGIN
-                                    //                                    return (frequency < 600.0)
-                                    //                                    ? sinf(M_PI * frequency * xt) * (^ float (void) {
-                                    //                                        return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                    //                                            return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
-                                    //                                        } (audio_format.channelCount, player_node_count));
-                                    //                                    } ())
-                                    //                                    : cosf(M_PI * frequency * xt) * (^ float (void) {
-                                    //                                        return sinf(M_PI * xt * ((((xt - 0.0) * (6.0 - 4.0)) / (1.0 - 0.0)))) * (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-                                    //                                            return ((^ float (float output_volume) { return /*sinf(M_PI * xt) / (2.0 * output_volume)*/ (1.0/output_volume) / (player_node_count * channel_count); } ((audio_session.outputVolume == 0) ? 1.0 : audio_session.outputVolume)));
-                                    //                                        } (audio_format.channelCount, player_node_count));
-                                    //                                    } ())
-                                    // END
-                                    ;
-                                    // (endValue – startValue) × time + startValue; Time = 1/number of points * point
-
-                                } (^ float (float range_min, float range_max, float range_value) {
-                                    return (range_value - range_min) / (range_max - range_min);
-                                } (0.0, sample_count, index), frequency);
+                            if (samples) samples[index] = (float32_t)(amp / 2 * cos((twopi * index * (frequency / sr)) + phase));
+//                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
+//                                    return ;
+////                                    sinf(M_PI * frequency * xt) *
+////                                    (^ float (float trill_calc) {
+////                                        return sinf(2.0 * xt * M_PI * trill_calc) /*(2 / M_PI) * asinf(sinf(((2 * M_PI) / (xt * (.35 - .25) + .25)) * xt))*/ *
+////                                        (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
+////                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
+////                                        } (audio_format.channelCount, player_node_count));
+////                                    } ((/**/ (xt / (sample_count * 2.0) * 4.0) + 4.0 /**/)));
+////                                    // (endValue – startValue) × time + startValue; Time = 1/number of points * point
+////
+//                                } (^ float (float range_min, float range_max, float range_value) {
+//                                    return (range_value - range_min) / (range_max - range_min);
+//                                } (0.0, sample_count, index), frequency);
                         })), ^{
                             player_node_duration_index = (player_node_duration_index + 1) % 4;
                             
