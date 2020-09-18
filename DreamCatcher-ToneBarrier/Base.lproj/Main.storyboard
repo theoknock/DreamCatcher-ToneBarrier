@@ -17,6 +17,31 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <view opaque="NO" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="PFW-NN-poo" userLabel="Event Log Text View Container">
+                                <rect key="frame" x="19" y="105" width="375" height="685"/>
+                                <subviews>
+                                    <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" ambiguous="YES" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
+                                        <rect key="frame" x="0.0" y="0.0" width="375" height="685"/>
+                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                        <attributedString key="attributedText"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                        <connections>
+                                            <outlet property="delegate" destination="BYZ-38-t0r" id="F7Q-9J-hgR"/>
+                                        </connections>
+                                    </textView>
+                                </subviews>
+                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="trailing" secondItem="Wky-rW-XYV" secondAttribute="trailing" id="7Xg-eT-X5G"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="top" secondItem="PFW-NN-poo" secondAttribute="top" id="Adi-cB-KYB"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="width" secondItem="PFW-NN-poo" secondAttribute="width" id="acu-16-veh"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="height" secondItem="PFW-NN-poo" secondAttribute="height" id="cDh-vv-R8g"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="leading" secondItem="PFW-NN-poo" secondAttribute="leading" id="gJO-W1-UfJ"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="centerY" secondItem="PFW-NN-poo" secondAttribute="centerY" id="ogE-Qo-7o6"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="bottom" secondItem="PFW-NN-poo" secondAttribute="bottom" id="sTa-1I-tEx"/>
+                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="centerX" secondItem="PFW-NN-poo" secondAttribute="centerX" id="y16-7g-HJF"/>
+                                </constraints>
+                            </view>
                             <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
                                 <rect key="frame" x="0.0" y="43.5" width="414" height="820"/>
                                 <color key="tintColor" systemColor="systemBlueColor"/>
@@ -95,6 +120,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="logTextView" destination="Wky-rW-XYV" id="5w6-Fq-3rz"/>
                         <outlet property="node1ChannelLLabel" destination="Iwe-MF-B93" id="GhK-4U-9Mh"/>
                         <outlet property="node1ChannelRLabel" destination="L0d-Tg-Urn" id="gR2-ds-zdT"/>
                         <outlet property="node2ChannelLLabel" destination="MN2-rN-X7r" id="CLn-IZ-StF"/>

@@ -576,22 +576,17 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             
                             __block double sin_phase = 0.0;
                             __block double cos_phase = M_PI / 2.0;
-                            double pi_pi = 2.0 * M_PI;
-                            double sin_phase_increment = frequency * (pi_pi / sample_rate);
-                            double cos_phase_increment = frequency * ((M_PI / 2.0) / sample_rate);
                             for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
-                                    ^ float (void) {
+                                    ^ float (double sin_phase_increment, double cos_phase_increment) {
                                         sin_phase += sin_phase_increment;
                                         cos_phase += cos_phase_increment;
-                                        
                                         return sin(sin_phase) + cos(cos_phase);
-                                    }();
+                                    } (frequency * ((2.0 * M_PI) / sample_rate),
+                                       frequency * ((M_PI / 2.0) / sample_rate));
                         })), ^{
                             player_node_duration_index = (player_node_duration_index + 1) % 4;
-                            
                             render_buffer[i](player_node_index, concurrent_queue, serial_queue, player_node, tone_duration, frequency_chord);
-
                         });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
                        ^(AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone) {
