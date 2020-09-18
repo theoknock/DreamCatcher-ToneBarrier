@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
-    <device id="retina6_1" orientation="landscape" appearance="dark"/>
+    <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17124"/>
         <capability name="Image references" minToolsVersion="12.0"/>
@@ -14,11 +14,16 @@
             <objects>
                 <viewController modalPresentationStyle="fullScreen" interfaceStyle="dark" id="BYZ-38-t0r" customClass="ViewController" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
-                        <rect key="frame" x="0.0" y="0.0" width="896" height="414"/>
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
+                                <rect key="frame" x="0.0" y="43.5" width="414" height="820"/>
+                                <color key="tintColor" systemColor="systemBlueColor"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="26"/>
+                            </imageView>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCT-a9-qbI">
-                                <rect key="frame" x="387.5" y="128.5" width="121.5" height="136.5"/>
+                                <rect key="frame" x="146.5" y="385" width="121.5" height="136.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal">
@@ -29,17 +34,59 @@
                                     <action selector="playToneBarrierScore:forEvent:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bbo-3M-VTr"/>
                                 </connections>
                             </button>
-                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
-                                <rect key="frame" x="44" y="-0.5" width="808" height="395"/>
-                                <color key="tintColor" systemColor="systemBlueColor"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="26"/>
-                            </imageView>
+                            <stackView opaque="NO" contentMode="scaleToFill" misplaced="YES" axis="vertical" alignment="top" translatesAutoresizingMaskIntoConstraints="NO" id="Nva-Sf-ual">
+                                <rect key="frame" x="21" y="44" width="146" height="176"/>
+                                <subviews>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Node 1 Channel L" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Iwe-MF-B93">
+                                        <rect key="frame" x="0.0" y="0.0" width="146" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="146" id="O7i-v0-UmP"/>
+                                            <constraint firstAttribute="height" constant="44" id="Va4-1a-sph"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Node 1 Channel R" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="L0d-Tg-Urn">
+                                        <rect key="frame" x="0.0" y="44" width="146" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="Al7-fQ-bUr"/>
+                                            <constraint firstAttribute="width" constant="146" id="tvK-r6-wVw"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Node 2 Channel L" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="MN2-rN-X7r">
+                                        <rect key="frame" x="0.0" y="88" width="146" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="44" id="3nT-Lr-OXW"/>
+                                            <constraint firstAttribute="width" constant="146" id="ZUS-Dt-9wi"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                    <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Node 2 Channel R" lineBreakMode="tailTruncation" numberOfLines="2" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="CXK-AY-OT9">
+                                        <rect key="frame" x="0.0" y="132" width="146" height="44"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="146" id="U1L-UD-20j"/>
+                                            <constraint firstAttribute="height" constant="44" id="gMQ-kD-OtI"/>
+                                        </constraints>
+                                        <fontDescription key="fontDescription" type="system" pointSize="10"/>
+                                        <color key="textColor" systemColor="systemBlueColor"/>
+                                        <nil key="highlightedColor"/>
+                                    </label>
+                                </subviews>
+                            </stackView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="MdB-Vf-a99" secondAttribute="bottom" id="0jV-10-YNN"/>
+                            <constraint firstItem="Nva-Sf-ual" firstAttribute="leading" secondItem="MdB-Vf-a99" secondAttribute="leading" id="2WI-Mr-Hix"/>
                             <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="MdB-Vf-a99" secondAttribute="trailing" id="5zF-oH-1Xf"/>
+                            <constraint firstItem="Nva-Sf-ual" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="QfW-ON-cwh"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="aMd-DB-g0z"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="ct6-iP-OPf"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="dA2-om-Hcq"/>
@@ -48,7 +95,15 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="node1ChannelLLabel" destination="Iwe-MF-B93" id="GhK-4U-9Mh"/>
+                        <outlet property="node1ChannelRLabel" destination="L0d-Tg-Urn" id="gR2-ds-zdT"/>
+                        <outlet property="node2ChannelLLabel" destination="MN2-rN-X7r" id="CLn-IZ-StF"/>
+                        <outlet property="node2ChannelRLabel" destination="CXK-AY-OT9" id="rpc-ti-8Ra"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
+                        <outletCollection property="frequencyDurationLabelOutletCollection" destination="Iwe-MF-B93" id="UpJ-qL-cKc"/>
+                        <outletCollection property="frequencyDurationLabelOutletCollection" destination="L0d-Tg-Urn" id="2pV-P8-AAI"/>
+                        <outletCollection property="frequencyDurationLabelOutletCollection" destination="MN2-rN-X7r" id="yTq-NN-VqS"/>
+                        <outletCollection property="frequencyDurationLabelOutletCollection" destination="CXK-AY-OT9" id="t7e-5w-eP3"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

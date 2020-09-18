@@ -220,7 +220,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-            if ([self play])
+            if ([self playWithUpdateFrequencyDurationBlock:nil])
             {
                 [self nowPlayingInfo];
                 return MPRemoteCommandHandlerStatusSuccess;
@@ -411,7 +411,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
     return result;
 };
 
-- (BOOL)play
+- (BOOL)playWithUpdateFrequencyDurationBlock:(UpdateFrequencyDuration)updateFrequencyDuration
 {
     //    void * tone = new(Tone, "ToneChannelR");
     
@@ -536,7 +536,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                    return result;
                                } (drand48(), 0.25, 1.75, 1.0));
                             
-                            printf("duration == %f\n", tone_duration->tally);
                             double sample_rate = [audio_format sampleRate];
                             AVAudioChannelCount channel_count = audio_format.channelCount;
                             AVAudioFrameCount frame_length = sample_rate * tone_duration->tally;
@@ -573,17 +572,18 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                         } ((^(AVAudioFrameCount sample_count, double sample_rate, AVAudioChannelCount channel_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
+                            updateFrequencyDuration([NSString stringWithFormat:@"%d\t%f sec\n\t%f Hz", player_node_channel_index, sample_count / sample_rate, frequency], player_node_channel_index);
                             
                             __block double sin_phase = 0.0;
                             __block double cos_phase = M_PI / 2.0;
                             double pi_pi = 2.0 * M_PI;
-                            double sin_phase_increment = pi_pi / sample_rate;
-                            double cos_phase_increment = (M_PI / 2.0) / sample_rate;
+                            double sin_phase_increment = frequency * (pi_pi / sample_rate);
+                            double cos_phase_increment = frequency * ((M_PI / 2.0) / sample_rate);
                             for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
                                     ^ float (void) {
-                                        sin_phase += frequency * sin_phase_increment;
-                                        cos_phase += frequency * cos_phase_increment;
+                                        sin_phase += sin_phase_increment;
+                                        cos_phase += cos_phase_increment;
                                         
                                         return sin(sin_phase) + cos(cos_phase);
                                     }();

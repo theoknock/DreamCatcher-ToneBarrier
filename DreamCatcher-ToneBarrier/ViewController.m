@@ -20,7 +20,11 @@
 }
 
 - (IBAction)playToneBarrierScore:(UIButton *)sender forEvent:(UIEvent *)event {
-    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer play];
+    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer playWithUpdateFrequencyDurationBlock:^(NSString * _Nonnull frequencyDurationLabelText, NSUInteger labelCollectionIndex) {
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [(UILabel *)[(NSArray<UILabel *> *)self.frequencyDurationLabelOutletCollection objectAtIndex:labelCollectionIndex] setText:frequencyDurationLabelText];
+        });
+    }];
     [sender setImage:([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning] && isToneBarrierScorePlaying) ? [UIImage systemImageNamed:@"stop"] : [UIImage systemImageNamed:@"play"] forState:UIControlStateNormal];
 }
 

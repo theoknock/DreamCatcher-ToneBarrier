@@ -12,6 +12,12 @@
 @interface ViewController : UIViewController
 
 @property (weak, nonatomic) IBOutlet UIButton *playButton;
+@property (weak, nonatomic) IBOutlet UILabel *node1ChannelLLabel;
+@property (weak, nonatomic) IBOutlet UILabel *node1ChannelRLabel;
+@property (weak, nonatomic) IBOutlet UILabel *node2ChannelLLabel;
+@property (weak, nonatomic) IBOutlet UILabel *node2ChannelRLabel;
+
+@property (strong, nonatomic) IBOutletCollection(UILabel) NSArray *frequencyDurationLabelOutletCollection;
 
 @end
 

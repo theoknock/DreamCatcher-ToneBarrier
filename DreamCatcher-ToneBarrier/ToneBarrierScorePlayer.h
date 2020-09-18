@@ -48,7 +48,10 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
 @property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
 
 
-- (BOOL)play;
+
+typedef void (^UpdateFrequencyDuration)(NSString *, NSUInteger);
+- (BOOL)playWithUpdateFrequencyDurationBlock:(_Nullable UpdateFrequencyDuration)updateFrequencyDuration;
+//- (BOOL)play;
 
 
 @end
