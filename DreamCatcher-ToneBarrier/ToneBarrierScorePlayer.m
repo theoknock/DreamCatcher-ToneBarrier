@@ -574,34 +574,19 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
                             
-                            float amplitude_peak = (1LL << 32) / 2;
-                            __block double phase = 0.0;         /* phase, in fractions of a cycle */
-                            double pi_pi = 2.0 * M_PI;  //8.0 * atan(-1.0); /* 2 * M_PI; //, a constant */
-//                            phase *= pi_pi;             /* phase in radians */
-                            double frequency_adj = 440.0 / sample_rate;
-                            double w = (pi_pi * frequency_adj);
-                            double phase_increment = pi_pi / sample_rate;
+                            __block double sin_phase = 0.0;
+                            __block double cos_phase = M_PI / 2.0;
+                            double pi_pi = 2.0 * M_PI;
+                            double sin_phase_increment = pi_pi / sample_rate;
+                            double cos_phase_increment = (M_PI / 2.0) / sample_rate;
                             for (int index = 0; index < sample_count; index++)
                                 if (samples) samples[index] =
-                                    ^ double (double amplitude) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
-                                        phase += frequency * phase_increment;
-                                        return sin(phase); // amplitude *
-                                    } (^ double (double peak, double t) {
-                                        return peak;//cos(pi_pi * t) * (peak * t);
-                                    } (amplitude_peak, (^ float (float range_min, float range_max, float range_value) {
-                                        return (range_value - range_min) / (range_max - range_min);
-                                    } (0.0, sample_count, index))));
-////                                    (^ float (float trill_calc) {
-////                                        return sinf(2.0 * xt * M_PI * trill_calc) /*(2 / M_PI) * asinf(sinf(((2 * M_PI) / (xt * (.35 - .25) + .25)) * xt))*/ *
-////                                        (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
-////                                            return ((^ float (float output_volume) { return (1.0 - output_volume) * (1.0 / (player_node_count * channel_count)); } (audio_session.outputVolume + .1))); // To-Do: Add audio route to parameters list and adjust amplitude with volume based on whether speakers or headphones are in use
-////                                        } (audio_format.channelCount, player_node_count));
-////                                    } ((/**/ (xt / (sample_count * 2.0) * 4.0) + 4.0 /**/)));
-////                                    // (endValue – startValue) × time + startValue; Time = 1/number of points * point
-////
-//                                } (^ float (float range_min, float range_max, float range_value) {
-//                                    return (range_value - range_min) / (range_max - range_min);
-//                                } (0.0, sample_count, index), frequency);
+                                    ^ float (void) {
+                                        sin_phase += frequency * sin_phase_increment;
+                                        cos_phase += frequency * cos_phase_increment;
+                                        
+                                        return sin(sin_phase) + cos(cos_phase);
+                                    }();
                         })), ^{
                             player_node_duration_index = (player_node_duration_index + 1) % 4;
                             
@@ -640,19 +625,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                     
                 });
             
-//            dispatch_async(player_nodes_concurrent_queue, ^{
-//
-//                dispatch_sync((j == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
-//                    render_buffer[j](j,
-//                                     player_nodes_concurrent_queue,
-//                                     (j == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
-//                                     (j == 0) ? self.playerNode : self.playerNodeAux,
-//                                     ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[j]),
-//                                     ^struct FrequencyChord * (struct FrequencyChord * frequency_chord){ return frequency_chord; }(self->frequency_chord));
-//                });
-//            });
-            
-            
             return TRUE;
             
         } else {
@@ -660,112 +632,5 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
         }
     }
 }
-
-//    struct RandomSource * duration_random_source;
-//    struct RandomSource * frequency_random_source;
-//    duration_random_source = new(random_generator_drand48, 0.25, 1.75);
-//    frequency_random_source = new(random_generator_drand48, 500.0, 2000.0);
-//
-//    ^ void (AVAudioPlayerNode * _Nonnull __strong player_node, AVAudioSession * _Nonnull __strong audio_session, AVAudioFormat * _Nonnull __strong audio_format, void (^ _Nonnull __strong buffer_rendered)(AVAudioPlayerNode * _Nonnull __strong, AVAudioPCMBuffer * _Nonnull __strong, void (^ _Nonnull __strong)(void)))
-//    {
-//        (player_node, ^AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, double, float *, AVAudioChannelCount)) {
-//                double duration = duration_random_source->generate_random(duration_random_source);
-//                AVAudioFrameCount frameCount = ([audio_format sampleRate] * duration);
-//                AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frameCount];
-//                pcmBuffer.frameLength        = frameCount;
-//
-//                AVAudioChannelCount channel_count = audio_format.channelCount;
-//                double root_freq = frequency_random_source->generate_random(frequency_random_source) * duration;
-//                double harmonic_freq = root_freq * (5.0/4.0);
-//                double device_volume = audio_session.outputVolume;
-//                double gain_new_max = 1.0 / (channel_count); // 0.5
-//                double gain_new_min = 1.0 / gain_new_max; // 2
-//                double gain_adjustment = normalize(gain_new_min, gain_new_max, device_volume);
-//
-//                buffer_sample(frameCount,
-//                              root_freq,
-//                              duration,
-//                              gain_adjustment,
-//                              pcmBuffer.floatChannelData[0],
-//                              channel_count);
-//
-//                buffer_sample(frameCount,
-//                              harmonic_freq,
-//                              duration,
-//                              gain_adjustment,
-//                              (channel_count == 2) ? pcmBuffer.floatChannelData[1] : nil,
-//                              channel_count);
-//
-//                return pcmBuffer;
-//            } (^(AVAudioFrameCount sampleCount, double frequency, double duration, double output_volume, float * samples, AVAudioChannelCount channel_count)
-//               {
-//                for (int index = 0; index < sampleCount; index++)
-//                {
-//                    double normalized_time = normalize(0.0, sampleCount, index);
-//                    double sine_frequency = sample_frequency(normalized_time, frequency, channel_count, 1.0);
-//                    double sample = (sine_frequency * sample_amplitude(normalized_time, output_volume, channel_count, 1.0));
-//
-//                    if (samples) samples[index] = sample;
-//                }
-//            }), ^{
-//                render_buffer();
-//            });
-//        } (self.playerNode, [AVAudioSession sharedInstance], self.audioFormat, ^(AVAudioPlayerNode * player_node, AVAudioPCMBuffer * pcm_buffer, PlayedToneCompletionBlock played_tone)
-//           {
-//            if ([player_node isPlaying])
-//                [player_node scheduleBuffer:pcm_buffer atTime:nil options:AVAudioPlayerNodeBufferInterruptsAtLoop completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType)
-//                 {
-//                    played_tone();
-//                }];
-//        });
-//    };
-//    
-//    dispatch_block_t play_tones = dispatch_block_create(0, ^{
-//        render_buffer();
-//    });
-//    
-//    dispatch_block_t stop_engine = dispatch_block_create(0, ^{
-//        [self.audioEngine pause];
-//        [self.audioEngine stop];
-//        [self.audioEngine reset];
-////        [self.audioEngine detachNode:self.playerNode];
-////        self.playerNode = nil;
-////
-////        [self.audioEngine detachNode:self.reverb];
-////        self.reverb = nil;
-////
-////        [self.audioEngine detachNode:self.mixerNode];
-////        self.mixerNode = nil;
-//    });
-//    
-//    dispatch_block_t start_engine = dispatch_block_create(0, ^{
-//        // Initialize nodes
-//        
-//    });
-//    
-//    if ([self.audioEngine isRunning])
-//    {
-//        dispatch_async(self->render_buffer_serial_queue, stop_engine);
-//    } else {
-//        if ()
-//        dispatch_async(self->render_buffer_serial_queue, start_engine);
-////        if ([self setupEngine])
-////        {
-//////            dispatch_async(self->render_buffer_serial_queue, start_engine);
-////
-////            if ([self startEngine] && ([self.audioEngine isRunning]))
-////            {
-////
-////                if ([self.playerNode isPlaying])
-////                {
-//        if (![self.playerNode isPlaying])
-//            [self.playerNode play];
-//        
-//            render_buffer();
-////
-////        }
-//    }
-//    return [self.audioEngine isRunning];
-//}
 
 @end
