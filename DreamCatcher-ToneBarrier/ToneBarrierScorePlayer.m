@@ -517,9 +517,9 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 } (&frequency_chord->root_frequency, ^ double (double random, double n, double m, double gamma) {
                                     // ignore gamma for now
                                     // -57.0, 50.0
-                                    double result = scale(n, m, random, 0, RAND_MAX);
+                                    double result = (random * (m - n)) + n;//scale(n, m, random, 0.0, 1.0);
                                     return result;
-                                } (random(), 0.0, 24.0, 1.0));
+                                } (drand48(), -8.0, 24.0, 1.0));
                             }
                             
                             ^ (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
@@ -532,9 +532,9 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                                 }
                             } (&tone_duration->tally, &tone_duration->total,
                                ^ double (double random, double n, double m, double gamma) {
-                                   double result = scale(n, m, random, 0, RAND_MAX);
+                                double result = (random * (m - n)) + n;//scale(n, m, random, 0, 1.0);
                                    return result;
-                               } (random(), 0.25, 1.75, 1.0));
+                               } (drand48(), 0.25, 1.75, 1.0));
                             
                             printf("duration == %f\n", tone_duration->tally);
                             double sample_rate = [audio_format sampleRate];
@@ -574,15 +574,23 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
                             
-                            float32_t amp = (1LL << 32) / 2;
-                            float32_t phase = 0.0;         /* phase, in fractions of a cycle */
-                            double twopi = 2 * M_PI; //8*atan(-1.); /* 2*PI, a constant */
-                            phase *= twopi;             /* phase in radians */
+                            float amplitude_peak = (1LL << 32) / 2;
+                            __block double phase = 0.0;         /* phase, in fractions of a cycle */
+                            double pi_pi = 2.0 * M_PI;  //8.0 * atan(-1.0); /* 2 * M_PI; //, a constant */
+//                            phase *= pi_pi;             /* phase in radians */
+                            double frequency_adj = 440.0 / sample_rate;
+                            double w = (pi_pi * frequency_adj);
+                            double phase_increment = pi_pi / sample_rate;
                             for (int index = 0; index < sample_count; index++)
-                            if (samples) samples[index] = (float32_t)(amp * cos((twopi * index * (frequency / sample_rate)) + phase));
-//                                ^ float (float xt, float frequency) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
-//                                    return ;
-////                                    sinf(M_PI * frequency * xt) *
+                                if (samples) samples[index] =
+                                    ^ double (double amplitude) { // pow(2.0 * pow(sinf(M_PI * time * trill), 2.0) * 0.5, 4.0);
+                                        phase += frequency * phase_increment;
+                                        return sin(phase); // amplitude *
+                                    } (^ double (double peak, double t) {
+                                        return peak;//cos(pi_pi * t) * (peak * t);
+                                    } (amplitude_peak, (^ float (float range_min, float range_max, float range_value) {
+                                        return (range_value - range_min) / (range_max - range_min);
+                                    } (0.0, sample_count, index))));
 ////                                    (^ float (float trill_calc) {
 ////                                        return sinf(2.0 * xt * M_PI * trill_calc) /*(2 / M_PI) * asinf(sinf(((2 * M_PI) / (xt * (.35 - .25) + .25)) * xt))*/ *
 ////                                        (^ float (AVAudioChannelCount channel_count, AVAudioPlayerNodeCount player_node_count) {
@@ -618,7 +626,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             }
             
             dispatch_async(render_buffer_serial_queue, ^{
-                    srand((unsigned int)time(0));
+                    srand48((unsigned short *)time(0));
                     dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index){
 //                        dispatch_sync((index == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
                             render_buffer[index](index,
