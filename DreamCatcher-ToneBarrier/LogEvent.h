@@ -143,7 +143,7 @@ static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * log
         
         NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
         NSMutableAttributedString *log = [[NSMutableAttributedString alloc] initWithAttributedString:[logView attributedText]];
-        NSAttributedString *time_s = [[NSAttributedString alloc] initWithString:timeString(log_entry->entry_date) attributes:logEntryAttributes];
+        NSAttributedString *time_s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
 //        NSAttributedString *context_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->context] attributes:logEntryAttributes];
 //        NSAttributedString *entry_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->entry] attributes:logEntryAttributes];
         [log appendAttributedString:time_s];
