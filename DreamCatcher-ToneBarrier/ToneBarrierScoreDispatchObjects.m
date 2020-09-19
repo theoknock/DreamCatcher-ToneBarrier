@@ -10,7 +10,7 @@
 @implementation ToneBarrierScoreDispatchObjects
 
 static ToneBarrierScoreDispatchObjects * sharedDispatchObjects = NULL;
-+ (nonnull ToneBarrierScoreDispatchObjects *)sharedDispatchObjects;
++ (nonnull ToneBarrierScoreDispatchObjects *)sharedDispatchObjects
 {
     static dispatch_once_t onceSecurePredicate;
     dispatch_once(&onceSecurePredicate,^{

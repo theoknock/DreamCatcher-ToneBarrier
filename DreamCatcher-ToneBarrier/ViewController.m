@@ -8,6 +8,8 @@
 #import "ViewController.h"
 #import "AppDelegate.h"
 #import "ToneBarrierScorePlayer.h"
+#import "ToneBarrierScoreDispatchObjects.h"
+#import "LogEvent.h"
 
 @interface ViewController ()
 {
@@ -20,8 +22,50 @@
 
 - (void)viewDidLoad {
     [super viewDidLoad];
-    // Do any additional setup after loading the view.
+    
+    dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
+        LogEntry log_entry = dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
+        
+        NSMutableAttributedString *log = [[NSMutableAttributedString alloc] initWithAttributedString:[self.logTextView attributedText]];
+        NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
+        NSAttributedString *entry = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
+        [log appendAttributedString:entry];
+        
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [self.logTextView setAttributedText:log];
+        });
+        
+        free(log_entry), log_entry = 0;
+        
+    });
+        
+    dispatch_resume(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
 }
+
+/*
+ __block NSMutableAttributedString *log = [[NSMutableAttributedString alloc] init];
+ 
+ [logEntries enumerateObjectsUsingBlock:^(NSValue * _Nonnull logEntryValue, NSUInteger idx, BOOL * _Nonnull stop) {
+     LogEntry log_entry;
+     [logEntryValue getValue:&log_entry];
+     NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
+     NSAttributedString *time_s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
+     [log appendAttributedString:time_s];
+     printf("idx %lu\n", idx);
+ }];
+ 
+ 
+ 
+ //        NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
+ //        NSMutableAttributedString *log = [[NSMutableAttributedString alloc] initWithAttributedString:[logView attributedText]];
+ //        NSAttributedString *time_s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
+ //        NSAttributedString *context_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->context] attributes:logEntryAttributes];
+ //        NSAttributedString *entry_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->entry] attributes:logEntryAttributes];
+ //        [log appendAttributedString:time_s];
+ //        [log appendAttributedString:context_s];
+ //        [log appendAttributedString:entry_s];
+ [logView setAttributedText:log]; // To-Do: display every entry in logEntries
+ */
 
 - (void)textStyles
 {

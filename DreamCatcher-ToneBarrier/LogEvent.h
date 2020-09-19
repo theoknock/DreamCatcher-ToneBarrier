@@ -20,6 +20,8 @@
 #import <CoreMedia/CMTime.h>
 #import <CoreMedia/CMSync.h>
 
+#import "ToneBarrierScoreDispatchObjects.h"
+
 typedef NS_ENUM(NSUInteger, LogEntryAttribute) {
     LogEntryAttributeError,     // Any error
     LogEntryAttributeSuccess,   // A successful @try
@@ -124,34 +126,22 @@ static LogEntryAttributeStyle _Nonnull logEntryAttributeStyle = ^ NSDictionary<N
 ////    });
 //};
 
-typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> *_Nonnull, UITextView * _Nonnull, char * _Nonnull, char * _Nonnull, LogEntryAttribute);
-static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * logEntries, UITextView * _Nonnull logView, char * context, char * entry, LogEntryAttribute logEntryAttribute) {
+typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> *_Nonnull, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute);
+static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * logEntries, NSString * context, NSString * entry, LogEntryAttribute logEntryAttribute) {
     printf("%s\n", __PRETTY_FUNCTION__);
-    
-    LogEntry log_entry = calloc(1, sizeof(CMTime) + sizeof(NSUInteger));
-    log_entry->entry_date = current_cmtime();
-//    log_entry->context = strdup("context");
-//    log_entry->entry = strdup(entry);
-    log_entry->log_entry_attribute = logEntryAttribute;
-
-    NSValue *logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
-    [logEntries addObject:logEntryValue];
-    free(log_entry), log_entry = 0;
-    dispatch_async(dispatch_get_main_queue(), ^{
-        LogEntry log_entry;
-        [logEntryValue getValue:&log_entry];
+    dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
+        struct LogEntry *log_entry = malloc(sizeof(struct LogEntry));
+        log_entry->entry_date = current_cmtime();
+        //    log_entry->context = strdup("context");
+        //    log_entry->entry = strdup(entry);
+        log_entry->log_entry_attribute = logEntryAttribute;
         
-        NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
-        NSMutableAttributedString *log = [[NSMutableAttributedString alloc] initWithAttributedString:[logView attributedText]];
-        NSAttributedString *time_s = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
-//        NSAttributedString *context_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->context] attributes:logEntryAttributes];
-//        NSAttributedString *entry_s = [[NSAttributedString alloc] initWithString:[NSString stringWithUTF8String:log_entry->entry] attributes:logEntryAttributes];
-        [log appendAttributedString:time_s];
-//        [log appendAttributedString:context_s];
-//        [log appendAttributedString:entry_s];
-        [logView setAttributedText:log]; // To-Do: display every entry in logEntries
+        NSValue *logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
+        [logEntries addObject:logEntryValue];
+        
+        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, log_entry);
+        dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
     });
-    
 };
 
 #endif /* LogEvent_h */

@@ -24,14 +24,10 @@ typedef void (^BufferRendered)(void (^)(AVAudioPCMBuffer * _Nonnull,
                                    void (^)(AVAudioPlayerNode * _Nonnull,
                                             void (^)(AVAudioPlayerNode * _Nonnull))));
                           
-typedef void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
-                          void (^)(AVAudioPCMBuffer * _Nonnull,
-                                   void (^)(AVAudioPlayerNode * _Nonnull)));
+//typedef void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
+//                          void (^)(AVAudioPCMBuffer * _Nonnull,
+//                                   void (^)(AVAudioPlayerNode * _Nonnull)));
     
-typedef NSUInteger AVAudioPlayerNodeIndex;
-typedef struct DurationTally DurationTally;
-typedef struct FrequencyChord FrequencyChord;
-typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, DurationTally *, FrequencyChord *);
 
 //typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
 //                               void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
@@ -51,11 +47,12 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
 @property (nonatomic, strong) AVAudioMixerNode * _Nullable  mixerNode;
 @property (nonatomic, strong) AVAudioFormat * _Nullable     audioFormat;
 @property (nonatomic, strong) AVAudioUnitReverb * _Nullable reverb;
+@property (nonatomic, strong) AVAudioPCMBuffer * pcmBuffer;
+@property (nonatomic, strong) AVAudioPCMBuffer * pcmBufferAux;
 
 @property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
 
-- (BOOL)playWithLogEventHandler:(void (^)(NSMutableOrderedSet<NSValue *> * logEntries, NSString * _Nonnull context, NSString * _Nonnull entry, LogEntryAttribute logEntryAttribute))logEventHandler;
-
+- (BOOL)play;
 
 @end
 

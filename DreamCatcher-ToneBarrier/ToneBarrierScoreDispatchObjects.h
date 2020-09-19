@@ -9,6 +9,11 @@
 
 NS_ASSUME_NONNULL_BEGIN
 
+typedef struct ContextData
+{
+    double x;
+} ContextData;
+
 @interface ToneBarrierScoreDispatchObjects : NSObject
 
 + (nonnull ToneBarrierScoreDispatchObjects *)sharedDispatchObjects;
