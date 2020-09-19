@@ -20,7 +20,7 @@
 struct Score
 {
     const void * class;
-    void * title;
+    char * title;
     struct Tempo
     {
         int session_period;     // 8 hours
@@ -33,10 +33,9 @@ struct Score
 static void * Score_ctor (void * _self, va_list * app)
 {
     struct Score * self = _self;
-    void * title = new(String, va_arg(* app, const char *));
-//    const char * title = va_arg(* app, const char *);
-//    self -> title = malloc(strlen(title) + 1);
-//    strcpy(self -> title, title);
+    const char * title = va_arg(* app, const char *);
+    self -> title = malloc(strlen(title) + 1);
+    strcpy(self -> title, title);
     assert(self -> title);
     
     int session_period = va_arg(* app, int);

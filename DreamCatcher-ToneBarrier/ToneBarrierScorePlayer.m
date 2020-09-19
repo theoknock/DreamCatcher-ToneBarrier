@@ -27,12 +27,14 @@
 #include "time.h"
 #include "math.h"
 
-
+#import "ViewController.h"
 #import "ToneBarrierScorePlayer.h"
 #import "ToneBarrierScoreDispatchObjects.h"
 
 #include "Randomizer.h"
 #include "Tone.h"
+
+#define foo4random()    (arc4random() / ((unsigned)RAND_MAX))
 
 typedef struct ContextData
 {
@@ -41,7 +43,7 @@ typedef struct ContextData
 
 
 
-typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
+typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
 
 // Classification of structs:
 // - some organize properties and methods that relate to software design and architecture (computer science, hardware considerations, best practices, provisions)
@@ -62,21 +64,21 @@ typedef uint32_t AVAudioPlayerNodeCount, AVAudioPlayerNodeIndex, AVAudioPlayerNo
 //    }
 //};
 
-typedef struct DurationTally
+struct DurationTally
 {
     double total;
     double tally;
     __unsafe_unretained double(^next_duration)(double * tally, double * total);
-} * DurationTally;
+} * duration_tally;
 
-typedef struct FrequencyChord
+struct FrequencyChord
 {
     double root_frequency;
     int total;
     int tally;
     double ratios[4];
 //    int (^next_ratio)(int * total, int * tally);
-} * FrequencyChord;
+} * frequency_chord;
 
 // Pitch Set - Major Seventh
 //                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
@@ -174,15 +176,19 @@ static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum t
     return ratios;
 };
 
-
+#import <CoreMedia/CMTime.h>
+#import <CoreMedia/CMSync.h>
 
 @interface ToneBarrierScorePlayer ()
 {
-    struct DurationTally * duration_tally[2];
-    struct FrequencyChord * frequency_chord;
+//    struct DurationTally * duration_tally;
+//    struct FrequencyChord * frequency_chord;
 }
 
+@property (strong, nonatomic) NSMutableOrderedSet * playerLogEvents;
+
 @end
+
 
 @implementation ToneBarrierScorePlayer
 
@@ -204,6 +210,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 {
     if (self == [super init])
     {
+        _playerLogEvents = [[NSMutableOrderedSet alloc] init];
         dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
                 struct ContextData * data = dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
                 printf("x = %f", data->x);
@@ -220,7 +227,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-            if ([self playWithUpdateFrequencyDurationBlock:nil])
+            if ([self playWithLogEventHandler:nil])
             {
                 [self nowPlayingInfo];
                 return MPRemoteCommandHandlerStatusSuccess;
@@ -411,7 +418,7 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
     return result;
 };
 
-- (BOOL)playWithUpdateFrequencyDurationBlock:(UpdateFrequencyDuration)updateFrequencyDuration
+- (BOOL)playWithLogEventHandler:(void (^)(NSMutableOrderedSet<NSValue *> * logEntries, NSString * _Nonnull context, NSString * _Nonnull entry, LogEntryAttribute logEntryAttribute))logEventHandler
 {
     //    void * tone = new(Tone, "ToneChannelR");
     
@@ -480,112 +487,128 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             size_t buffer_size = 256 * sizeof(char *);
             char * random_buffer      = (char *)malloc(buffer_size);
             initstate(seed, random_buffer, buffer_size);
+            srandomdev();
+            
             
             __block AVAudioPlayerNodeChannelIndex player_node_channel_index = 0;
-            __block AVAudioPlayerNodeDurationIndex player_node_duration_index = 0;
             
-            frequency_chord = (struct FrequencyChord *)malloc(sizeof(struct FrequencyChord));
+            frequency_chord = (FrequencyChord *)malloc(sizeof(FrequencyChord));
             frequency_chord->root_frequency = 440.0;
             frequency_chord->total = 3;
             frequency_chord->tally = 0;
-            frequency_chord->ratios[0] = 8.0;
-            frequency_chord->ratios[1] = 10.0;
-            frequency_chord->ratios[2] = 12.0;
-            frequency_chord->ratios[3] = 15.0;
+            frequency_chord->ratios[0] = 1.0;
+            frequency_chord->ratios[1] = 10.0 / 8.0;
+            frequency_chord->ratios[2] = 12.0 / 8.0;
+            frequency_chord->ratios[3] = 15.0 / 8.0;
 
-            static void(^render_buffer[2])(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, struct DurationTally *, struct FrequencyChord *);
+            static RenderBuffer render_buffer[2];
             for (int i = 0; i < 2; i++)
             {
                 
                 
-                duration_tally[i] = (struct DurationTally *)malloc(sizeof(struct DurationTally));
-                duration_tally[i]->tally = 2.0;
-                duration_tally[i]->total = 2.0;
+                duration_tally = (DurationTally *)malloc(sizeof(DurationTally));
+                duration_tally->tally = 2.0;
+                duration_tally->total = 2.0;
                 
-                
-                
-                render_buffer[i] = ^(AVAudioPlayerNodeIndex player_node_index, dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, struct DurationTally * tone_duration, struct FrequencyChord * frequency_chord) {
+                render_buffer[i] = ^(AVAudioPlayerNodeIndex player_node_index, dispatch_queue_t __strong concurrent_queue, dispatch_queue_t __strong serial_queue, AVAudioPlayerNode * __strong player_node, DurationTally * tone_duration, FrequencyChord * frequency_chord) {
                     ^(AVAudioPlayerNodeCount player_node_count, AVAudioSession * audio_session, AVAudioFormat * audio_format, BufferRenderedCompletionBlock buffer_rendered)
                     {
                         //                        dispatch_async(serial_queue, ^{
-                        buffer_rendered(^ AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, AVAudioChannelCount, double, StereoChannelOutput, float *)) {
+                        buffer_rendered(^ AVAudioPCMBuffer * (void (^buffer_sample)(AVAudioFrameCount, double, double, StereoChannelOutput, float *)) {
                             
-                            if (player_node_duration_index == 0)
-                            {
-                                ^ void (double * root_frequency, double random) {
-                                    *root_frequency = pow(1.059463094, (int)random) * 440.0;
-                                } (&frequency_chord->root_frequency, ^ double (double random, double n, double m, double gamma) {
-                                    // ignore gamma for now
-                                    // -57.0, 50.0
-                                    double result = (random * (m - n)) + n;//scale(n, m, random, 0.0, 1.0);
-                                    return result;
-                                } (drand48(), -8.0, 24.0, 1.0));
-                            }
-                            
-                            ^ (double * tally, double *total, double random) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
-                                if (*tally == *total)
-                                {
-                                    double duration_diff = random;//random() / RAND_MAX; // < -- placeholder for duration_randomizer->generate_distributed_random(duration_randomizer);
-                                    *tally = *total - duration_diff;
-                                } else {
-                                    *tally = *total - *tally;
-                                }
-                            } (&tone_duration->tally, &tone_duration->total,
-                               ^ double (double random, double n, double m, double gamma) {
-                                double result = (random * (m - n)) + n;//scale(n, m, random, 0, 1.0);
-                                   return result;
-                               } (drand48(), 0.25, 1.75, 1.0));
+                            ;
                             
                             double sample_rate = [audio_format sampleRate];
                             AVAudioChannelCount channel_count = audio_format.channelCount;
-                            AVAudioFrameCount frame_length = sample_rate * tone_duration->tally;
+                            AVAudioFrameCount frame_length = sample_rate * (^ double (double * tally, double total) { // the random() parameter needs to be in a block that returns the result of the function for when buffers are swapped out and states are set, etc.
+                                if (*tally == total)
+                                {
+                                    *tally = total - (^ double (double random, double n, double m, double gamma) {
+                                        printf("%f\t", random);
+                                        double result = scale(n, m, arc4random(), -(pow(2, 32) / 2), (pow(2, 32) / 2));
+                                        printf("%f\n", result);
+                                        
+                                        return 1.0;
+                                    } (foo4random(), 0.25, 1.75, 1.0));
+                                } else {
+                                    *tally = total - *tally;
+                                }
+                                return *tally;
+                            } (&tone_duration->tally, tone_duration->total));
                             AVAudioFrameCount frame_count  = frame_length * channel_count;
                             [player_node prepareWithFrameCount:frame_length];
                             AVAudioPCMBuffer *pcmBuffer  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:audio_format frameCapacity:frame_count];
                             pcmBuffer.frameLength        = frame_length;
                             
-                            dispatch_async(render_buffer_serial_queue, ^{
-                                dispatch_apply(channel_count, render_buffer_serial_queue_apply, ^(size_t index) {
+//                            dispatch_async(render_buffer_serial_queue, ^{
+//                                dispatch_apply(channel_count, render_buffer_serial_queue_apply, ^(size_t index) {
+                            for (int index = 0; index < 2; index++)
                                     buffer_sample(frame_length,
                                                   sample_rate,
-                                                  channel_count,
-                                                  ^ double (double * fundamental_frequency, double * fundamental_ratio, double * frequency_ratio) {
-                                        return ((*fundamental_frequency / *fundamental_ratio) * *frequency_ratio);
-                                    } (&frequency_chord->root_frequency, &frequency_chord->ratios[0],
-                                       &frequency_chord->ratios[^ int (int * total, int * tally) {
-                                        if (*tally == *total)
+                                                  ^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
+                                        return (fundamental_frequency * frequency_ratio);
+                                    } ((player_node_channel_index == 0) ? ^ double (double * root_frequency, double random) {
+                                        *root_frequency = pow(1.059463094, (int)random) * 440.0;
+                                        return *root_frequency;
+                                    } (&frequency_chord->root_frequency, ^ double (double random, double n, double m, double gamma) {
+                                        // ignore gamma for now
+                                        // -57.0, 50.0
+                                        double result = scale(n, m, arc4random(), -pow(2, 32), pow(2, 32));
+                                        return result;
+                                    } (foo4random(), -8.0, 24.0, 1.0)) : frequency_chord->root_frequency, frequency_chord->ratios[0],
+                                       frequency_chord->ratios[^ int (int total, int * tally) {
+                                        if (*tally == total)
                                         {
-                                            *tally = *total - *tally;
+                                            *tally = total - *tally;
                                             return *tally;
                                         } else {
-                                            int diff = *total - *tally;
+                                            int diff = total - *tally;
                                             *tally = *tally + 1;
                                             return diff;
                                         }
-                                    } (&frequency_chord->total, &frequency_chord->tally)]),
+                                    } (frequency_chord->total, &frequency_chord->tally)]),
                                                   StereoChannelOutputUnspecified,
                                                   pcmBuffer.floatChannelData[index]);
-                                });
-                            });
-                         
+//                                });
+//                            });
+                            
+                            logEventHandler(_playerLogEvents, @"Buffer Rendered",
+                                            @"Node: %d\n%f sec\n\t%f Hz\t%f Hz\n", /*player_node_index, frame_count / sample_rate, frequency_chord->root_frequency, frequency_chord->root_frequency * frequency_chord->ratios[player_node_channel_index),*/
+                                            LogEntryAttributeOperation);
+//                            logEvent([NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+//                                     [NSString stringWithFormat:@"Node: %d\n%f sec\n\t%f Hz\t%f Hz\n", player_node_index, frame_count / sample_rate, frequency_chord->root_frequency, frequency_chord->root_frequency * frequency_chord->ratios[player_node_channel_index]],
+//                                     LogTextAttributes_Event,
+//                                             ^{
+//
+//                            });
+                            
                             return pcmBuffer;
-                        } ((^(AVAudioFrameCount sample_count, double sample_rate, AVAudioChannelCount channel_count, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                        } ((^(AVAudioFrameCount sample_count, double sample_rate, double frequency, StereoChannelOutput stereo_channel_output, float * samples) {
+                            
+                            
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
-                            updateFrequencyDuration([NSString stringWithFormat:@"%d\t%f sec\n\t%f Hz", player_node_channel_index, sample_count / sample_rate, frequency], player_node_channel_index);
-                            
-                            __block double sin_phase = 0.0;
-                            __block double cos_phase = M_PI / 2.0;
+
+                            double sin_phase = 0.0;
+                            double sin_increment = (frequency * (2.0 * M_PI)) / sample_rate;
                             for (int index = 0; index < sample_count; index++)
-                                if (samples) samples[index] =
-                                    ^ float (double sin_phase_increment, double cos_phase_increment) {
-                                        sin_phase += sin_phase_increment;
-                                        cos_phase += cos_phase_increment;
-                                        return sin(sin_phase) + cos(cos_phase);
-                                    } (frequency * ((2.0 * M_PI) / sample_rate),
-                                       frequency * ((M_PI / 2.0) / sample_rate));
+                            {
+                                if (samples) samples[index] = sinf(sin_phase);
+                                sin_phase += sin_increment;
+                                if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
+                                if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
+                            }
+                            
+                            
+                            
+                            
+                            //                                    ^ float (double sin_phase_increment, double cos_phase_increment) {
+//                                        sin_phase += sin_phase_increment;
+////                                        cos_phase += cos_phase_increment;
+//                                        return (sinf(sin_phase) + cosf(cos_phase));//* sin(index * M_PI * (1.0/sample_rate));
+//                                    } (sin_increment,
+//                                       cos_increment);
                         })), ^{
-                            player_node_duration_index = (player_node_duration_index + 1) % 4;
                             render_buffer[i](player_node_index, concurrent_queue, serial_queue, player_node, tone_duration, frequency_chord);
                         });
                     } ((AVAudioPlayerNodeCount)2, [AVAudioSession sharedInstance], self.audioFormat,
@@ -606,15 +629,15 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
             }
             
             dispatch_async(render_buffer_serial_queue, ^{
-                    srand48((unsigned short *)time(0));
+                    
                     dispatch_apply(2, render_buffer_serial_queue_apply, ^(size_t index){
 //                        dispatch_sync((index == 0) ? player_node_serial_queue : player_node_serial_queue_aux, ^{
                             render_buffer[index](index,
                                              player_nodes_concurrent_queue,
                                              (index == 0) ? player_node_serial_queue : player_node_serial_queue_aux,
                                              (index == 0) ? self.playerNode : self.playerNodeAux,
-                                             ^struct DurationTally * (struct DurationTally * tally){ return tally; }(self->duration_tally[index]),
-                                             ^struct FrequencyChord * (struct FrequencyChord * frequency_chord){ return frequency_chord; }(self->frequency_chord));
+                                             ^DurationTally * (DurationTally * tally){ return tally; } (duration_tally),
+                                             ^FrequencyChord * (FrequencyChord * frequency_chord){ return frequency_chord; } (frequency_chord));
 //                        });
                     });
                     
@@ -627,5 +650,6 @@ AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int ar
         }
     }
 }
+
 
 @end

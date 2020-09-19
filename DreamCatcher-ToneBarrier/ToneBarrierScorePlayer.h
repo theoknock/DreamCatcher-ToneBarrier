@@ -10,6 +10,8 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 
+#import "LogEvent.h"
+
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^BufferConsumed)(
@@ -25,12 +27,17 @@ typedef void (^BufferRendered)(void (^)(AVAudioPCMBuffer * _Nonnull,
 typedef void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
                           void (^)(AVAudioPCMBuffer * _Nonnull,
                                    void (^)(AVAudioPlayerNode * _Nonnull)));
-                          
-typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
-                               void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
-                                                    void (^BufferRendered)(AVAudioPCMBuffer * _Nonnull,
-                                                             void (^ConsumeBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull,
-                                                                      void (^BufferConsumed)(AVAudioPlayerNode * _Nonnull)))));
+    
+typedef NSUInteger AVAudioPlayerNodeIndex;
+typedef struct DurationTally DurationTally;
+typedef struct FrequencyChord FrequencyChord;
+typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, DurationTally *, FrequencyChord *);
+
+//typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
+//                               void (^BufferRenderer)(AVAudioFormat * _Nonnull, AVAudioSession * _Nonnull,
+//                                                    void (^BufferRendered)(AVAudioPCMBuffer * _Nonnull,
+//                                                             void (^ConsumeBuffer)(AVAudioPlayerNode * _Nonnull, AVAudioPCMBuffer * _Nonnull,
+//                                                                      void (^BufferConsumed)(AVAudioPlayerNode * _Nonnull)))));
 
 
 @interface ToneBarrierScorePlayer : NSObject
@@ -47,11 +54,7 @@ typedef void (^RenderBuffer)(AVAudioPlayerNode * _Nonnull,
 
 @property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
 
-
-
-typedef void (^UpdateFrequencyDuration)(NSString *, NSUInteger);
-- (BOOL)playWithUpdateFrequencyDurationBlock:(_Nullable UpdateFrequencyDuration)updateFrequencyDuration;
-//- (BOOL)play;
+- (BOOL)playWithLogEventHandler:(void (^)(NSMutableOrderedSet<NSValue *> * logEntries, NSString * _Nonnull context, NSString * _Nonnull entry, LogEntryAttribute logEntryAttribute))logEventHandler;
 
 
 @end

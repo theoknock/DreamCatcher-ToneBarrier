@@ -6,20 +6,18 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <CoreMedia/CMTime.h>
+#import <CoreMedia/CMSync.h>
 #import <Foundation/Foundation.h>
+
+#import "LogEvent.h"
 #import "ToneBarrierScorePlayer.h"
 
 @interface ViewController : UIViewController <UITextViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *playButton;
-@property (weak, nonatomic) IBOutlet UILabel *node1ChannelLLabel;
-@property (weak, nonatomic) IBOutlet UILabel *node1ChannelRLabel;
-@property (weak, nonatomic) IBOutlet UILabel *node2ChannelLLabel;
-@property (weak, nonatomic) IBOutlet UILabel *node2ChannelRLabel;
-@property (strong, nonatomic) IBOutletCollection(UILabel) NSArray *frequencyDurationLabelOutletCollection;
 
 @property (strong, nonatomic) IBOutlet UITextView *logTextView;
-- (void)log:(NSString *)context entry:(NSString *)entry time:(CMTime)time textAttributes:(NSUInteger)logTextAttributes;
 
 
 @end
