@@ -35,8 +35,8 @@ typedef struct LogEntry
 {
     CMTime entry_date;
     LogEntryAttribute log_entry_attribute;
-    const char * _Nonnull context;
-    const char * _Nonnull entry;
+    char * _Nonnull context;
+    char * _Nonnull entry;
 } * LogEntry;
 
 typedef CMTime(^CurrentCMTime)(void);
@@ -129,17 +129,19 @@ static LogEntryAttributeStyle _Nonnull logEntryAttributeStyle = ^ NSDictionary<N
 typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> * _Nonnull, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute, BOOL);
 static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * _Nonnull logEntries, NSString * context, NSString * entry, LogEntryAttribute logEntryAttribute, BOOL refreshLogTextView) {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        struct LogEntry * log_entry = malloc(sizeof(struct LogEntry));
-        log_entry->entry_date = current_cmtime();
-        log_entry->context = (const char *)[context UTF8String];
-        log_entry->entry = (const char *)[entry UTF8String];
-        log_entry->log_entry_attribute = logEntryAttribute;
-        
-        NSValue * logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
-        [logEntries addObject:logEntryValue];
-        
-        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, (__bridge void * _Nullable)(logEntries));
-        dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
+//        struct LogEntry * log_entry = malloc(sizeof(struct LogEntry));
+//        log_entry->entry_date = current_cmtime();
+////        log_entry->context = malloc(sizeof(char *));
+////        strcpy(log_entry->context, (const char *)[context UTF8String]);
+////        log_entry->entry = malloc(sizeof(char *));
+////        strcpy(log_entry->entry, (const char *)[entry UTF8String]);
+//        log_entry->log_entry_attribute = logEntryAttribute;
+//        
+//        NSValue * logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
+//        [logEntries addObject:logEntryValue];
+//        
+//        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, (__bridge void * _Nullable)(logEntries));
+//        dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
     });
 };
 

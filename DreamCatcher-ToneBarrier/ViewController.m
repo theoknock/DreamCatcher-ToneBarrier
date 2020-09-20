@@ -32,12 +32,12 @@
             
             NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
             NSAttributedString * entry_date = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
-            NSAttributedString * context = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->context]] attributes:logEntryAttributes];
-            NSAttributedString * entry = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->entry]] attributes:logEntryAttributes];
+//            NSAttributedString * context = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->context]] attributes:logEntryAttributes];
+//            NSAttributedString * entry = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->entry]] attributes:logEntryAttributes];
             
             [log appendAttributedString:entry_date];
-            [log appendAttributedString:context];
-            [log appendAttributedString:entry];
+//            [log appendAttributedString:context];
+//            [log appendAttributedString:entry];
         }];
         [self.logTextView setAttributedText:log];
     });
