@@ -125,9 +125,7 @@
 }
 
 - (IBAction)playToneBarrierScore:(UIButton *)sender forEvent:(UIEvent *)event {
-    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer playWithLogEventHandler:^(NSMutableOrderedSet<NSValue *> * logEntries, NSString * _Nonnull context, NSString * _Nonnull entry, LogEntryAttribute logEntryAttribute) {
-        logEvent(logEntries, self.logTextView, "", "", LogEntryAttributeOperation);
-    }];
+    BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer play];
     [sender setImage:([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning] && isToneBarrierScorePlaying) ? [UIImage systemImageNamed:@"stop"] : [UIImage systemImageNamed:@"play"] forState:UIControlStateNormal];
 }
 
