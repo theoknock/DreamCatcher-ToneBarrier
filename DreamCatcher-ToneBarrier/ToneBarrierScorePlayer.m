@@ -524,13 +524,15 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             
             __block AVAudioPlayerNodeChannelIndex player_node_channel_index = 0;
             
+            const double PI_2 = 2.0 * M_PI;
+            
             typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
                                       __weak typeof(AVAudioPCMBuffer) *,
                                       __weak typeof(AVAudioFormat) *,
                                       __weak typeof(NSMutableOrderedSet) *);
             
             
-            static PlayTones play_tones;
+            static PlayTones play_tones, play_tones_aux;
             
             play_tones =
             ^ (__weak typeof(AVAudioPlayerNode) * player_node,
@@ -582,18 +584,35 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                     *tally = *tally + 1;
                                     return diff;
                                 }
-                            } (frequency_scale->total, &frequency_scale->tally)]) * (2.0 * M_PI)) / sample_rate;
+                            } (frequency_scale->total, &frequency_scale->tally)]) * PI_2) / sample_rate;
                             
                             player_node_channel_index++;
                             player_node_channel_index = player_node_channel_index % 4;
                             
+                            
+                            double val;
+                            double curfreq = scale(0.5, 4.0, frequency_scale->root_frequency, 277.1826317, 1396.912916);
+                            double curphase = (player_node_channel_index == 0 || player_node_channel_index == 2) ? 0.0 : M_PI_2;
+                                double incr = (PI_2 / sample_rate) * curfreq;
+                            
+                            
+
+                            
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++)
                                 {
-                                    float_channel_data[channel_index][buffer_index] = sinf(sin_phase);
+                                    val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
+                                    if(val < 0.0)
+                                        val = -val;
+                                    val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
+                                        curphase -= PI_2;
+                                    if(curphase < 0.0)
+                                        curphase += PI_2;
+                                    
+                                    float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
                                     sin_phase += sin_increment;
-                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
-                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
+                                    if (sin_phase >= PI_2) sin_phase -= PI_2;
+                                    if (sin_phase < 0.0)   sin_phase += PI_2;
                                 }
                         }
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
@@ -643,6 +662,133 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             __weak typeof(NSMutableOrderedSet) * w_logEvents = self.playerLogEvents;
             
             play_tones(w_playerNode, w_pcmBuffer, w_audioFormat, w_logEvents);
+            
+            play_tones_aux =
+            ^ (__weak typeof(AVAudioPlayerNode) * player_node,
+               __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
+               __weak typeof(AVAudioFormat) * audio_format,
+               __weak typeof(NSMutableOrderedSet) * log_events) {
+                
+                logEvent(log_events,
+                         [NSString stringWithFormat:@"%@", self.description],
+                         [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                         LogEntryAttributeOperation, FALSE);
+                
+                double sample_rate = [audio_format sampleRate];
+                AVAudioChannelCount channel_count = audio_format.channelCount;
+                AVAudioFrameCount frame_count = sample_rate * 2.0;
+                pcm_buffer.frameLength        = frame_count;
+                
+                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
+                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
+                    
+                    logEvent(log_events,
+                             [NSString stringWithFormat:@"%@", self.description],
+                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                             LogEntryAttributeOperation, FALSE);
+                    
+                    ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
+                        double sin_phase = 0.0;
+                        
+                        for (int channel_index = 0; channel_index < channel_count; channel_index++)
+                        {
+                            double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
+                                return (fundamental_frequency * frequency_ratio);
+                            } ((player_node_channel_index == 0) ? ^ double (double * root_frequency, double random) {
+                                *root_frequency = pow(1.059463094, (int)random) * (440.0 * (10.0 / 8.0));
+                                return *root_frequency;
+                            } (&frequency_scale->root_frequency, ^ double (double random, double n, double m, double gamma) {
+                                // ignore gamma for now
+                                // -57.0, 50.0
+                                double result = scale(n, m, random, -pow(2, 32), pow(2, 32));
+                                return result;
+                            } (arc4random(), -8.0, 24.0, 1.0)) : frequency_scale->root_frequency, frequency_scale->ratios[0],
+                               frequency_scale->ratios[^ int (int total, int * tally) {
+                                if (*tally == total)
+                                {
+                                    *tally = total - *tally;
+                                    return *tally;
+                                } else {
+                                    int diff = total - *tally;
+                                    *tally = *tally + 1;
+                                    return diff;
+                                }
+                            } (frequency_scale->total, &frequency_scale->tally)]) * PI_2) / sample_rate;
+                            
+                            player_node_channel_index++;
+                            player_node_channel_index = player_node_channel_index % 4;
+                            
+                            
+                            double val;
+                            double curfreq = scale(0.5, 4.0, frequency_scale->root_frequency, 277.1826317, 1396.912916);
+                            double curphase = (player_node_channel_index == 0 || player_node_channel_index == 2) ? 0.0 : M_PI_2;
+                                double incr = (PI_2 / sample_rate) * curfreq;
+              
+                            if (float_channel_data[channel_index])
+                                for (int buffer_index = 0; buffer_index < frame_count; buffer_index++)
+                                {
+                                    val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
+                                    if(val < 0.0)
+                                        val = -val;
+                                    val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
+                                        curphase -= PI_2;
+                                    if(curphase < 0.0)
+                                        curphase += PI_2;
+                                    
+                                    float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
+                                    sin_phase += sin_increment;
+                                    if (sin_phase >= PI_2) sin_phase -= PI_2;
+                                    if (sin_phase < 0.0)   sin_phase += PI_2;
+                                }
+                        }
+                    } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
+                });
+                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
+                    
+                    logEvent(log_events,
+                             [NSString stringWithFormat:@"%@", self.description],
+                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                             LogEntryAttributeOperation, FALSE);
+                    
+                    ^ (PlayedToneCompletionBlock played_tone) {
+                        
+                        logEvent(log_events,
+                                 [NSString stringWithFormat:@"%@", self.description],
+                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                                 LogEntryAttributeOperation, FALSE);
+                        
+                        if ([player_node isPlaying])
+                        {
+                            [player_node prepareWithFrameCount:frame_count]; // check this number
+                            [player_node scheduleBuffer:pcm_buffer atTime:nil
+                                                options:AVAudioPlayerNodeBufferInterruptsAtLoop
+                                 completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack
+                                      completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+                                if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
+                                    played_tone();
+                            }];
+                        }
+                    } (^ {
+                        
+                        logEvent(log_events,
+                                 [NSString stringWithFormat:@"%@", self.description],
+                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                                 LogEntryAttributeOperation, FALSE);
+                        
+                        play_tones(player_node, pcm_buffer, audio_format, log_events);
+                    });
+                });
+                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
+                dispatch_async(samplerQueue, samplerBlock);
+            };
+            
+            __weak typeof(AVAudioPlayerNode) * w_playerNodeAux = self.playerNodeAux;
+            __weak typeof(AVAudioPCMBuffer) * w_pcmBufferAux = self.pcmBufferAux;
+            __weak typeof(AVAudioFormat) * w_audioFormatAux = self.audioFormat;
+            __weak typeof(NSMutableOrderedSet) * w_logEventsAux = self.playerLogEvents;
+            
+            play_tones_aux(w_playerNodeAux, w_pcmBufferAux, w_audioFormatAux, w_logEventsAux);
+            
             
             
             //            __block AVAudioPlayerNodeChannelIndex player_node_channel_index = 0;
