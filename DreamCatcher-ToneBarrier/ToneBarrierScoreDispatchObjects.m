@@ -27,7 +27,7 @@ static ToneBarrierScoreDispatchObjects * sharedDispatchObjects = NULL;
 {
     if (self == [super init])
     {
-        self.tone_barrier_dispatch_queue = dispatch_queue_create("Tone Barrier Dispatch Queue", DISPATCH_QUEUE_CONCURRENT);
+        self.tone_barrier_dispatch_queue = dispatch_queue_create_with_target("Tone Barrier Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
         self.tone_barrier_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.tone_barrier_dispatch_queue);
     }
     

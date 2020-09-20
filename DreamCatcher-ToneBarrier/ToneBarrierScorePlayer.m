@@ -206,7 +206,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     logEvent(_playerLogEvents,
              [NSString stringWithFormat:@"%@", self.description],
              [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation);
+             LogEntryAttributeOperation, FALSE);
     
     if (self == [super init])
     {
@@ -269,7 +269,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     logEvent(_playerLogEvents,
              [NSString stringWithFormat:@"%@", self.description],
              [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation);
+             LogEntryAttributeOperation, FALSE);
     
     self.audioEngine = [[AVAudioEngine alloc] init];
     self.mainNode = [self.audioEngine mainMixerNode];
@@ -285,7 +285,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     logEvent(_playerLogEvents,
              [NSString stringWithFormat:@"%@", self.description],
              [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation);
+             LogEntryAttributeOperation, FALSE);
     
     __autoreleasing NSError *error = nil;
     if ([self.audioEngine startAndReturnError:&error])
@@ -438,13 +438,13 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
 
 - (BOOL)play
 {
-    logEvent(_playerLogEvents,
-             [NSString stringWithFormat:@"%@", self.description],
-             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation);
-    
     if ([self.audioEngine isRunning])
     {
+        logEvent(_playerLogEvents,
+                 [NSString stringWithFormat:@"%@", self.description],
+                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                 LogEntryAttributeOperation, TRUE);
+        
         [self.playerNode pause];
         [self.playerNodeAux pause];
         
@@ -465,6 +465,12 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
         
         return FALSE;
     } else {
+        
+        logEvent(_playerLogEvents,
+                 [NSString stringWithFormat:@"%@", self.description],
+                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
+                 LogEntryAttributeOperation, FALSE);
+        
         [self setupEngine];
         
         self.playerNode = [[AVAudioPlayerNode alloc] init];
@@ -528,7 +534,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 logEvent(log_events,
                          [NSString stringWithFormat:@"%@", self.description],
                          [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                         LogEntryAttributeOperation);
+                         LogEntryAttributeOperation, FALSE);
                 
                 double sample_rate = [audio_format sampleRate];
                 AVAudioChannelCount channel_count = audio_format.channelCount;
@@ -541,7 +547,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                         logEvent(log_events,
                                  [NSString stringWithFormat:@"%@", self.description],
                                  [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation);
+                                 LogEntryAttributeOperation, FALSE);
                         
                         ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                             double sin_phase = 0.0;
@@ -565,14 +571,14 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                         logEvent(log_events,
                                  [NSString stringWithFormat:@"%@", self.description],
                                  [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation);
+                                 LogEntryAttributeOperation, FALSE);
                         
                         ^ (PlayedToneCompletionBlock played_tone) {
                             
                             logEvent(log_events,
                                      [NSString stringWithFormat:@"%@", self.description],
                                      [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                     LogEntryAttributeOperation);
+                                     LogEntryAttributeOperation, FALSE);
                             
                             if ([player_node isPlaying])
                             {
@@ -590,7 +596,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                             logEvent(log_events,
                                      [NSString stringWithFormat:@"%@", self.description],
                                      [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                     LogEntryAttributeOperation);
+                                     LogEntryAttributeOperation, FALSE);
                             
                             play_tones(player_node, pcm_buffer, audio_format, log_events);
                         });
@@ -694,7 +700,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
 //
 //                    logEvent(_playerLogEvents, @"Buffer Rendered",
 //                             @"Node: %d\n%f sec\n\t%f Hz\t%f Hz\n", /*player_node_index, frame_count / sample_rate, frequency_scale->root_frequency, frequency_scale->root_frequency * frequency_scale->ratios[player_node_channel_index),*/
-//                             LogEntryAttributeOperation);
+//                             LogEntryAttributeOperation, FALSE);
 //                    //                            logEvent([NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
 //                    //                                     [NSString stringWithFormat:@"Node: %d\n%f sec\n\t%f Hz\t%f Hz\n", player_node_index, frame_count / sample_rate, frequency_scale->root_frequency, frequency_scale->root_frequency * frequency_scale->ratios[player_node_channel_index]],
 //                    //                                     LogTextAttributes_Event,

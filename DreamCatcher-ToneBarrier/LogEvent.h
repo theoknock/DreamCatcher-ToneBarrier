@@ -35,8 +35,8 @@ typedef struct LogEntry
 {
     CMTime entry_date;
     LogEntryAttribute log_entry_attribute;
-    char * _Nonnull context;
-    char * _Nonnull entry;
+    const char * _Nonnull context;
+    const char * _Nonnull entry;
 } * LogEntry;
 
 typedef CMTime(^CurrentCMTime)(void);
@@ -126,20 +126,19 @@ static LogEntryAttributeStyle _Nonnull logEntryAttributeStyle = ^ NSDictionary<N
 ////    });
 //};
 
-typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> *_Nonnull, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute);
-static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * logEntries, NSString * context, NSString * entry, LogEntryAttribute logEntryAttribute) {
-    printf("%s\n", __PRETTY_FUNCTION__);
+typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> * _Nonnull, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute, BOOL);
+static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * _Nonnull logEntries, NSString * context, NSString * entry, LogEntryAttribute logEntryAttribute, BOOL refreshLogTextView) {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-        struct LogEntry *log_entry = malloc(sizeof(struct LogEntry));
+        struct LogEntry * log_entry = malloc(sizeof(struct LogEntry));
         log_entry->entry_date = current_cmtime();
-        //    log_entry->context = strdup("context");
-        //    log_entry->entry = strdup(entry);
+        log_entry->context = (const char *)[context UTF8String];
+        log_entry->entry = (const char *)[entry UTF8String];
         log_entry->log_entry_attribute = logEntryAttribute;
         
-        NSValue *logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
+        NSValue * logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
         [logEntries addObject:logEntryValue];
         
-        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, log_entry);
+        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, (__bridge void * _Nullable)(logEntries));
         dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
     });
 };
