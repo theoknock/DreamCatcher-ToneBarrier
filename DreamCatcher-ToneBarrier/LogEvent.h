@@ -35,8 +35,8 @@ typedef struct LogEntry
 {
     CMTime entry_date;
     LogEntryAttribute log_entry_attribute;
-    char * _Nonnull context;
-    char * _Nonnull entry;
+    const char * context;
+    const char * entry;
 } * LogEntry;
 
 typedef CMTime(^CurrentCMTime)(void);
@@ -97,6 +97,17 @@ static LogEntryAttributeStyle _Nonnull logEntryAttributeStyle = ^ NSDictionary<N
     return logEntryAttributeStyle;
 };
 
+struct LogEntry * logEntry = malloc(sizeof(struct LogEntry));
+logEntry->entry_date = current_cmtime();
+logEntry->log_entry_attribute = log_entry_attribute;
+logEntry->context = (char *)malloc(strlen((const char *)[log_entry_context UTF8String]));
+strcpy(logEntry->context, (const char *)[log_entry_context UTF8String]);
+logEntry->entry = (char *)malloc(strlen((const char *)[log_entry_entry UTF8String]));
+strcpy(logEntry->entry, (const char *)[log_entry_entry UTF8String]);
+
+self.logEntryBuffer[0] = logEntry;
+_logEntryCount = 1;
+
 
 //static dispatch_queue_t _Nonnull loggerQueue;
 //static dispatch_queue_t _Nonnull taskQueue;
@@ -126,16 +137,19 @@ static LogEntryAttributeStyle _Nonnull logEntryAttributeStyle = ^ NSDictionary<N
 ////    });
 //};
 
-typedef void (^LogEvent)(NSMutableOrderedSet<NSValue *> * _Nonnull, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute, BOOL);
+typedef void (^LogEvent)(LogViewDataSource, NSString * _Nonnull, NSString * _Nonnull, LogEntryAttribute, BOOL);
 static LogEvent _Nonnull logEvent = ^ void (NSMutableOrderedSet<NSValue *> * _Nonnull logEntries, NSString * context, NSString * entry, LogEntryAttribute logEntryAttribute, BOOL refreshLogTextView) {
     dispatch_async(dispatch_get_global_queue(QOS_CLASS_USER_INTERACTIVE, 0), ^{
-//        struct LogEntry * log_entry = malloc(sizeof(struct LogEntry));
-//        log_entry->entry_date = current_cmtime();
-////        log_entry->context = malloc(sizeof(char *));
-////        strcpy(log_entry->context, (const char *)[context UTF8String]);
-////        log_entry->entry = malloc(sizeof(char *));
-////        strcpy(log_entry->entry, (const char *)[entry UTF8String]);
-//        log_entry->log_entry_attribute = logEntryAttribute;
+        struct LogEntry * logEntry = malloc(sizeof(struct LogEntry));
+        logEntry->entry_date = current_cmtime();
+        logEntry->log_entry_attribute = logEntryAttribute;
+        logEntry->context = (char *)malloc(strlen((const char *)[log_entry_context UTF8String]));
+        strcpy(logEntry->context, (const char *)[log_entry_context UTF8String]);
+        logEntry->entry = (char *)malloc(strlen((const char *)[log_entry_entry UTF8String]));
+        strcpy(logEntry->entry, (const char *)[log_entry_entry UTF8String]);
+        
+        self.logEntryBuffer[0] = logEntry;
+        _logEntryCount = 1;
 //        
 //        NSValue * logEntryValue = [NSValue valueWithBytes:&log_entry objCType:@encode(LogEntry)];
 //        [logEntries addObject:logEntryValue];

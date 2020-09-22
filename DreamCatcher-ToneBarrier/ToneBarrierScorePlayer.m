@@ -29,7 +29,7 @@
 
 #import "ViewController.h"
 #import "ToneBarrierScorePlayer.h"
-#import "ToneBarrierScoreDispatchObjects.h"
+#import "LogViewDataSource.h"
 
 #include "Randomizer.h"
 #include "Tone.h"
@@ -180,8 +180,6 @@ static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum t
     //    struct FrequencyScale * frequency_scale;
 }
 
-@property (strong, nonatomic) NSMutableOrderedSet * playerLogEvents;
-
 @end
 
 
@@ -203,14 +201,12 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
 - (instancetype)init
 {
-    logEvent(_playerLogEvents,
-             [NSString stringWithFormat:@"%@", self.description],
-             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation, FALSE);
+    [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                              entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                     attributeStyle:LogEntryAttributeStyleOperation];
     
     if (self == [super init])
     {
-        _playerLogEvents = [[NSMutableOrderedSet alloc] init];
         //        dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
         //            struct ContextData * data = dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
         //            printf("x = %f", data->x);
@@ -266,11 +262,6 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
 - (BOOL)setupEngine
 {
-    logEvent(_playerLogEvents,
-             [NSString stringWithFormat:@"%@", self.description],
-             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation, FALSE);
-    
     self.audioEngine = [[AVAudioEngine alloc] init];
     self.mainNode = [self.audioEngine mainMixerNode];
     AVAudioChannelCount channelCount = [self.mainNode outputFormatForBus:0].channelCount;
@@ -282,11 +273,6 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
 - (BOOL)startEngine
 {
-    logEvent(_playerLogEvents,
-             [NSString stringWithFormat:@"%@", self.description],
-             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-             LogEntryAttributeOperation, FALSE);
-    
     __autoreleasing NSError *error = nil;
     if ([self.audioEngine startAndReturnError:&error])
     {
@@ -440,11 +426,6 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
 {
     if ([self.audioEngine isRunning])
     {
-        logEvent(_playerLogEvents,
-                 [NSString stringWithFormat:@"%@", self.description],
-                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                 LogEntryAttributeOperation, TRUE);
-        
         [self.playerNode pause];
         [self.playerNodeAux pause];
         
@@ -465,11 +446,6 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
         
         return FALSE;
     } else {
-        
-        logEvent(_playerLogEvents,
-                 [NSString stringWithFormat:@"%@", self.description],
-                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                 LogEntryAttributeOperation, FALSE);
         
         [self setupEngine];
         
@@ -528,8 +504,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             
             typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
                                       __weak typeof(AVAudioPCMBuffer) *,
-                                      __weak typeof(AVAudioFormat) *,
-                                      __weak typeof(NSMutableOrderedSet) *);
+                                      __weak typeof(AVAudioFormat) *);
             
             
             static PlayTones play_tones, play_tones_aux;
@@ -537,13 +512,9 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             play_tones =
             ^ (__weak typeof(AVAudioPlayerNode) * player_node,
                __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
-               __weak typeof(AVAudioFormat) * audio_format,
-               __weak typeof(NSMutableOrderedSet) * log_events) {
+               __weak typeof(AVAudioFormat) * audio_format) {
                 
-                logEvent(log_events,
-                         [NSString stringWithFormat:@"%@", self.description],
-                         [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                         LogEntryAttributeOperation, FALSE);
+                
                 
                 double sample_rate = [audio_format sampleRate];
                 AVAudioChannelCount channel_count = audio_format.channelCount;
@@ -552,11 +523,6 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
-                    
-                    logEvent(log_events,
-                             [NSString stringWithFormat:@"%@", self.description],
-                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                             LogEntryAttributeOperation, FALSE);
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         double sin_phase = 0.0;
@@ -618,18 +584,14 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
                 });
                 dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
-                    
-                    logEvent(log_events,
-                             [NSString stringWithFormat:@"%@", self.description],
-                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                             LogEntryAttributeOperation, FALSE);
-                    
+                   
                     ^ (PlayedToneCompletionBlock played_tone) {
                         
-                        logEvent(log_events,
-                                 [NSString stringWithFormat:@"%@", self.description],
-                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation, FALSE);
+                        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                                  entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                                         attributeStyle:LogEntryAttributeStyleOperation];
+                        
+                        
                         
                         if ([player_node isPlaying])
                         {
@@ -643,13 +605,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                             }];
                         }
                     } (^ {
-                        
-                        logEvent(log_events,
-                                 [NSString stringWithFormat:@"%@", self.description],
-                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation, FALSE);
-                        
-                        play_tones(player_node, pcm_buffer, audio_format, log_events);
+                        play_tones(player_node, pcm_buffer, audio_format);
                     });
                 });
                 dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
@@ -659,20 +615,15 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             __weak typeof(AVAudioPlayerNode) * w_playerNode = self.playerNode;
             __weak typeof(AVAudioPCMBuffer) * w_pcmBuffer = self.pcmBuffer;
             __weak typeof(AVAudioFormat) * w_audioFormat = self.audioFormat;
-            __weak typeof(NSMutableOrderedSet) * w_logEvents = self.playerLogEvents;
             
-            play_tones(w_playerNode, w_pcmBuffer, w_audioFormat, w_logEvents);
+            play_tones(w_playerNode, w_pcmBuffer, w_audioFormat);
             
             play_tones_aux =
             ^ (__weak typeof(AVAudioPlayerNode) * player_node,
                __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
-               __weak typeof(AVAudioFormat) * audio_format,
-               __weak typeof(NSMutableOrderedSet) * log_events) {
+               __weak typeof(AVAudioFormat) * audio_format) {
                 
-                logEvent(log_events,
-                         [NSString stringWithFormat:@"%@", self.description],
-                         [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                         LogEntryAttributeOperation, FALSE);
+                
                 
                 double sample_rate = [audio_format sampleRate];
                 AVAudioChannelCount channel_count = audio_format.channelCount;
@@ -681,12 +632,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
-                    
-                    logEvent(log_events,
-                             [NSString stringWithFormat:@"%@", self.description],
-                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                             LogEntryAttributeOperation, FALSE);
-                    
+                   
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         double sin_phase = 0.0;
                         
@@ -745,18 +691,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 });
                 dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
                     
-                    logEvent(log_events,
-                             [NSString stringWithFormat:@"%@", self.description],
-                             [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                             LogEntryAttributeOperation, FALSE);
-                    
                     ^ (PlayedToneCompletionBlock played_tone) {
-                        
-                        logEvent(log_events,
-                                 [NSString stringWithFormat:@"%@", self.description],
-                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation, FALSE);
-                        
                         if ([player_node isPlaying])
                         {
                             [player_node prepareWithFrameCount:frame_count]; // check this number
@@ -770,12 +705,9 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                         }
                     } (^ {
                         
-                        logEvent(log_events,
-                                 [NSString stringWithFormat:@"%@", self.description],
-                                 [NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__],
-                                 LogEntryAttributeOperation, FALSE);
                         
-                        play_tones(player_node, pcm_buffer, audio_format, log_events);
+                        
+                        play_tones(player_node, pcm_buffer, audio_format);
                     });
                 });
                 dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
@@ -785,9 +717,8 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             __weak typeof(AVAudioPlayerNode) * w_playerNodeAux = self.playerNodeAux;
             __weak typeof(AVAudioPCMBuffer) * w_pcmBufferAux = self.pcmBufferAux;
             __weak typeof(AVAudioFormat) * w_audioFormatAux = self.audioFormat;
-            __weak typeof(NSMutableOrderedSet) * w_logEventsAux = self.playerLogEvents;
             
-            play_tones_aux(w_playerNodeAux, w_pcmBufferAux, w_audioFormatAux, w_logEventsAux);
+            play_tones_aux(w_playerNodeAux, w_pcmBufferAux, w_audioFormatAux);
             
             
             

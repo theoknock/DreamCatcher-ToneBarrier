@@ -8,67 +8,45 @@
 #import "ViewController.h"
 #import "AppDelegate.h"
 #import "ToneBarrierScorePlayer.h"
-#import "ToneBarrierScoreDispatchObjects.h"
-#import "LogEvent.h"
+#import "LogViewDataSource.h"
 
-@interface ViewController ()
-{
-    NSDictionary *_eventTextAttributes, *_operationTextAttributes, *_errorTextAttributes, *_successTextAttributes;
-}
-
-@end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
     
-    dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
-        NSMutableOrderedSet<NSValue *> * log_entries = (__bridge NSMutableOrderedSet<NSValue *> *)(dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source));
-        __block NSMutableAttributedString * log = [[NSMutableAttributedString alloc] init];//WithAttributedString:[self.logTextView attributedText]];
-        [log_entries enumerateObjectsUsingBlock:^(NSValue * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            LogEntry log_entry;
-            [obj getValue:&log_entry];
-            
-            NSDictionary<NSAttributedStringKey,id> * logEntryAttributes = logEntryAttributeStyle(log_entry->log_entry_attribute);
-            NSAttributedString * entry_date = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", timeString(log_entry->entry_date)] attributes:logEntryAttributes];
-//            NSAttributedString * context = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->context]] attributes:logEntryAttributes];
-//            NSAttributedString * entry = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:log_entry->entry]] attributes:logEntryAttributes];
-            
-            [log appendAttributedString:entry_date];
-//            [log appendAttributedString:context];
-//            [log appendAttributedString:entry];
-        }];
-        [self.logTextView setAttributedText:log];
+    dispatch_source_set_event_handler(LogViewDataSource.logData.log_view_dispatch_source, ^{
+        [self.logView setAttributedText:[LogViewDataSource.logData logAttributedText]];
     });
-        
-    dispatch_resume(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
+
+    dispatch_resume(LogViewDataSource.logData.log_view_dispatch_source);
 }
 
-- (void)textStyles
-{
-    NSMutableParagraphStyle *leftAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    leftAlignedParagraphStyle.alignment = NSTextAlignmentLeft;
-    _operationTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.87 green:0.5 blue:0.0 alpha:1.0],
-                                 NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
-    
-    NSMutableParagraphStyle *fullJustificationParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    fullJustificationParagraphStyle.alignment = NSTextAlignmentJustified;
-    _errorTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.91 green:0.28 blue:0.5 alpha:1.0],
-                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
-    
-    NSMutableParagraphStyle *rightAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    rightAlignedParagraphStyle.alignment = NSTextAlignmentRight;
-    _eventTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.54 blue:0.87 alpha:1.0],
-                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-                             NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
-    
-    NSMutableParagraphStyle *centerAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-    centerAlignedParagraphStyle.alignment = NSTextAlignmentCenter;
-    _successTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.87 blue:0.19 alpha:1.0],
-                               NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-                               NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
-}
+//- (void)textStyles
+//{
+//    NSMutableParagraphStyle *leftAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+//    leftAlignedParagraphStyle.alignment = NSTextAlignmentLeft;
+//    _operationTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.87 green:0.5 blue:0.0 alpha:1.0],
+//                                 NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
+//
+//    NSMutableParagraphStyle *fullJustificationParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+//    fullJustificationParagraphStyle.alignment = NSTextAlignmentJustified;
+//    _errorTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.91 green:0.28 blue:0.5 alpha:1.0],
+//                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
+//
+//    NSMutableParagraphStyle *rightAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+//    rightAlignedParagraphStyle.alignment = NSTextAlignmentRight;
+//    _eventTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.54 blue:0.87 alpha:1.0],
+//                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+//                             NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
+//
+//    NSMutableParagraphStyle *centerAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+//    centerAlignedParagraphStyle.alignment = NSTextAlignmentCenter;
+//    _successTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.87 blue:0.19 alpha:1.0],
+//                               NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+//                               NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
+//}
 
 #pragma mark - Log
 
@@ -91,16 +69,16 @@
     //    });
 
 
-- (IBAction)hidelogTextView:(UITapGestureRecognizer *)sender {
-    [UIView animateWithDuration:1.0 animations:^{
-        [self.logTextView setAlpha:(self.logTextView.alpha == 0.0) ? 1.0 : 0.0];
-    }];
-}
+//- (IBAction)hidelogTextView:(UITapGestureRecognizer *)sender {
+//    [UIView animateWithDuration:1.0 animations:^{
+//        [self.logTextView setAlpha:(self.logTextView.alpha == 0.0) ? 1.0 : 0.0];
+//    }];
+//}
 
-- (void)displayYHeightForFrameBoundsRect:(CGRect)rect withLabel:(NSString *)label
-{
-    NSLog(@"%@", [NSString stringWithFormat:@"y:\t%f\t\th:\t%f\t\t\ty:\t%f\t\th:\t%f\t\t(%@)", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height, label]);
-}
+//- (void)displayYHeightForFrameBoundsRect:(CGRect)rect withLabel:(NSString *)label
+//{
+//    NSLog(@"%@", [NSString stringWithFormat:@"y:\t%f\t\th:\t%f\t\t\ty:\t%f\t\th:\t%f\t\t(%@)", rect.origin.x, rect.origin.y, rect.size.width, rect.size.height, label]);
+//}
 
 - (IBAction)playToneBarrierScore:(UIButton *)sender forEvent:(UIEvent *)event {
     BOOL isToneBarrierScorePlaying = [ToneBarrierScorePlayer.sharedPlayer play];

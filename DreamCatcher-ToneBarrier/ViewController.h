@@ -10,14 +10,13 @@
 #import <CoreMedia/CMSync.h>
 #import <Foundation/Foundation.h>
 
-#import "LogEvent.h"
 #import "ToneBarrierScorePlayer.h"
 
 @interface ViewController : UIViewController <UITextViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *playButton;
 
-@property (strong, nonatomic) IBOutlet UITextView *logTextView;
+@property (weak, nonatomic) IBOutlet UITextView *logView;
 
 
 @end

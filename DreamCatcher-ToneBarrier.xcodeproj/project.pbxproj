@@ -19,6 +19,7 @@
 		B9259D2D24F669E000FA19FA /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B9259D2C24F669E000FA19FA /* Assets.xcassets */; };
 		B9259D3024F669E000FA19FA /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */; };
 		B9259D3324F669E000FA19FA /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D3224F669E000FA19FA /* main.m */; };
+		B9273D3B2517D90A00F1BE30 /* LogViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */; };
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
 		B9763DFE250822B5003DB662 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = B9763DFD250822B5003DB662 /* test.m */; };
 		B9B9F01425120961002E4295 /* ToneBarrierScoreDispatchObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = B9B9F01325120961002E4295 /* ToneBarrierScoreDispatchObjects.m */; };
@@ -94,10 +95,11 @@
 		B9259D5924F669E300FA19FA /* PushNotificationPayload.apns */ = {isa = PBXFileReference; lastKnownFileType = text; path = PushNotificationPayload.apns; sourceTree = "<group>"; };
 		B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScorePlayer.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScorePlayer.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B9273D392517D90A00F1BE30 /* LogViewDataSource.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogViewDataSource.h; sourceTree = "<group>"; wrapsLines = 0; };
+		B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogViewDataSource.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B96EC02725006C5F00F9C929 /* ToneBarrierScoreCodeCemetary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScoreCodeCemetary.h; sourceTree = "<group>"; };
 		B9763DFC250822B5003DB662 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		B9763DFD250822B5003DB662 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; wrapsLines = 0; };
-		B997EB1B251508E6003A1518 /* LogEvent.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogEvent.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9B9F01225120961002E4295 /* ToneBarrierScoreDispatchObjects.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScoreDispatchObjects.h; sourceTree = "<group>"; };
 		B9B9F01325120961002E4295 /* ToneBarrierScoreDispatchObjects.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = ToneBarrierScoreDispatchObjects.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
@@ -171,7 +173,8 @@
 				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
 				B9B9F01225120961002E4295 /* ToneBarrierScoreDispatchObjects.h */,
 				B9B9F01325120961002E4295 /* ToneBarrierScoreDispatchObjects.m */,
-				B997EB1B251508E6003A1518 /* LogEvent.h */,
+				B9273D392517D90A00F1BE30 /* LogViewDataSource.h */,
+				B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
 				B9259D2724F669DD00FA19FA /* Main.storyboard */,
@@ -326,6 +329,7 @@
 			files = (
 				8A4108C3250C61580004FD0E /* Score.c in Sources */,
 				8A410892250AE3D80004FD0E /* New.c in Sources */,
+				B9273D3B2517D90A00F1BE30 /* LogViewDataSource.m in Sources */,
 				8A41089B250AE6300004FD0E /* String.c in Sources */,
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,
 				B9763DFE250822B5003DB662 /* test.m in Sources */,

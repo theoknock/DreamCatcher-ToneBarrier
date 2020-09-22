@@ -25,9 +25,6 @@
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <attributedString key="attributedText"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                        <connections>
-                                            <outlet property="delegate" destination="BYZ-38-t0r" id="F7Q-9J-hgR"/>
-                                        </connections>
                                     </textView>
                                 </subviews>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -79,11 +76,12 @@
                         </constraints>
                     </view>
                     <connections>
-                        <outlet property="logTextView" destination="Wky-rW-XYV" id="5w6-Fq-3rz"/>
+                        <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <customObject id="23E-y9-uzd" customClass="LogViewDataSource"/>
             </objects>
             <point key="canvasLocation" x="121.73913043478262" y="112.5"/>
         </scene>

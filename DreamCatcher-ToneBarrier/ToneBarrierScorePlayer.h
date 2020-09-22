@@ -10,8 +10,6 @@
 #import <UIKit/UIKit.h>
 #import <MediaPlayer/MediaPlayer.h>
 
-#import "LogEvent.h"
-
 NS_ASSUME_NONNULL_BEGIN
 
 typedef void (^BufferConsumed)(
