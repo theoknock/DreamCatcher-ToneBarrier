@@ -23,31 +23,6 @@
     dispatch_resume(LogViewDataSource.logData.log_view_dispatch_source);
 }
 
-//- (void)textStyles
-//{
-//    NSMutableParagraphStyle *leftAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-//    leftAlignedParagraphStyle.alignment = NSTextAlignmentLeft;
-//    _operationTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.87 green:0.5 blue:0.0 alpha:1.0],
-//                                 NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
-//
-//    NSMutableParagraphStyle *fullJustificationParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-//    fullJustificationParagraphStyle.alignment = NSTextAlignmentJustified;
-//    _errorTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.91 green:0.28 blue:0.5 alpha:1.0],
-//                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium]};
-//
-//    NSMutableParagraphStyle *rightAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-//    rightAlignedParagraphStyle.alignment = NSTextAlignmentRight;
-//    _eventTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.54 blue:0.87 alpha:1.0],
-//                             NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-//                             NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
-//
-//    NSMutableParagraphStyle *centerAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-//    centerAlignedParagraphStyle.alignment = NSTextAlignmentCenter;
-//    _successTextAttributes = @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.87 blue:0.19 alpha:1.0],
-//                               NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-//                               NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
-//}
-
 #pragma mark - Log
 
     //    dispatch_async(dispatch_get_main_queue(), ^{

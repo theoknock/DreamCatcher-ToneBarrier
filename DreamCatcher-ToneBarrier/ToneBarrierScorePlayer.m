@@ -559,37 +559,37 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                             double val;
                             double curfreq = scale(0.5, 4.0, frequency_scale->root_frequency, 277.1826317, 1396.912916);
                             double curphase = (player_node_channel_index == 0 || player_node_channel_index == 2) ? 0.0 : M_PI_2;
-                                double incr = (PI_2 / sample_rate) * curfreq;
+                            double incr = (PI_2 / sample_rate) * curfreq;
                             
                             
-
+                            
                             
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++)
-                                {
-                                    val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
-                                    if(val < 0.0)
-                                        val = -val;
-                                    val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
-                                        curphase -= PI_2;
-                                    if(curphase < 0.0)
-                                        curphase += PI_2;
-                                    
-                                    float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
-                                    sin_phase += sin_increment;
-                                    if (sin_phase >= PI_2) sin_phase -= PI_2;
-                                    if (sin_phase < 0.0)   sin_phase += PI_2;
-                                }
+                            {
+                                val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
+                                if(val < 0.0)
+                                    val = -val;
+                                val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
+                                    curphase -= PI_2;
+                                if(curphase < 0.0)
+                                    curphase += PI_2;
+                                
+                                float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
+                                sin_phase += sin_increment;
+                                if (sin_phase >= PI_2) sin_phase -= PI_2;
+                                if (sin_phase < 0.0)   sin_phase += PI_2;
+                            }
                         }
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
                 });
                 dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
-                   
+                    
                     ^ (PlayedToneCompletionBlock played_tone) {
                         
                         [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
                                                                   entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
-                                                         attributeStyle:LogEntryAttributeStyleOperation];
+                                                         attributeStyle:LogEntryAttributeStyleEvent];
                         
                         
                         
@@ -632,7 +632,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
-                   
+                    
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         double sin_phase = 0.0;
                         
@@ -668,24 +668,24 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                             double val;
                             double curfreq = scale(0.5, 4.0, frequency_scale->root_frequency, 277.1826317, 1396.912916);
                             double curphase = (player_node_channel_index == 0 || player_node_channel_index == 2) ? 0.0 : M_PI_2;
-                                double incr = (PI_2 / sample_rate) * curfreq;
-              
+                            double incr = (PI_2 / sample_rate) * curfreq;
+                            
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++)
-                                {
-                                    val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
-                                    if(val < 0.0)
-                                        val = -val;
-                                    val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
-                                        curphase -= PI_2;
-                                    if(curphase < 0.0)
-                                        curphase += PI_2;
-                                    
-                                    float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
-                                    sin_phase += sin_increment;
-                                    if (sin_phase >= PI_2) sin_phase -= PI_2;
-                                    if (sin_phase < 0.0)   sin_phase += PI_2;
-                                }
+                            {
+                                val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
+                                if(val < 0.0)
+                                    val = -val;
+                                val = 2.0 * (val - 0.5); curphase += incr; if (curphase >= PI_2)
+                                    curphase -= PI_2;
+                                if(curphase < 0.0)
+                                    curphase += PI_2;
+                                
+                                float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
+                                sin_phase += sin_increment;
+                                if (sin_phase >= PI_2) sin_phase -= PI_2;
+                                if (sin_phase < 0.0)   sin_phase += PI_2;
+                            }
                         }
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
                 });
