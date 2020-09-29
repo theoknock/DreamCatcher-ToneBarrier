@@ -232,10 +232,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
 
 - (BOOL)setupEngine
 {
-    [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                              entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
-                                     attributeStyle:LogEntryAttributeStyleOperation];
-    
+    if (self.audioEngine)
+        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                  entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                         attributeStyle:LogEntryAttributeStyleOperation];
+ 
     self.audioEngine = [[AVAudioEngine alloc] init];
     self.mainNode = [self.audioEngine mainMixerNode];
     AVAudioChannelCount channelCount = [self.mainNode outputFormatForBus:0].channelCount;
@@ -255,25 +256,43 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     if ([self.audioEngine startAndReturnError:&error])
     {
         NSLog(@"1/3. AudioEngine started: %@", error.description);
+        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine started"]
+                                                  entry:[NSString stringWithFormat:@"%@", error.description]
+                                         attributeStyle:LogEntryAttributeStyleSuccess];
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
         if (error)
         {
             NSLog(@"1/3. AudioSession category could not be set: %@", [error description]);
+            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                      entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                             attributeStyle:LogEntryAttributeStyleError];
             return FALSE;
         } else {
             NSLog(@"2/3. AudioSession configured %@", [error description]);
+            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                      entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                             attributeStyle:LogEntryAttributeStyleSuccess];
             [[AVAudioSession sharedInstance] setActive:YES error:&error];
             if (error)
             {
                 NSLog(@"2/3. AudioSession could not be activated: %@", [error description]);
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                          entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                                 attributeStyle:LogEntryAttributeStyleError];
                 return FALSE;
             } else {
                 NSLog(@"3/3. AudioSession activated%@", [error description]);
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                          entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                                 attributeStyle:LogEntryAttributeStyleSuccess];
                 return TRUE;
             }
         }
     } else {
         NSLog(@"1/3. AudioEngine could not be started: %@", [error description]);
+        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                  entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                         attributeStyle:LogEntryAttributeStyleError];
         return FALSE;
     }
 }

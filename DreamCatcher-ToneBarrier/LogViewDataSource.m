@@ -76,21 +76,41 @@ NSDictionary<NSAttributedStringKey,id> * _Nonnull (^(^set_log_entry_attribute_st
     switch (logEntryAttributeStyle) {
         case LogEntryAttributeStyleOperation:
             return ^ NSDictionary * (void) {
+                NSMutableParagraphStyle *leftAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+                leftAlignedParagraphStyle.alignment = NSTextAlignmentLeft;
+                return @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.87 green:0.5 blue:0.0 alpha:1.0],
+                         NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+                         NSParagraphStyleAttributeName: leftAlignedParagraphStyle};
+            };
+            break;
+        
+        case LogEntryAttributeStyleSuccess:
+            return ^ NSDictionary * (void) {
                 NSMutableParagraphStyle *centerAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
                 centerAlignedParagraphStyle.alignment = NSTextAlignmentCenter;
                 return @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.87 blue:0.19 alpha:1.0],
-                                           NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-                                           NSParagraphStyleAttributeName: centerAlignedParagraphStyle};
+                         NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+                         NSParagraphStyleAttributeName: centerAlignedParagraphStyle};
             };
             break;
             
         case LogEntryAttributeStyleEvent:
             return ^ NSDictionary * (void) {
-                NSMutableParagraphStyle *leftAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
-                leftAlignedParagraphStyle.alignment = NSTextAlignmentLeft;
-                return @{NSForegroundColorAttributeName:[UIColor colorWithRed:0.87 green:0.5 blue:0.0 alpha:1.0],
-                         NSFontAttributeName:[UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
-                         NSParagraphStyleAttributeName:leftAlignedParagraphStyle};
+                NSMutableParagraphStyle *rightAlignedParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+                rightAlignedParagraphStyle.alignment = NSTextAlignmentRight;
+                return @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.0 green:0.54 blue:0.87 alpha:1.0],
+                                         NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+                                         NSParagraphStyleAttributeName: rightAlignedParagraphStyle};
+            };
+            break;
+            
+        case LogEntryAttributeStyleError:
+            return ^ NSDictionary * (void) {
+                NSMutableParagraphStyle *fullJustificationParagraphStyle = [[NSMutableParagraphStyle alloc] init];
+                fullJustificationParagraphStyle.alignment = NSTextAlignmentJustified;
+                return @{NSForegroundColorAttributeName: [UIColor colorWithRed:0.91 green:0.28 blue:0.5 alpha:1.0],
+                         NSFontAttributeName: [UIFont systemFontOfSize:11.0 weight:UIFontWeightMedium],
+                         NSParagraphStyleAttributeName:fullJustificationParagraphStyle};
             };
             break;
             
@@ -158,15 +178,11 @@ static LogViewDataSource * logData = NULL;
         for (NSUInteger logEntryIndex = 0; logEntryIndex < logEntryCount; logEntryIndex++)
         {
             NSDictionary<NSAttributedStringKey,id> * attributeStyleForLogEntry = logEntryArray[logEntryIndex]->attribute_style_for_log_entry();
-//            NSAttributedString * entry_date = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", cmTimeString(logEntryArray[logEntryIndex]->entry_date)] attributes:attributeStyleForLogEntry];
-            NSAttributedString * datestamp = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->datestamp]] attributes:attributeStyleForLogEntry];
-            NSAttributedString * timestamp = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->timestamp]] attributes:attributeStyleForLogEntry];
+            NSAttributedString * entry_date = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\t%@\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->datestamp], [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->timestamp]] attributes:attributeStyleForLogEntry];
             NSAttributedString * title     = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->title]] attributes:attributeStyleForLogEntry];
-            NSAttributedString * entry     = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->entry]] attributes:attributeStyleForLogEntry];
+            NSAttributedString * entry     = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"%@\n\n", [NSString stringWithUTF8String:logEntryArray[logEntryIndex]->entry]] attributes:attributeStyleForLogEntry];
             
-//            [log appendAttributedString:entry_date];
-            [log appendAttributedString:datestamp];
-            [log appendAttributedString:timestamp];
+            [log appendAttributedString:entry_date];
             [log appendAttributedString:title];
             [log appendAttributedString:entry];
         }
