@@ -18,6 +18,8 @@
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
 
+#include <Accelerate/Accelerate.h>
+
 #include <stdio.h>
 #include <stdarg.h>
 #include <stddef.h>
@@ -33,6 +35,7 @@
 
 #include "Randomizer.h"
 #include "Tone.h"
+#include "Chords.h"
 
 #define randomdouble()    (arc4random() / ((unsigned)RAND_MAX))
 
@@ -63,15 +66,6 @@ struct DurationTally
     double tally;
     __unsafe_unretained double(^next_duration)(double * tally, double * total);
 } * duration_tally;
-
-struct FrequencyScale
-{
-    double root_frequency;
-    int total;
-    int tally;
-    double ratios[4];
-    //    int (^next_ratio)(int * total, int * tally);
-} * frequency_scale;
 
 // Pitch Set - Major Seventh
 //                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
@@ -145,29 +139,7 @@ struct FrequencyScale
 //static double harmonic_alignment_ratios_consonant[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
 //static double harmonic_alignment_ratios_dissonant[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
 
-typedef double * (^FrequencyModulator)(double, int, ...);
-static FrequencyModulator harmonize_frequency = //enum HarmonicAlignment, enum typeof(HarmonicInterval)));
-^ double * (double root_frequency, int argument_count, ... /*enum HarmonicAlignment harmonic_alignment, enum typeof(HarmonicInterval) harmonic_interval*/)
-{
-    va_list ap;
-    double * harmonic_pitch;
-    int harmonic_pitch_ratio_count;
-    va_start (ap, argument_count);
-    harmonic_pitch = va_arg (ap, double *);
-    harmonic_pitch_ratio_count = va_arg (ap, int);
-    va_end (ap);
-    
-    double ratio_1[4] = {8.0, 10.0, 12.0, 15.0};
-    double * majorSeventhFrequencyRatios = &ratio_1[0];
-    
-    //    for (int i = 0; i < (harmonic_pitch_ratio_count); i++)
-    //        harmonized_frequency[i] = (harmonic_alignment == HarmonicAlignmentConsonant) ? harmonic_alignment_ratios_consonant[i] : harmonic_alignment_ratios_dissonant[i];
-    double ratios_values[4] = {0.0, 1.0, 2.0, 3.0};
-    double *ratios = malloc(sizeof(double) * 4);
-    ratios = ratios_values;
-    
-    return ratios;
-};
+
 
 #import <CoreMedia/CMTime.h>
 #import <CoreMedia/CMSync.h>
@@ -421,12 +393,11 @@ typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
 
 typedef NSUInteger AVAudioPlayerNodeIndex;
 typedef struct DurationTally DurationTally;
-typedef struct FrequencyScale FrequencyScale;
 
 typedef void (^PlayedToneCompletionBlock)(void); // passed to player node buffer scheduler by the buffer rendered completion block; called by the player node buffer scheduler after the schedule buffer plays; reruns the render buffer block
 typedef void (^BufferRenderedCompletionBlock)(PlayedToneCompletionBlock _Nonnull); // called by buffer renderer after buffer samples are created; runs the player node buffer scheduler
 typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelOutput, float *, BufferRenderedCompletionBlock); // adds the sample data to the PCM buffer; calls the buffer rendered completion block when finisned
-typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, AVAudioPCMBuffer *, DurationTally *, FrequencyScale *, BufferRenderer); // starts the process of creating a buffer, scheduling it and playing it, and recursively starting itself again while the player node passed to it isPlaying
+typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, AVAudioPCMBuffer *, DurationTally *, BufferRenderer); // starts the process of creating a buffer, scheduling it and playing it, and recursively starting itself again while the player node passed to it isPlaying
 
 - (BOOL)play
 {
@@ -495,18 +466,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             initstate(seed, random_buffer, buffer_size);
             srandomdev();
             
-            frequency_scale = (FrequencyScale *)malloc(sizeof(FrequencyScale));
-            frequency_scale->root_frequency = 440.0;
-            frequency_scale->ratios[0] = 1.0;
-            frequency_scale->ratios[1] = 10.0 / 8.0;
-            frequency_scale->ratios[2] = 12.0 / 8.0;
-            frequency_scale->ratios[3] = 15.0 / 8.0;
-            
-            struct counter_struct
-            {
-                __block AVAudioPlayerNodeChannelIndex player_node_channel_index : 2;
-            };
-            __block struct counter_struct cs = { .player_node_channel_index = 0 };
+            chord_frequency_ratios = (struct ChordFrequencyRatio *)malloc(sizeof(struct ChordFrequencyRatio));
             
             const double PI_2 = 2.0 * M_PI;
             
@@ -531,26 +491,27 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         double sin_phase = 0.0;
                         
+                        // TO-DO: Consider pthread() and/or fork()
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
-                            } ((cs.player_node_channel_index == 0) ? ^ double (double * root_frequency, double random) {
-                                *root_frequency = pow(1.059463094, (int)random) * 440.0;
+                            } ((chord_frequency_ratios->indices.ratio == 0) ? ^ double (double * root_frequency, double random) {
+                                *root_frequency = pow(1.059463094f, (int)random) * 440.0;
                                 return *root_frequency;
-                            } (&frequency_scale->root_frequency, ^ double (double random, double n, double m, double gamma) {
+                            } (&chord_frequency_ratios->root, ^ double (double random, double n, double m, double gamma) {
                                 // ignore gamma for now
                                 // -57.0, 50.0
                                 double result = scale(n, m, random, -pow(2, 32), pow(2, 32));
                                 return result;
-                            } (arc4random(), -8.0, 24.0, 1.0)) : frequency_scale->root_frequency, frequency_scale->ratios[0],
-                               frequency_scale->ratios[cs.player_node_channel_index]) * PI_2) / sample_rate;
+                            } (arc4random(), -8.0, 24.0, 1.0)) : chord_frequency_ratios->root, ratio[0][0],
+                               ratio[0][chord_frequency_ratios->indices.chord]) * PI_2) / sample_rate;
                             
-                            cs.player_node_channel_index++;
+                            chord_frequency_ratios->indices.chord++;
                                                     
                             double val;
-                            double curfreq = scale(0.5, 4.0, frequency_scale->root_frequency, 277.1826317, 1396.912916);
-                            double curphase = (cs.player_node_channel_index == 0 || cs.player_node_channel_index == 2) ? 0.0 : M_PI_2;
+                            double curfreq = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
+                            double curphase = (chord_frequency_ratios->indices.chord == 0 || chord_frequency_ratios->indices.chord == 2) ? 0.0 : M_PI_2;
                             double incr = (PI_2 / sample_rate) * curfreq;
 
                             if (float_channel_data[channel_index])
