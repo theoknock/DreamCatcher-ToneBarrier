@@ -504,14 +504,15 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                 // -57.0, 50.0
                                 double result = scale(n, m, random, -pow(2, 32), pow(2, 32));
                                 return result;
-                            } (arc4random(), -8.0, 24.0, 1.0)) : chord_frequency_ratios->root, ratio[0][0],
-                               ratio[0][chord_frequency_ratios->indices.chord]) * PI_2) / sample_rate;
+                            } (arc4random(), -8.0, 24.0, 1.0)) : chord_frequency_ratios->root, ratio[chord_frequency_ratios->indices.chord][0],
+                               ratio[chord_frequency_ratios->indices.chord][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
                             
-                            chord_frequency_ratios->indices.chord++;
+                            chord_frequency_ratios->indices.ratio++;
+                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
                                                     
                             double val;
                             double curfreq = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
-                            double curphase = (chord_frequency_ratios->indices.chord == 0 || chord_frequency_ratios->indices.chord == 2) ? 0.0 : M_PI_2;
+                            double curphase = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 0.0 : M_PI_2;
                             double incr = (PI_2 / sample_rate) * curfreq;
 
                             if (float_channel_data[channel_index])
@@ -532,7 +533,6 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
                 });
                 dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
-                    
                     ^ (PlayedToneCompletionBlock played_tone) {
                         if ([player_node isPlaying])
                         {
