@@ -507,16 +507,16 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                         {
                             double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
-                            } ((chord_frequency_ratios->indices.ratio == 0)
+                            } ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2)
                                
-                               ? ^ double (double * root_frequency, int random) {
-                                *root_frequency = pow(1.059463094f, (int)random) * 440.0;
+                               ? ^ double (double * root_frequency, long random) {
+                                *root_frequency = pow(1.059463094f, random) * 440.0;
                                 return *root_frequency;
-                            } (&chord_frequency_ratios->root, ^ int (int random, int n, int m, double gamma) {
-                                int result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-                                printf("result == %d", result);
+                            } (&chord_frequency_ratios->root, ^ long (long random, int n, int m) {
+                                long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+                                printf("\nresult == %ld", result);
                                 return result;
-                            } (rand(), -8, 24, 3.0))
+                            } (random(), -8, 24))
                                
                                : chord_frequency_ratios->root, ratio[1][0],
                                ratio[1][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
