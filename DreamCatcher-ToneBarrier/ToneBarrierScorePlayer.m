@@ -513,7 +513,7 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                 *root_frequency = pow(1.059463094f, (int)random) * 440.0;
                                 return *root_frequency;
                             } (&chord_frequency_ratios->root, ^ int (int random, int n, int m, double gamma) {
-                                int result = random % (abs(m) + abs(n)) + MIN(m, n);
+                                int result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                                 printf("result == %d", result);
                                 return result;
                             } (rand(), -8, 24, 3.0))
