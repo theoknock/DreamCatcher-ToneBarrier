@@ -526,17 +526,20 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                : chord_frequency_ratios->root, ratio[1][0],
                                ratio[1][chord_frequency_ratios->indices.ratio]));
 //                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
-                            __block double signal_phase = 0.0;
+                            double signal_phase = 0.0;
                             double signal_increment = signal_frequency * phase_increment;
                             
-                            double amplitude_frequency = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
-                            __block double amplitude_phase = 0.0;
-                            double amplitude_increment = 0.5 * phase_increment;
+                            double amplitude_frequency = 1.0;//scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
+                            double amplitude_phase = 0.0;
+                            double amplitude_increment = amplitude_frequency * (phase_increment * 0.5f);
+                            
+                            
+                            
                                 
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
+                                    float_channel_data[channel_index][buffer_index] = sinf(amplitude_phase) * sinf(signal_phase);
                                     amplitude_phase += amplitude_increment;
-                                    float_channel_data[channel_index][buffer_index] = sinf(amplitude_phase) * sinf(signal_phase) /** val*/;
                                     signal_phase += signal_increment;
                                     phase_validator(amplitude_phase);
                                     phase_validator(signal_phase);
