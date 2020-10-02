@@ -503,26 +503,26 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         __block double sin_phase = 0.0;
-//                        const double D_PI = pow(4.0 * atan(1.0), 2.0);
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
                             } ((chord_frequency_ratios->indices.ratio == 0)
                                
-                               ? ^ double (double * root_frequency, double random) {
+                               ? ^ double (double * root_frequency, int random) {
                                 *root_frequency = pow(1.059463094f, (int)random) * 440.0;
                                 return *root_frequency;
-                            } (&chord_frequency_ratios->root, ^ double (double random, double n, double m, double gamma) {
-                                double result = scale(n, m, random, -pow(2, 32), pow(2, 32));
+                            } (&chord_frequency_ratios->root, ^ int (int random, int n, int m, double gamma) {
+                                int result = random % (abs(m) + abs(n)) + MIN(m, n);
+                                printf("result == %d", result);
                                 return result;
-                            } (arc4random(), -8.0, 24.0, 1.0))
+                            } (rand(), -8, 24, 3.0))
                                
-                               : chord_frequency_ratios->root, ratio[chord_frequency_ratios->indices.chord][0],
-                               ratio[chord_frequency_ratios->indices.chord][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
+                               : chord_frequency_ratios->root, ratio[1][0],
+                               ratio[1][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
                             
                             chord_frequency_ratios->indices.ratio++;
-                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
+//                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
                             
                             double val;
                             double curfreq = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);

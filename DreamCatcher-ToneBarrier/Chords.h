@@ -11,8 +11,8 @@
 #include <Accelerate/Accelerate.h>
 
 static float ratio[4][4] = {
-    {1.f,   25.f / 20.f,    30.f / 20.f,    36.f / 20.f},
-    {1.f,   25.f / 20.f,    30.f / 20.f,    36.f / 20.f},
+//    {1.f,   25.f / 20.f,    30.f / 20.f,    36.f / 20.f},
+//    {1.f,   25.f / 20.f,    30.f / 20.f,    36.f / 20.f},
     {1.f,   12.f / 10.f,    15.f / 10.f,    18.f / 10.f},
     {1.f,   10.f /  8.f,    12.f /  8.f,    15.f /  8.f}
 };
@@ -28,7 +28,7 @@ struct ChordFrequencyRatio
     
     struct
     {
-        unsigned int chord : 2;
+//        unsigned int chord : 2;
         unsigned int ratio : 2;
     } indices;
     
