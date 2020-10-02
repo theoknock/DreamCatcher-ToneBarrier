@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17154" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17503.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17124"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17502"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -39,18 +39,17 @@
                                     <constraint firstItem="Wky-rW-XYV" firstAttribute="centerX" secondItem="PFW-NN-poo" secondAttribute="centerX" id="y16-7g-HJF"/>
                                 </constraints>
                             </view>
-                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform.path" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
-                                <rect key="frame" x="0.0" y="43.5" width="414" height="820"/>
-                                <color key="tintColor" systemColor="systemBlueColor"/>
-                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="26"/>
+                            <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
+                                <rect key="frame" x="17" y="263.5" width="380.5" height="384"/>
+                                <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="370"/>
                             </imageView>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCT-a9-qbI">
-                                <rect key="frame" x="146.5" y="385" width="121.5" height="136.5"/>
+                            <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCT-a9-qbI">
+                                <rect key="frame" x="154" y="394.5" width="106.5" height="117.5"/>
                                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="18"/>
                                 <state key="normal">
-                                    <imageReference key="image" image="play" catalog="system" symbolScale="large"/>
-                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="114" scale="default" weight="light"/>
+                                    <imageReference key="image" image="play" catalog="system" symbolScale="default"/>
+                                    <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="121" scale="default" weight="regular"/>
                                 </state>
                                 <connections>
                                     <action selector="playToneBarrierScore:forEvent:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bbo-3M-VTr"/>
@@ -60,22 +59,20 @@
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="MdB-Vf-a99" secondAttribute="bottom" id="0jV-10-YNN"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="0yU-3M-1TG"/>
-                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="MdB-Vf-a99" secondAttribute="trailing" id="5zF-oH-1Xf"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="D5e-aa-b1n"/>
+                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="Lff-Md-abE"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="VSr-MX-Fdu"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="aMd-DB-g0z"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="ct6-iP-OPf"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="dA2-om-Hcq"/>
-                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="erl-Ov-c0y"/>
+                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerYWithinMargins" id="XVf-bk-fjW"/>
+                            <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerXWithinMargins" id="dUJ-3h-o9Q"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="jTr-NZ-Naj"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="oD8-Mm-8OK"/>
-                            <constraint firstItem="MdB-Vf-a99" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="sxI-GU-h2N"/>
+                            <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="rY6-QP-9l4"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="v8v-3x-adJ"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="logContainerView" destination="PFW-NN-poo" id="L5W-C7-ZKo"/>
                         <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
                     </connections>
@@ -88,12 +85,9 @@
     </scenes>
     <resources>
         <image name="play" catalog="system" width="120" height="128"/>
-        <image name="waveform.path" catalog="system" width="128" height="117"/>
+        <image name="waveform" catalog="system" width="128" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
-        <systemColor name="systemBlueColor">
-            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -255,43 +255,37 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     __autoreleasing NSError *error = nil;
     if ([self.audioEngine startAndReturnError:&error])
     {
-        NSLog(@"1/3. AudioEngine started: %@", error.description);
         [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine started"]
-                                                  entry:[NSString stringWithFormat:@"%@", error.description]
+                                                  entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                          attributeStyle:LogEntryAttributeStyleSuccess];
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
         if (error)
         {
-            NSLog(@"1/3. AudioSession category could not be set: %@", [error description]);
-            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                                      entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession category could not be set"]
+                                                      entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                              attributeStyle:LogEntryAttributeStyleError];
             return FALSE;
         } else {
-            NSLog(@"2/3. AudioSession configured %@", [error description]);
-            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                                      entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession configured"]
+                                                      entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                              attributeStyle:LogEntryAttributeStyleSuccess];
             [[AVAudioSession sharedInstance] setActive:YES error:&error];
             if (error)
             {
-                NSLog(@"2/3. AudioSession could not be activated: %@", [error description]);
-                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                                          entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession could not be activated"]
+                                                          entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                                  attributeStyle:LogEntryAttributeStyleError];
                 return FALSE;
             } else {
-                NSLog(@"3/3. AudioSession activated%@", [error description]);
-                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                                          entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession activated"]
+                                                          entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                                  attributeStyle:LogEntryAttributeStyleSuccess];
                 return TRUE;
             }
         }
     } else {
-        NSLog(@"1/3. AudioEngine could not be started: %@", [error description]);
-        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
-                                                  entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine could not be started"]
+                                                  entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
                                          attributeStyle:LogEntryAttributeStyleError];
         return FALSE;
     }
@@ -508,30 +502,31 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-                        double sin_phase = 0.0;
-                        
-                        // TO-DO: Consider pthread() and/or fork()
+                        __block double sin_phase = 0.0;
+//                        const double D_PI = pow(4.0 * atan(1.0), 2.0);
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
-                            } ((chord_frequency_ratios->indices.ratio == 0) ? ^ double (double * root_frequency, double random) {
+                            } ((chord_frequency_ratios->indices.ratio == 0)
+                               
+                               ? ^ double (double * root_frequency, double random) {
                                 *root_frequency = pow(1.059463094f, (int)random) * 440.0;
                                 return *root_frequency;
                             } (&chord_frequency_ratios->root, ^ double (double random, double n, double m, double gamma) {
-                                // ignore gamma for now
-                                // -57.0, 50.0
                                 double result = scale(n, m, random, -pow(2, 32), pow(2, 32));
                                 return result;
-                            } (arc4random(), -8.0, 24.0, 1.0)) : chord_frequency_ratios->root, ratio[chord_frequency_ratios->indices.chord][0],
+                            } (arc4random(), -8.0, 24.0, 1.0))
+                               
+                               : chord_frequency_ratios->root, ratio[chord_frequency_ratios->indices.chord][0],
                                ratio[chord_frequency_ratios->indices.chord][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
                             
                             chord_frequency_ratios->indices.ratio++;
                             if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
-                                                    
+                            
                             double val;
                             double curfreq = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
-                            double curphase = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 0.0 : M_PI_2;
+                            double curphase = 0.0;// (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 0.0 : M_PI_2;
                             double incr = (PI_2 / sample_rate) * curfreq;
 
                             if (float_channel_data[channel_index])
@@ -543,12 +538,13 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                     if (curphase >= PI_2) curphase -= PI_2;
                                     if (curphase < 0.0)   curphase += PI_2;
                                     
-                                    float_channel_data[channel_index][buffer_index] = val * sinf(sin_phase);
+                                    float_channel_data[channel_index][buffer_index] = ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? val : 1.0 - val) * sinf(sin_phase);
                                     sin_phase += sin_increment;
                                     if (sin_phase >= PI_2) sin_phase -= PI_2;
                                     if (sin_phase < 0.0)   sin_phase += PI_2;
                                 }
                         }
+                            
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
                 });
                 dispatch_block_t playToneBlock = dispatch_block_create(0, ^{

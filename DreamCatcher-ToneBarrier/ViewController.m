@@ -16,6 +16,11 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     
+    CAGradientLayer * gradient = [CAGradientLayer new];
+    gradient.frame = self.logContainerView.bounds;
+    [gradient setColors:@[(id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor]];
+    self.logContainerView.layer.mask = gradient;
+    
     dispatch_source_set_event_handler(LogViewDataSource.logData.log_view_dispatch_source, ^{
         [self.logView setAttributedText:[LogViewDataSource.logData logAttributedText]];
     });

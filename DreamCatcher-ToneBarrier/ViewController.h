@@ -16,6 +16,7 @@
 
 @property (weak, nonatomic) IBOutlet UIButton *playButton;
 
+@property (weak, nonatomic) IBOutlet UIView *logContainerView;
 @property (weak, nonatomic) IBOutlet UITextView *logView;
 
 
