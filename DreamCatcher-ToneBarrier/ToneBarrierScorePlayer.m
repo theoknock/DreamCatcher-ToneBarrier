@@ -481,8 +481,6 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             
             chord_frequency_ratios = (struct ChordFrequencyRatio *)malloc(sizeof(struct ChordFrequencyRatio));
             
-            const double PI_2 = 2.0 * M_PI;
-            
             typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
                                       __weak typeof(AVAudioPCMBuffer) *,
                                       __weak typeof(AVAudioFormat) *);
@@ -493,22 +491,30 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
                __weak typeof(AVAudioFormat) * audio_format) {
                 
-                double sample_rate = [audio_format sampleRate];
-                AVAudioChannelCount channel_count = audio_format.channelCount;
-                AVAudioFrameCount frame_count = sample_rate * 2.0;
-                pcm_buffer.frameLength        = frame_count;
+                const double sample_rate = [audio_format sampleRate];
+                
+                const AVAudioChannelCount channel_count = audio_format.channelCount;
+                const AVAudioFrameCount frame_count = sample_rate * 2.0;
+                pcm_buffer.frameLength = frame_count;
+                
+                const double PI_2 = 2.0 * M_PI;
+                const double phase_increment = PI_2 / frame_count;
+                const double (^phase_validator)(double) = ^ double (double phase) {
+                    if (phase >= PI_2) phase -= PI_2;
+                    if (phase < 0.0)   phase += PI_2;
+                    
+                    return phase;
+                };
                 
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-                        __block double sin_phase = 0.0;
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
-                            double sin_increment = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
+                            double signal_frequency = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
                             } ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2)
-                               
                                ? ^ double (double * root_frequency, long random) {
                                 *root_frequency = pow(1.059463094f, random) * 440.0;
                                 return *root_frequency;
@@ -517,32 +523,25 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                 printf("\nresult == %ld", result);
                                 return result;
                             } (random(), -8, 24))
-                               
                                : chord_frequency_ratios->root, ratio[1][0],
-                               ratio[1][chord_frequency_ratios->indices.ratio]) * PI_2) / sample_rate;
-                            
-                            chord_frequency_ratios->indices.ratio++;
+                               ratio[1][chord_frequency_ratios->indices.ratio]));
 //                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
+                            __block double signal_phase = 0.0;
+                            double signal_increment = signal_frequency * phase_increment;
                             
-                            double val;
-                            double curfreq = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
-                            double curphase = 0.0;// (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 0.0 : M_PI_2;
-                            double incr = (PI_2 / sample_rate) * curfreq;
-
+                            double amplitude_frequency = scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
+                            __block double amplitude_phase = 0.0;
+                            double amplitude_increment = 0.5 * phase_increment;
+                                
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-                                    val = (2.0 * (curphase * (1.0 / PI_2) )) - 1.0;
-                                    if (val < 0.0) val = -val;
-                                    val = 2.0 * (val - 0.5);
-                                    curphase += incr;
-                                    if (curphase >= PI_2) curphase -= PI_2;
-                                    if (curphase < 0.0)   curphase += PI_2;
-                                    
-                                    float_channel_data[channel_index][buffer_index] = ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? val : 1.0 - val) * sinf(sin_phase);
-                                    sin_phase += sin_increment;
-                                    if (sin_phase >= PI_2) sin_phase -= PI_2;
-                                    if (sin_phase < 0.0)   sin_phase += PI_2;
+                                    amplitude_phase += amplitude_increment;
+                                    float_channel_data[channel_index][buffer_index] = sinf(amplitude_phase) * sinf(signal_phase) /** val*/;
+                                    signal_phase += signal_increment;
+                                    phase_validator(amplitude_phase);
+                                    phase_validator(signal_phase);
                                 }
+                            chord_frequency_ratios->indices.ratio++;
                         }
                             
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
