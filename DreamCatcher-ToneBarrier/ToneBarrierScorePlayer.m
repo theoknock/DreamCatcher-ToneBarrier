@@ -38,6 +38,7 @@
 #include "Chords.h"
 
 #define randomdouble()    (arc4random() / ((unsigned)RAND_MAX))
+#define E_NUM 0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495
 
 typedef unsigned int AVAudioPlayerNodeCount, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
 
@@ -308,6 +309,14 @@ Scale scale = ^double(double min_new, double max_new, double val_old, double min
 };
 
 
+typedef double (^Linearize)(double, double, double);
+Linearize linearize = ^double(double range_min, double range_max, double value)
+{
+    double result = (value * (range_max - range_min)) + range_min;
+
+    return result;
+};
+
 //typedef double (^FrequencySample)(double, double, ...);
 // TO-DO: Cut normalized time into three segments, each corresponding to attack, sustain and release;
 //        Distribute time in proportion to the relative duration of each segment;
@@ -506,13 +515,15 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     return phase;
                 };
                 
+                const double divisor = frame_count/sample_rate;
+                
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
-                            double signal_frequency = (^ double (double fundamental_frequency, double fundamental_ratio, double frequency_ratio) {
+                            double signal_frequency = (^ double (double fundamental_frequency, double frequency_ratio) {
                                 return (fundamental_frequency * frequency_ratio);
                             } ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2)
                                ? ^ double (double * root_frequency, long random) {
@@ -520,29 +531,43 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                                 return *root_frequency;
                             } (&chord_frequency_ratios->root, ^ long (long random, int n, int m) {
                                 long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-                                printf("\nresult == %ld", result);
                                 return result;
                             } (random(), -8, 24))
-                               : chord_frequency_ratios->root, ratio[1][0],
+                               : chord_frequency_ratios->root,
                                ratio[1][chord_frequency_ratios->indices.ratio]));
 //                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
                             double signal_phase = 0.0;
                             double signal_increment = signal_frequency * phase_increment;
+                            double signal_increment_aux = (signal_frequency * ratio[1][chord_frequency_ratios->indices.ratio]) * phase_increment;
                             
-                            double amplitude_frequency = 1.0;//scale(0.5, 4.0, chord_frequency_ratios->root, 277.1826317, 1396.912916);
+                            double amplitude_frequency = 1.0;
                             double amplitude_phase = 0.0;
-                            double amplitude_increment = amplitude_frequency * (phase_increment * 0.5f);
+                            double amplitude_increment = (amplitude_frequency / divisor) * phase_increment;
                             
+                            double tremolo_min, tremolo_max;
+                            tremolo_min = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 4.0 : 6.0;
+                            tremolo_max = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 6.0 : 4.0;
+                            double tremolo_frequency   = scale(tremolo_min, tremolo_max, chord_frequency_ratios->root, 277.1826317, 1396.912916);
                             
-                            
+                            double tremolo_phase = 0.0;
+                            double tremolo_increment = (tremolo_frequency / divisor) * phase_increment;
                                 
+                            // TO-DO: Account for possibility that there is not another ratio higher than the one being used to generate the aux frequency
+                            double divider = ^ double (long random, int n, int m) {
+                                double result = (random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n)) * .01;
+                                return result;
+                            } (random(), 25, 175);
+                            
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-                                    float_channel_data[channel_index][buffer_index] = sinf(amplitude_phase) * sinf(signal_phase);
-                                    amplitude_phase += amplitude_increment;
-                                    signal_phase += signal_increment;
-                                    phase_validator(amplitude_phase);
+                                    float_channel_data[channel_index][buffer_index] = sinf(tremolo_phase) * sinf(amplitude_phase) * sinf(signal_phase);
+                                    signal_phase += ^ double (double time) { return (time < divider) ? signal_increment : signal_increment_aux; } (scale(0.0, 1.0, buffer_index, 0, frame_count)); // TO-DO: apply "s-curve" to buffer_index value to correct the transition from one frequency to the other
+                                    
                                     phase_validator(signal_phase);
+                                    amplitude_phase += amplitude_increment;
+                                    phase_validator(amplitude_phase);
+                                    tremolo_phase += ^ double (double time) { return time * tremolo_increment; } (scale(MIN(tremolo_min, tremolo_frequency / divisor), MIN(tremolo_max, tremolo_frequency / divisor), buffer_index, 0, frame_count));
+                                    phase_validator(tremolo_phase);
                                 }
                             chord_frequency_ratios->indices.ratio++;
                         }
