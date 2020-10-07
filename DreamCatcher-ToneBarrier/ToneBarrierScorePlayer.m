@@ -482,6 +482,18 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             if (![self.playerNode isPlaying]) [self.playerNode play];
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
             
+//            struct AudioStreamBasicDescription {
+//                mSampleRate       = 44100.0;
+//                mFormatID         = kAudioFormatLinearPCM;
+//                mFormatFlags      = kAudioFormatFlagsAudioUnitCanonical;
+//                mBitsPerChannel   = 8 * sizeof (AudioUnitSampleType);                    // 32 bits
+//                mChannelsPerFrame = 2;
+//                mBytesPerFrame    = mChannelsPerFrame * sizeof (AudioUnitSampleType);    // 8 bytes
+//                mFramesPerPacket  = 1;
+//                mBytesPerPacket   = mFramesPerPacket * mBytesPerFrame;     // 8 bytes
+//                mReserved         = 0;
+//            };
+            
             unsigned int seed    = (unsigned int)time(0);
             size_t buffer_size   = 256 * sizeof(char *);
             char * random_buffer = (char *)malloc(buffer_size);
