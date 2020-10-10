@@ -11,6 +11,7 @@
 #import <Foundation/Foundation.h>
 
 #import "ToneBarrierScorePlayer.h"
+#import "LogViewGestureRecognizer.h"
 
 @interface ViewController : UIViewController <UITextViewDelegate>
 
@@ -18,6 +19,10 @@
 
 @property (weak, nonatomic) IBOutlet UIView *logContainerView;
 @property (weak, nonatomic) IBOutlet UITextView *logView;
+
+@property (weak, nonatomic) IBOutlet UIVisualEffectView *blurView;
+
+@property (strong, nonatomic) LogViewGestureRecognizer *log_view_gesture_recognizer;
 
 
 @end

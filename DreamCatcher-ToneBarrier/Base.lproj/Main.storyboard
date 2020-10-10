@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17503.1" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17505" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES" initialViewController="BYZ-38-t0r">
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17502"/>
@@ -17,10 +17,18 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <visualEffectView opaque="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0bu-8s-u8t">
+                                <rect key="frame" x="0.0" y="5" width="414" height="896"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="MqO-PI-EpS">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                </view>
+                                <blurEffect style="regular"/>
+                            </visualEffectView>
                             <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PFW-NN-poo" userLabel="Event Log Text View Container">
                                 <rect key="frame" x="0.0" y="44" width="414" height="818"/>
                                 <subviews>
-                                    <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" alpha="0.5" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
+                                    <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" alpha="0.0" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
                                         <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <attributedString key="attributedText"/>
@@ -61,17 +69,22 @@
                         <constraints>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="0yU-3M-1TG"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="D5e-aa-b1n"/>
+                            <constraint firstItem="0bu-8s-u8t" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Gah-B9-9Ex"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="Lff-Md-abE"/>
+                            <constraint firstItem="0bu-8s-u8t" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="NeC-vb-Esd"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="VSr-MX-Fdu"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerYWithinMargins" id="XVf-bk-fjW"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerXWithinMargins" id="dUJ-3h-o9Q"/>
+                            <constraint firstItem="0bu-8s-u8t" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="eHy-et-oIm"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="jTr-NZ-Naj"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="oD8-Mm-8OK"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="rY6-QP-9l4"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="v8v-3x-adJ"/>
+                            <constraint firstItem="0bu-8s-u8t" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="yLM-Mg-yYj"/>
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="blurView" destination="0bu-8s-u8t" id="iaJ-qh-AHM"/>
                         <outlet property="logContainerView" destination="PFW-NN-poo" id="L5W-C7-ZKo"/>
                         <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>

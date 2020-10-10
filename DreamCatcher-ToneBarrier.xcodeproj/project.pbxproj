@@ -22,6 +22,7 @@
 		B9273D3B2517D90A00F1BE30 /* LogViewDataSource.m in Sources */ = {isa = PBXBuildFile; fileRef = B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */; };
 		B92C45B62531E1B0001A3D9D /* SignalCalculator.m in Sources */ = {isa = PBXBuildFile; fileRef = B92C45B52531E1B0001A3D9D /* SignalCalculator.m */; };
 		B92C45B82531E259001A3D9D /* signal_calculator_kernel.metal in Sources */ = {isa = PBXBuildFile; fileRef = B92C45B72531E259001A3D9D /* signal_calculator_kernel.metal */; };
+		B92C45BF253215D9001A3D9D /* LogViewGestureRecognizer.m in Sources */ = {isa = PBXBuildFile; fileRef = B92C45BE253215D9001A3D9D /* LogViewGestureRecognizer.m */; };
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
 		B9763DFE250822B5003DB662 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = B9763DFD250822B5003DB662 /* test.m */; };
 		B9B9F01425120961002E4295 /* ToneBarrierScoreDispatchObjects.m in Sources */ = {isa = PBXBuildFile; fileRef = B9B9F01325120961002E4295 /* ToneBarrierScoreDispatchObjects.m */; };
@@ -103,6 +104,8 @@
 		B92C45B42531E1B0001A3D9D /* SignalCalculator.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = SignalCalculator.h; sourceTree = "<group>"; };
 		B92C45B52531E1B0001A3D9D /* SignalCalculator.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = SignalCalculator.m; sourceTree = "<group>"; };
 		B92C45B72531E259001A3D9D /* signal_calculator_kernel.metal */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.metal; path = signal_calculator_kernel.metal; sourceTree = "<group>"; };
+		B92C45BD253215D9001A3D9D /* LogViewGestureRecognizer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogViewGestureRecognizer.h; sourceTree = "<group>"; };
+		B92C45BE253215D9001A3D9D /* LogViewGestureRecognizer.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogViewGestureRecognizer.m; sourceTree = "<group>"; wrapsLines = 0; };
 		B96EC02725006C5F00F9C929 /* ToneBarrierScoreCodeCemetary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScoreCodeCemetary.h; sourceTree = "<group>"; };
 		B9763DFC250822B5003DB662 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		B9763DFD250822B5003DB662 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; wrapsLines = 0; };
@@ -171,7 +174,6 @@
 		B9259D1D24F669DD00FA19FA /* DreamCatcher-ToneBarrier */ = {
 			isa = PBXGroup;
 			children = (
-				8A6ADA7A25115D0B00B418D4 /* DreamCatcher-ToneBarrier.entitlements */,
 				B9FAD47E2503F31600FF4772 /* ToneBarrierScoreSchema */,
 				B9259D1E24F669DD00FA19FA /* AppDelegate.h */,
 				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
@@ -183,6 +185,8 @@
 				B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
+				B92C45BD253215D9001A3D9D /* LogViewGestureRecognizer.h */,
+				B92C45BE253215D9001A3D9D /* LogViewGestureRecognizer.m */,
 				B9259D2724F669DD00FA19FA /* Main.storyboard */,
 				B913D976251EC1C200570F23 /* Chords.h */,
 				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
@@ -212,6 +216,7 @@
 				B9259D3124F669E000FA19FA /* Info.plist */,
 				B9259D2E24F669E000FA19FA /* LaunchScreen.storyboard */,
 				B9259D3224F669E000FA19FA /* main.m */,
+				8A6ADA7A25115D0B00B418D4 /* DreamCatcher-ToneBarrier.entitlements */,
 				B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */,
 			);
 			path = "DreamCatcher-ToneBarrier";
@@ -348,6 +353,7 @@
 				B92C45B62531E1B0001A3D9D /* SignalCalculator.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
+				B92C45BF253215D9001A3D9D /* LogViewGestureRecognizer.m in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
 				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
 				B9B9F01425120961002E4295 /* ToneBarrierScoreDispatchObjects.m in Sources */,
