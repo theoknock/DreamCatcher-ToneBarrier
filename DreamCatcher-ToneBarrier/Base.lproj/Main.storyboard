@@ -69,7 +69,7 @@
                                         <constraint firstItem="PFW-NN-poo" firstAttribute="top" secondItem="MqO-PI-EpS" secondAttribute="top" constant="39" id="zwP-Vq-kIU"/>
                                     </constraints>
                                 </view>
-                                <blurEffect style="systemThickMaterialDark"/>
+                                <blurEffect style="systemThinMaterialDark"/>
                             </visualEffectView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>

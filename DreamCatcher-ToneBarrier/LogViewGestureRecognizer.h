@@ -6,6 +6,8 @@
 //
 
 #import <UIKit/UIKit.h>
+#import <UIKit/UIGestureRecognizerSubclass.h>
+
 
 NS_ASSUME_NONNULL_BEGIN
 
