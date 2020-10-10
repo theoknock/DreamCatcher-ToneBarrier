@@ -17,6 +17,10 @@
 #import <MediaPlayer/MediaPlayer.h>
 #import <GameKit/GameKit.h>
 #import <objc/runtime.h>
+#import <mach/mach.h>
+
+#import <Metal/Metal.h>
+#import "SignalCalculator.h"
 
 #include <Accelerate/Accelerate.h>
 
@@ -206,6 +210,14 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         [self.commandCenter.playCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.stopCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.pauseCommand addTargetWithHandler:remoteCommandHandler];
+        
+        // GPU configuration
+        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+
+        SignalCalculator* signal_calculator = [[SignalCalculator alloc] initWithDevice:device];
+        [signal_calculator prepareData];
+        [signal_calculator sendComputeCommand];
+
     }
     
     return self;
@@ -590,6 +602,8 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     ^ (PlayedToneCompletionBlock played_tone) {
                         if ([player_node isPlaying])
                         {
+                            report_memory();
+                            
                             [player_node prepareWithFrameCount:frame_count];
                             [player_node scheduleBuffer:pcm_buffer
                                                  atTime:nil
@@ -620,6 +634,28 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             return FALSE;
         }
     }
+}
+
+void report_memory(void) {
+  struct task_basic_info info;
+  mach_msg_type_number_t size = TASK_BASIC_INFO_COUNT;
+  kern_return_t kerr = task_info(mach_task_self(),
+                                 TASK_BASIC_INFO,
+                                 (task_info_t)&info,
+                                 &size);
+  if( kerr == KERN_SUCCESS ) {
+    NSLog(@"Memory in use (in bytes): %lu", info.resident_size);
+    NSLog(@"Memory in use (in MiB): %f", ((CGFloat)info.resident_size / 1048576));
+  } else {
+    NSLog(@"Error with task_info(): %s", mach_error_string(kerr));
+  }
+}
+
+void add_arrays(const float signal_increment,
+                float* channel_data,
+                int index)
+{
+    channel_data[index] = sin(signal_increment);
 }
 
 
