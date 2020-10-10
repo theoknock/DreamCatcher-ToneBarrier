@@ -26,6 +26,14 @@
     
     self.log_view_gesture_recognizer = [[LogViewGestureRecognizer alloc] init];
     [self.log_view_gesture_recognizer setDelegate:self.log_view_gesture_recognizer];
+    dispatch_source_set_event_handler(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, ^{
+        struct MainViewTouchRecognizerLocationX * data = dispatch_get_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source);
+        float alpha = (1.0 - (data->x / CGRectGetWidth(self.view.frame)));
+        printf("alpha = %f\n", alpha);
+        
+        [self.blurView setAlpha:alpha];
+        [self.logView setAlpha:alpha];
+    });
     [self.view addGestureRecognizer:self.log_view_gesture_recognizer];
     
     dispatch_source_set_event_handler(LogViewDataSource.logData.log_view_dispatch_source, ^{

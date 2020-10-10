@@ -17,36 +17,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <visualEffectView opaque="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0bu-8s-u8t">
-                                <rect key="frame" x="0.0" y="5" width="414" height="896"/>
-                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="MqO-PI-EpS">
-                                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                                </view>
-                                <blurEffect style="regular"/>
-                            </visualEffectView>
-                            <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PFW-NN-poo" userLabel="Event Log Text View Container">
-                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
-                                <subviews>
-                                    <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" alpha="0.0" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <attributedString key="attributedText"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                    </textView>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstAttribute="trailing" secondItem="Wky-rW-XYV" secondAttribute="trailing" id="7Xg-eT-X5G"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="top" secondItem="PFW-NN-poo" secondAttribute="top" id="Adi-cB-KYB"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="width" secondItem="PFW-NN-poo" secondAttribute="width" id="acu-16-veh"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="height" secondItem="PFW-NN-poo" secondAttribute="height" id="cDh-vv-R8g"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="leading" secondItem="PFW-NN-poo" secondAttribute="leading" id="gJO-W1-UfJ"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="centerY" secondItem="PFW-NN-poo" secondAttribute="centerY" id="ogE-Qo-7o6"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="bottom" secondItem="PFW-NN-poo" secondAttribute="bottom" id="sTa-1I-tEx"/>
-                                    <constraint firstItem="Wky-rW-XYV" firstAttribute="centerX" secondItem="PFW-NN-poo" secondAttribute="centerX" id="y16-7g-HJF"/>
-                                </constraints>
-                            </view>
                             <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
                                 <rect key="frame" x="17" y="263.5" width="380.5" height="384"/>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="370"/>
@@ -63,23 +33,55 @@
                                     <action selector="playToneBarrierScore:forEvent:" destination="BYZ-38-t0r" eventType="touchUpInside" id="bbo-3M-VTr"/>
                                 </connections>
                             </button>
+                            <visualEffectView opaque="NO" alpha="0.0" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="0bu-8s-u8t">
+                                <rect key="frame" x="0.0" y="5" width="414" height="896"/>
+                                <view key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" insetsLayoutMarginsFromSafeArea="NO" id="MqO-PI-EpS">
+                                    <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <subviews>
+                                        <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PFW-NN-poo" userLabel="Event Log Text View Container">
+                                            <rect key="frame" x="0.0" y="39" width="414" height="818"/>
+                                            <subviews>
+                                                <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" alpha="0.0" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
+                                                    <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
+                                                    <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                                    <attributedString key="attributedText"/>
+                                                    <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                                </textView>
+                                            </subviews>
+                                            <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                            <constraints>
+                                                <constraint firstAttribute="trailing" secondItem="Wky-rW-XYV" secondAttribute="trailing" id="7Xg-eT-X5G"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="top" secondItem="PFW-NN-poo" secondAttribute="top" id="Adi-cB-KYB"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="width" secondItem="PFW-NN-poo" secondAttribute="width" id="acu-16-veh"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="height" secondItem="PFW-NN-poo" secondAttribute="height" id="cDh-vv-R8g"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="leading" secondItem="PFW-NN-poo" secondAttribute="leading" id="gJO-W1-UfJ"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="centerY" secondItem="PFW-NN-poo" secondAttribute="centerY" id="ogE-Qo-7o6"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="bottom" secondItem="PFW-NN-poo" secondAttribute="bottom" id="sTa-1I-tEx"/>
+                                                <constraint firstItem="Wky-rW-XYV" firstAttribute="centerX" secondItem="PFW-NN-poo" secondAttribute="centerX" id="y16-7g-HJF"/>
+                                            </constraints>
+                                        </view>
+                                    </subviews>
+                                    <constraints>
+                                        <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="MqO-PI-EpS" secondAttribute="centerY" id="Ek6-bG-vp8"/>
+                                        <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="MqO-PI-EpS" secondAttribute="centerX" id="Sae-lm-VmZ"/>
+                                        <constraint firstItem="PFW-NN-poo" firstAttribute="leading" secondItem="MqO-PI-EpS" secondAttribute="leading" id="Ub6-Vj-Ybh"/>
+                                        <constraint firstItem="PFW-NN-poo" firstAttribute="top" secondItem="MqO-PI-EpS" secondAttribute="top" constant="39" id="zwP-Vq-kIU"/>
+                                    </constraints>
+                                </view>
+                                <blurEffect style="systemThickMaterialDark"/>
+                            </visualEffectView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="0yU-3M-1TG"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="D5e-aa-b1n"/>
                             <constraint firstItem="0bu-8s-u8t" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="Gah-B9-9Ex"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="Lff-Md-abE"/>
                             <constraint firstItem="0bu-8s-u8t" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="NeC-vb-Esd"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="VSr-MX-Fdu"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerYWithinMargins" id="XVf-bk-fjW"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerXWithinMargins" id="dUJ-3h-o9Q"/>
                             <constraint firstItem="0bu-8s-u8t" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="eHy-et-oIm"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="trailing" secondItem="6Tk-OE-BBY" secondAttribute="trailing" id="jTr-NZ-Naj"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="oD8-Mm-8OK"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="rY6-QP-9l4"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="bottom" secondItem="6Tk-OE-BBY" secondAttribute="bottom" id="v8v-3x-adJ"/>
                             <constraint firstItem="0bu-8s-u8t" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="yLM-Mg-yYj"/>
                         </constraints>
                     </view>

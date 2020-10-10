@@ -18,10 +18,20 @@
 //    dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
     struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
     UITouch *touch = [[event allTouches] anyObject];
-    main_view_touch_recognizer_location_x_context_data->x = [touch preciseLocationInView:touch.view].x;
+    CGFloat touch_location_x = [touch preciseLocationInView:touch.view].x;
+    main_view_touch_recognizer_location_x_context_data->x = (touch_location_x >= (CGRectGetWidth(touch.view.frame) - 42)) ? CGRectGetWidth(touch.view.frame) : touch_location_x;
     dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
     dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
 }
+
+//- (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
+//{
+//    struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
+//    UITouch *touch = [[event allTouches] anyObject];
+//    main_view_touch_recognizer_location_x_context_data->x = [touch preciseLocationInView:touch.view].x;
+//    dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
+//    dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
+//}
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
 {
