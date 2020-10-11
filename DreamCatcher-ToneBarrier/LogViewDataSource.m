@@ -152,16 +152,6 @@ static LogViewDataSource * logData = NULL;
         
         self.log_view_dispatch_queue  = dispatch_queue_create_with_target("Log View Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
         self.log_view_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.log_view_dispatch_queue);
-        
-        self.main_view_touch_recognizer_dispatch_queue  = dispatch_queue_create_with_target("Main View Touch Recognizer Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
-        self.main_view_touch_recognizer_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.main_view_touch_recognizer_dispatch_queue);
-//        dispatch_source_set_event_handler(self.main_view_touch_recognizer_dispatch_source, ^{
-//            struct MainViewTouchRecognizerLocationX * data = dispatch_get_context(self.main_view_touch_recognizer_dispatch_source);
-//            printf("x = %f", data->x);
-//        });
-        dispatch_resume(self.main_view_touch_recognizer_dispatch_source);
-        
-        
     }
     return self;
 }

@@ -89,10 +89,16 @@
                         <outlet property="blurView" destination="0bu-8s-u8t" id="iaJ-qh-AHM"/>
                         <outlet property="logContainerView" destination="PFW-NN-poo" id="L5W-C7-ZKo"/>
                         <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
+                        <outlet property="logViewControllerTapGestureRecognizer" destination="PYG-RA-uI8" id="77e-iG-49d"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
+                <tapGestureRecognizer id="PYG-RA-uI8">
+                    <connections>
+                        <action selector="presentAction:" destination="BYZ-38-t0r" id="TdG-xp-k22"/>
+                    </connections>
+                </tapGestureRecognizer>
                 <customObject id="23E-y9-uzd" customClass="LogViewDataSource"/>
             </objects>
             <point key="canvasLocation" x="121.73913043478262" y="112.5"/>

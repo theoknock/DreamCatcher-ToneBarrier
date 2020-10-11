@@ -13,7 +13,7 @@
 #import "ToneBarrierScorePlayer.h"
 #import "LogViewGestureRecognizer.h"
 
-@interface ViewController : UIViewController <UITextViewDelegate>
+@interface ViewController : UIViewController <UITextViewDelegate, UIGestureRecognizerDelegate>
 
 @property (weak, nonatomic) IBOutlet UIButton *playButton;
 
@@ -22,6 +22,7 @@
 
 @property (weak, nonatomic) IBOutlet UIVisualEffectView *blurView;
 
+@property (strong, nonatomic) IBOutlet UITapGestureRecognizer *logViewControllerTapGestureRecognizer;
 @property (strong, nonatomic) LogViewGestureRecognizer *log_view_gesture_recognizer;
 
 

@@ -9,53 +9,62 @@
 #import "LogViewDataSource.h"
 
 @implementation LogViewGestureRecognizer
+{
+    BOOL isTracking;
+}
+
+- (instancetype)init
+{
+    if (self == [super init])
+    {
+        self.main_view_touch_recognizer_dispatch_queue  = dispatch_queue_create_with_target("Main View Touch Recognizer Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
+        self.main_view_touch_recognizer_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.main_view_touch_recognizer_dispatch_queue);
+    }
+    
+    return self;
+}
 
 - (void)touchesBegan:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    //    NSLog(@"%s", __PRETTY_FUNCTION__);
-    // get location (must be within 21 (?) points of right or left edge to be "recognized" as a swipe intended to display/hide the log view)
-    // send location to the dispatch_source context
-    //    dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
-    struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
+    isTracking = FALSE;
     UITouch *touch = [[event allTouches] anyObject];
     CGFloat touch_location_x = [touch preciseLocationInView:touch.view].x;
-    main_view_touch_recognizer_location_x_context_data->x = (touch_location_x <= (CGRectGetWidth(touch.view.frame) - 42)) ? CGRectGetWidth(touch.view.frame) : touch_location_x;
-    dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-    dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
+    isTracking = (touch_location_x > (CGRectGetMaxX(touch.view.frame) - 42));
+    NSLog(@"Touch location x %f %@ %f%@", touch_location_x, (isTracking) ? @">" : @"<", (CGRectGetMaxX(touch.view.frame) - 42), (isTracking) ? @"\n\nTRACKING" : @"");
+    if (isTracking)
+    {
+        struct MainViewTouchRecognizerLocationX * main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
+        main_view_touch_recognizer_location_x_context_data->x = touch_location_x;
+        dispatch_set_context(self.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
+        dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
+    } else {
+        
+    }
 }
 
 - (void)touchesMoved:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 {
-    //    UITouch *touch = [[event allTouches] anyObject];
-    for (UITouch * touch in touches)
+    UITouch *touch = [[event allTouches] anyObject];
+    CGFloat touch_location_x = [touch preciseLocationInView:touch.view].x;
+    if (touch_location_x < (CGRectGetMaxX(touch.view.frame) - 42) &&
+        touch.phase != 0 && isTracking)
     {
-        CGFloat touch_location_x = [touch preciseLocationInView:touch.view].x;
-        struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
-        
-        if (touch.phase == UITouchPhaseBegan)
-        {
-            main_view_touch_recognizer_location_x_context_data->x = (touch_location_x <= (CGRectGetWidth(touch.view.frame) - 42)) ? CGRectGetWidth(touch.view.frame) : touch_location_x;
-        } else if (touch.phase == UITouchPhaseEnded)
-        {
-            main_view_touch_recognizer_location_x_context_data->x = (touch_location_x <= (CGRectGetMinX(touch.view.frame) + 42)) ? touch_location_x : CGRectGetWidth(touch.view.frame);
-        } else if (touch.phase == UITouchPhaseMoved) {
-            main_view_touch_recognizer_location_x_context_data->x = touch_location_x;
-        }
-        
-        NSLog(@"Phase == %ld", (long)touch.phase);
-        dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-        dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
+        //        NSLog(@"Phase == %ld\t\t%@", (long)touch.phase, (isTracking) ? @"TRACKING" : @"UNTRACKED");
+        struct MainViewTouchRecognizerLocationX * main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
+        main_view_touch_recognizer_location_x_context_data->x = touch_location_x;
+        dispatch_set_context(self.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
+        dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
     }
 }
 
 //- (void)touchesEnded:(NSSet<UITouch *> *)touches withEvent:(UIEvent *)event
 //{
-//    struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
 //    UITouch *touch = [[event allTouches] anyObject];
+////    NSLog(@"Phase == %ld\t\t%@", (long)touch.phase, (isTracking) ? @"TRACKING" : @"UNTRACKED");
 //    CGFloat touch_location_x = [touch preciseLocationInView:touch.view].x;
+//    struct MainViewTouchRecognizerLocationX * main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
 //    main_view_touch_recognizer_location_x_context_data->x = (touch_location_x <= (CGRectGetMinX(touch.view.frame) + 42)) ? touch_location_x : CGRectGetWidth(touch.view.frame);
 //    dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-//    dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
 //}
 
 - (BOOL)gestureRecognizer:(UIGestureRecognizer *)gestureRecognizer shouldReceiveTouch:(UITouch *)touch
@@ -63,34 +72,9 @@
     if ([touch.view isKindOfClass:[UIButton class]])
     {
         return FALSE;
-        //        NSLog(@"Touch view == %@", [touch.view description]);
     } else {
         return TRUE;
     }
 }
-
-- (BOOL)gestureRecognizerShouldBegin:(UIGestureRecognizer *)gestureRecognizer
-{
-    if ([gestureRecognizer locationInView:gestureRecognizer.view].x < (CGRectGetMaxX(gestureRecognizer.view.frame) - 42))
-    {
-        return FALSE;
-    } else {
-        return TRUE;
-    }
-}
-
-//- (void)touchesMoved:(NSSet *)touches withEvent:(UIEvent *)event
-//{
-//    for (UITouch *touch in touches)
-//    {
-//        if (self.state == UIGestureRecognizerStateBegan)
-//        {
-//            struct MainViewTouchRecognizerLocationX *main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
-//            main_view_touch_recognizer_location_x_context_data->x = [touch preciseLocationInView:touch.view].x;
-//            dispatch_set_context(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-//            dispatch_source_merge_data(LogViewDataSource.logData.main_view_touch_recognizer_dispatch_source, 1);
-//        }
-//    }
-//}
 
 @end
