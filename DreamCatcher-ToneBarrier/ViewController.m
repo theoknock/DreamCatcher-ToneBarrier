@@ -31,22 +31,22 @@
     [gradient setColors:@[(id)[UIColor blackColor].CGColor, (id)[UIColor clearColor].CGColor, (id)[UIColor blackColor].CGColor]];
     self.logContainerView.layer.mask = gradient;
     
-    _animator = [[LogViewControllerAnimator alloc] init];
-    
-    [self.logViewControllerTapGestureRecognizer setDelegate:self];
-    [self.view addGestureRecognizer:self.logViewControllerTapGestureRecognizer];
-    
-    self.log_view_gesture_recognizer = [[LogViewGestureRecognizer alloc] init];
-    [self.log_view_gesture_recognizer setDelegate:self.log_view_gesture_recognizer];
-    dispatch_source_set_event_handler(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source, ^{
-        struct MainViewTouchRecognizerLocationX * data = dispatch_get_context(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source);
-        float alpha = (1.0 - (data->x / CGRectGetWidth(self.view.frame)));
-        printf("alpha = %f\n", alpha);
-        
-        [self.blurView setAlpha:alpha];
-        [self.logView setAlpha:alpha];
-    });
-    dispatch_resume(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source);
+//    _animator = [[LogViewControllerAnimator alloc] init];
+//
+//    [self.logViewControllerTapGestureRecognizer setDelegate:self];
+//    [self.view addGestureRecognizer:self.logViewControllerTapGestureRecognizer];
+//
+//    self.log_view_gesture_recognizer = [[LogViewGestureRecognizer alloc] init];
+//    [self.log_view_gesture_recognizer setDelegate:self.log_view_gesture_recognizer];
+//    dispatch_source_set_event_handler(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source, ^{
+//        struct MainViewTouchRecognizerLocationX * data = dispatch_get_context(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source);
+//        float alpha = (1.0 - (data->x / CGRectGetWidth(self.view.frame)));
+//        printf("alpha = %f\n", alpha);
+//
+//        [self.blurView setAlpha:alpha];
+//        [self.logView setAlpha:alpha];
+//    });
+//    dispatch_resume(self.log_view_gesture_recognizer.main_view_touch_recognizer_dispatch_source);
 //    [self.view addGestureRecognizer:self.log_view_gesture_recognizer];
     
     dispatch_source_set_event_handler(LogViewDataSource.logData.log_view_dispatch_source, ^{
