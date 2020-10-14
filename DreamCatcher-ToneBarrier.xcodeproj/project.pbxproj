@@ -11,6 +11,7 @@
 		8A41089B250AE6300004FD0E /* String.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A41089A250AE6300004FD0E /* String.c */; };
 		8A4108C3250C61580004FD0E /* Score.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A4108C2250C61580004FD0E /* Score.c */; };
 		8AF985E4250ACA14004900DA /* Randomizers.c in Sources */ = {isa = PBXBuildFile; fileRef = 8AF985E3250ACA14004900DA /* Randomizers.c */; };
+		B922F6A42534D9450084C065 /* LogTextView.m in Sources */ = {isa = PBXBuildFile; fileRef = B922F6A32534D9450084C065 /* LogTextView.m */; };
 		B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D1F24F669DD00FA19FA /* AppDelegate.m */; };
 		B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2224F669DD00FA19FA /* SceneDelegate.m */; };
 		B9259D2624F669DD00FA19FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2524F669DD00FA19FA /* ViewController.m */; };
@@ -72,6 +73,8 @@
 		8AFCCA35250517D8001427D2 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
 		8AFCCA36250517D8001427D2 /* new.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = new.h; sourceTree = "<group>"; };
 		B913D976251EC1C200570F23 /* Chords.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Chords.h; sourceTree = "<group>"; };
+		B922F6A22534D9450084C065 /* LogTextView.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LogTextView.h; sourceTree = "<group>"; };
+		B922F6A32534D9450084C065 /* LogTextView.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = LogTextView.m; sourceTree = "<group>"; };
 		B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D1E24F669DD00FA19FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B9259D1F24F669DD00FA19FA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -195,6 +198,8 @@
 				B976A25925327C0C00E2A940 /* LogViewController.m */,
 				B976A2552532785E00E2A940 /* LogViewControllerAnimator.h */,
 				B976A2562532785E00E2A940 /* LogViewControllerAnimator.m */,
+				B922F6A22534D9450084C065 /* LogTextView.h */,
+				B922F6A32534D9450084C065 /* LogTextView.m */,
 				B92C45BD253215D9001A3D9D /* LogViewGestureRecognizer.h */,
 				B92C45BE253215D9001A3D9D /* LogViewGestureRecognizer.m */,
 				B9259D2724F669DD00FA19FA /* Main.storyboard */,
@@ -362,6 +367,7 @@
 				B92C45B82531E259001A3D9D /* signal_calculator_kernel.metal in Sources */,
 				8AF985E4250ACA14004900DA /* Randomizers.c in Sources */,
 				B92C45B62531E1B0001A3D9D /* SignalCalculator.m in Sources */,
+				B922F6A42534D9450084C065 /* LogTextView.m in Sources */,
 				B976A25A25327C0C00E2A940 /* LogViewController.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,

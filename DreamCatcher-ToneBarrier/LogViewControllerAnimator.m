@@ -20,23 +20,16 @@
     UIViewController* toViewController = [transitionContext viewControllerForKey:UITransitionContextToViewControllerKey];
     UIViewController* fromViewController = [transitionContext viewControllerForKey:UITransitionContextFromViewControllerKey];
     
-    [transitionContext containerView].backgroundColor = [[UIColor colorWithPatternImage:[self screenShortOnView:fromViewController.view]]
-                                                         colorWithAlphaComponent:0.5];
     [transitionContext containerView].contentMode = UIViewContentModeCenter;
-    toViewController.view.alpha = 0;
-    toViewController.view.backgroundColor = _presenting?[UIColor redColor]:[UIColor whiteColor];
-    
-    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^{
-        
+    // TO-DO: insert view transition animations
+    [UIView animateWithDuration:[self transitionDuration:transitionContext] animations:^ {
         toViewController.view.alpha = 1;
         fromViewController.view.transform = CGAffineTransformMakeScale(0.9, 0.9);
         [transitionContext containerView].transform = CGAffineTransformMakeScale(0.9, 0.9);
         
     } completion:^(BOOL finished) {
-        
         if (_presenting) {
             
-            toViewController.view.transform = CGAffineTransformMakeScale(0.8, 0.5);
             [[transitionContext containerView] addSubview:toViewController.view];
             [[transitionContext containerView] bringSubviewToFront:toViewController.view];
         }else{
@@ -56,25 +49,31 @@
     UIImage *screengrab = UIGraphicsGetImageFromCurrentImageContext();
     UIGraphicsEndImageContext();
     
+    
+    
     return screengrab;
 }
 
 - (UIImage *)screenShorture{
     
-    // create graphics context with screen size
-    CGRect screenRect = [[UIScreen mainScreen] bounds];
-    UIGraphicsBeginImageContext(screenRect.size);
-    CGContextRef ctx = UIGraphicsGetCurrentContext();
-    [[UIColor blackColor] set];
-    CGContextFillRect(ctx, screenRect);
-    // grab reference to our window
-    UIWindow *window = [UIApplication sharedApplication].keyWindow;
-    // transfer content into our context
-    [window.layer renderInContext:ctx];
-    UIImage *screengrab = UIGraphicsGetImageFromCurrentImageContext();
-    UIGraphicsEndImageContext();
-    
-    return screengrab;
+//    // create graphics context with screen size
+//    CGRect screenRect = [[UIScreen mainScreen] bounds];
+//    UIGraphicsBeginImageContext(screenRect.size);
+//    CGContextRef ctx = UIGraphicsGetCurrentContext();
+//    [[UIColor blackColor] set];
+//    CGContextFillRect(ctx, screenRect);
+//    // grab reference to our window
+//    UIWindow *window = [UIApplication sharedApplication].keyWindow;
+//    // transfer content into our context
+//    [window.layer renderInContext:ctx];
+//    UIImage *screengrab = UIGraphicsGetImageFromCurrentImageContext();
+//    UIGraphicsEndImageContext();
+//
+    CGContextSetShouldAntialias(UIGraphicsGetCurrentContext(), YES);
+    UIImage *image = UIGraphicsGetImageFromCurrentImageContext();
+    UIGraphicsEndImageContext();
+
+    return image;
 }
 
 @end

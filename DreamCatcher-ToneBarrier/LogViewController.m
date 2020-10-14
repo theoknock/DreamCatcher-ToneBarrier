@@ -6,8 +6,12 @@
 //
 
 #import "LogViewController.h"
+#import "LogViewDataSource.h"
 
 @interface LogViewController ()
+{
+    UITextView *logView;
+}
 
 @end
 
@@ -16,6 +20,16 @@
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
+    
+    logView = [[UITextView alloc] initWithFrame:self.view.frame];
+    [logView setBackgroundColor:[UIColor clearColor]];
+    [self.view addSubview:logView];
+    
+    dispatch_source_set_event_handler(LogViewDataSource.logData.log_view_dispatch_source, ^{
+        [logView setAttributedText:[LogViewDataSource.logData logAttributedText]];
+    });
+    
+    dispatch_resume(LogViewDataSource.logData.log_view_dispatch_source);
 }
 
 /*
