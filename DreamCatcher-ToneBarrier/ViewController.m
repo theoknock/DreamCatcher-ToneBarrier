@@ -38,7 +38,12 @@
 }
 
 - (IBAction)playToneBarrierScore:(UIButton *)sender forEvent:(UIEvent *)event {
-    [ToneBarrierScorePlayer.sharedPlayer play];
+    struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+    // TO-DO: test another way for a playing tone barrier score (checking the running status of the audio engine defeats the purpose of explicitly calling start and stop)
+    audio_engine_command->command = ([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning]) ? AudioEngineCommandStop : AudioEngineCommandPlay;
+    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
+    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+//    [ToneBarrierScorePlayer.sharedPlayer play];
 }
 
 @end

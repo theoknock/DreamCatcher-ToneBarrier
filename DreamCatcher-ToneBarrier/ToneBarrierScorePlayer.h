@@ -38,9 +38,22 @@ typedef struct AudioEngineStatus
 {
     enum : unsigned int {
         AudioEngineStatusPlaying,
-        AudioEngineStatusStopped
+        AudioEngineStatusStopped,
+        AudioEngineStatusError
     } status;
 } AudioEngineStatus;
+
+// To explicitly start or stop audio engine without testing isRunning property (which does not indicate whether tone barrier is actually playing)
+typedef struct AudioEngineCommand
+{
+    enum : unsigned int {
+        AudioEngineCommandPlay,
+        AudioEngineCommandStop,
+        AudioEngineCommandPause,
+        AudioEngineCommandInit,
+        AudioEngineCommandStart
+    } command;
+} AudioEngineCommand;
 
 
 @interface ToneBarrierScorePlayer : NSObject
@@ -58,9 +71,13 @@ typedef struct AudioEngineStatus
 @property (nonatomic, strong) AVAudioPCMBuffer * pcmBufferAux;
 
 @property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
+@property (nonatomic, strong) NSMutableDictionary<NSString *, id> * nowPlayingInfo;
 
 @property (strong, nonatomic) dispatch_queue_t audio_engine_status_dispatch_queue;
 @property (strong, nonatomic) dispatch_source_t audio_engine_status_dispatch_source;
+
+@property (strong, nonatomic) dispatch_queue_t audio_engine_command_dispatch_queue;
+@property (strong, nonatomic) dispatch_source_t audio_engine_command_dispatch_source;
 
 - (BOOL)play;
 
