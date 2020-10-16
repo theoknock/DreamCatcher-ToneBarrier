@@ -411,9 +411,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     // Define Now Playing Info
     self.nowPlayingInfo = [[NSMutableDictionary alloc] initWithCapacity:2];
     
-    [self.nowPlayingInfo setObject:@"ToneBarrier" forKey:MPMediaItemPropertyTitle];
     
-    UIImage * image = [UIImage systemImageNamed:@"waveform.path"];
+    [self.nowPlayingInfo setObject:@"ToneBarrier" forKey:MPMediaItemPropertyAlbumArtist];
+    [self.nowPlayingInfo setObject:@"James Alan Bush" forKey:MPMediaItemPropertyAlbumTitle];
+    
+    UIImage * image = [UIImage imageNamed:@"AppIcon-Wave-Regular-M-2"];
     CGSize imageBounds = CGSizeMake(180.0, 180.0);
     
     MPMediaItemArtwork *artwork = [[MPMediaItemArtwork alloc] initWithBoundsSize:imageBounds requestHandler:^UIImage * _Nonnull(CGSize size) {
