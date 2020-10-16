@@ -209,7 +209,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                 
                 [self.audioEngine stop];
                 
-            } else {
+            } else if (audio_engine_command->command == AudioEngineCommandPlay) {
                 if ([self setupEngine]) [self.audioEngine prepare];
                 
                 self.playerNode = [[AVAudioPlayerNode alloc] init];
@@ -350,6 +350,60 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                     __weak typeof(AVAudioFormat) * w_audioFormat = self.audioFormat;
                     
                     play_tones(w_playerNode, w_pcmBuffer, w_audioFormat);
+                } 
+            } else if (audio_engine_command->command == AudioEngineCommandInit) {
+                NSLog(@"init");
+                if (self.audioEngine)
+                    [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                              entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                                     attributeStyle:LogEntryAttributeStyleOperation];
+                
+                self.audioEngine = [[AVAudioEngine alloc] init];
+                self.mainNode = [self.audioEngine mainMixerNode];
+                AVAudioChannelCount channelCount = [self.mainNode outputFormatForBus:0].channelCount;
+                const double sampleRate = [self.mainNode outputFormatForBus:0].sampleRate;
+                self.audioFormat = [[AVAudioFormat alloc] initStandardFormatWithSampleRate:sampleRate channels:channelCount];
+            } else if (audio_engine_command->command == AudioEngineCommandStart) {
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                          entry:[NSString stringWithFormat:@"%s", __PRETTY_FUNCTION__]
+                                                 attributeStyle:LogEntryAttributeStyleOperation];
+                
+                __autoreleasing NSError *error = nil;
+                if ([self.audioEngine startAndReturnError:&error])
+                {
+                    [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine started"]
+                                                              entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                     attributeStyle:LogEntryAttributeStyleSuccess];
+                    [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
+                    if (error)
+                    {
+                        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession category could not be set"]
+                                                                  entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                         attributeStyle:LogEntryAttributeStyleError];
+//                        return FALSE;
+                    } else {
+                        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession configured"]
+                                                                  entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                         attributeStyle:LogEntryAttributeStyleSuccess];
+                        [[AVAudioSession sharedInstance] setActive:YES error:&error];
+                        if (error)
+                        {
+                            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession could not be activated"]
+                                                                      entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                             attributeStyle:LogEntryAttributeStyleError];
+//                            return FALSE;
+                        } else {
+                            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession activated"]
+                                                                      entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                             attributeStyle:LogEntryAttributeStyleSuccess];
+//                            return TRUE;
+                        }
+                    }
+                } else {
+                    [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine could not be started"]
+                                                              entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                                                     attributeStyle:LogEntryAttributeStyleError];
+//                    return FALSE;
                 }
             }
         });
@@ -361,33 +415,21 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-           if ([[event command] isEqual:self.commandCenter.playCommand])
-           {
-               struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
-               audio_engine_command->command = AudioEngineCommandPlay;
-               dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
-               dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
-           } else if ([[event command] isEqual:self.commandCenter.stopCommand])
+            struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+            
+            if ([[event command] isEqual:self.commandCenter.playCommand])
             {
-                struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+                audio_engine_command->command = AudioEngineCommandPlay;
+            } else if ([[event command] isEqual:self.commandCenter.stopCommand]) {
                 audio_engine_command->command = AudioEngineCommandStop;
-                dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
-                dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
-            } else if ([[event command] isEqual:self.commandCenter.pauseCommand])
-            {
-                struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+            } else if ([[event command] isEqual:self.commandCenter.pauseCommand]) {
                 audio_engine_command->command = AudioEngineCommandStop;
-                dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
-                dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
             }
             
-//            if ([self play])
-//            {
-//                [self nowPlayingInfo];
-                return MPRemoteCommandHandlerStatusSuccess;
-//            } else {
-//                return MPRemoteCommandHandlerStatusCommandFailed;
-//            }
+            dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
+            dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+            
+            return MPRemoteCommandHandlerStatusSuccess;
         };
         
         [self.commandCenter.playCommand addTargetWithHandler:remoteCommandHandler];
@@ -427,7 +469,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:(NSDictionary *)self.nowPlayingInfo];
 }
 
-
+// TO-DO: Replace this method with a dispatch source event handler
 - (BOOL)setupEngine
 {
     if (self.audioEngine)
@@ -444,6 +486,8 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     return (self.audioEngine != nil) ? TRUE : FALSE;
 }
 
+
+// TO-DO: Replace this method with a dispatch source event handler
 - (BOOL)startEngine
 {
     [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
