@@ -8,8 +8,8 @@
 #import "SignalCalculator.h"
 
 // The number of floats in each array, and the size of the arrays in bytes.
-const unsigned int arrayLength = 1 << 24;
-const unsigned int bufferSize = arrayLength * sizeof(float);
+const unsigned int arrayLength =  1 << 24;
+const unsigned int bufferSize  = arrayLength * sizeof(float);
 
 @implementation SignalCalculator
 {
@@ -21,9 +21,7 @@ const unsigned int bufferSize = arrayLength * sizeof(float);
     // The command queue used to pass commands to the device.
     id<MTLCommandQueue> _mCommandQueue;
 
-    // Buffers to hold data.
-//    id<MTLBuffer> _mBufferA;
-//    id<MTLBuffer> _mBufferB;
+    // Buffer to hold data.
     id<MTLBuffer> _mBuffer_channel_data;
 }
 
@@ -74,15 +72,9 @@ const unsigned int bufferSize = arrayLength * sizeof(float);
     return self;
 }
 
-- (void) prepareData
+- (void)prepareBuffer:(float * const _Nonnull * _Nullable)buffer size:(const unsigned int)bufferSize
 {
-    // Allocate three buffers to hold our initial data and the result.
-//    _mBufferA = [_mDevice newBufferWithLength:bufferSize options:MTLResourceStorageModeShared];
-//    _mBufferB = [_mDevice newBufferWithLength:bufferSize options:MTLResourceStorageModeShared];
     _mBuffer_channel_data = [_mDevice newBufferWithLength:bufferSize options:MTLResourceStorageModeShared];
-
-//    [self generateRandomFloatData:_mBufferA];
-//    [self generateRandomFloatData:_mBufferB];
 }
 
 - (void) sendComputeCommand
@@ -114,6 +106,7 @@ const unsigned int bufferSize = arrayLength * sizeof(float);
 
     // Encode the pipeline state object and its parameters.
     [computeEncoder setComputePipelineState:_mAddFunctionPSO];
+//    [computeEncoder set]
 //    [computeEncoder setBuffer:_mBufferA offset:0 atIndex:0];
 //    [computeEncoder setBuffer:_mBufferB offset:0 atIndex:1];
 //    [computeEncoder setBuffer:_mBufferResult offset:0 atIndex:2];

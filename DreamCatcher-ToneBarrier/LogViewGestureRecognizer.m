@@ -17,8 +17,8 @@
 {
     if (self == [super init])
     {
-        self.main_view_touch_recognizer_dispatch_queue  = dispatch_queue_create_with_target("Main View Touch Recognizer Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
-        self.main_view_touch_recognizer_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.main_view_touch_recognizer_dispatch_queue);
+        self.log_view_gesture_recognizer_dispatch_queue  = dispatch_queue_create_with_target("Log View Gesture Recognizer Dispatch Queue", DISPATCH_QUEUE_CONCURRENT, dispatch_get_main_queue());
+        self.log_view_gesture_recognizer_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_REPLACE, 0, 0, self.log_view_gesture_recognizer_dispatch_queue);
     }
     
     return self;
@@ -33,10 +33,10 @@
     NSLog(@"Touch location x %f %@ %f%@", touch_location_x, (isTracking) ? @">" : @"<", (CGRectGetMaxX(touch.view.frame) - 42), (isTracking) ? @"\n\nTRACKING" : @"");
     if (isTracking)
     {
-        struct MainViewTouchRecognizerLocationX * main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
-        main_view_touch_recognizer_location_x_context_data->x = touch_location_x;
-        dispatch_set_context(self.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-        dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
+        struct LogViewGestureRecognizerLocationX * log_view_gesture_recognizer_location_x_context_data = malloc(sizeof(struct LogViewGestureRecognizerLocationX));
+        log_view_gesture_recognizer_location_x_context_data->x = touch_location_x;
+        dispatch_set_context(self.log_view_gesture_recognizer_dispatch_source, log_view_gesture_recognizer_location_x_context_data);
+        dispatch_source_merge_data(self.log_view_gesture_recognizer_dispatch_source, 1);
     } else {
         
     }
@@ -50,10 +50,10 @@
         touch.phase != 0 && isTracking)
     {
         //        NSLog(@"Phase == %ld\t\t%@", (long)touch.phase, (isTracking) ? @"TRACKING" : @"UNTRACKED");
-        struct MainViewTouchRecognizerLocationX * main_view_touch_recognizer_location_x_context_data = malloc(sizeof(struct MainViewTouchRecognizerLocationX));
-        main_view_touch_recognizer_location_x_context_data->x = touch_location_x;
-        dispatch_set_context(self.main_view_touch_recognizer_dispatch_source, main_view_touch_recognizer_location_x_context_data);
-        dispatch_source_merge_data(self.main_view_touch_recognizer_dispatch_source, 1);
+        struct LogViewGestureRecognizerLocationX * log_view_gesture_recognizer_location_x_context_data = malloc(sizeof(struct LogViewGestureRecognizerLocationX));
+        log_view_gesture_recognizer_location_x_context_data->x = touch_location_x;
+        dispatch_set_context(self.log_view_gesture_recognizer_dispatch_source, log_view_gesture_recognizer_location_x_context_data);
+        dispatch_source_merge_data(self.log_view_gesture_recognizer_dispatch_source, 1);
     }
 }
 

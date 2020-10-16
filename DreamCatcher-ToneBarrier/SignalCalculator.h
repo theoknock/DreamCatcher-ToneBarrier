@@ -13,9 +13,9 @@ NS_ASSUME_NONNULL_BEGIN
 
 @interface SignalCalculator : NSObject
 
-- (instancetype) initWithDevice: (id<MTLDevice>) device;
-- (void) prepareData;
-- (void) sendComputeCommand;
+- (instancetype)initWithDevice:(id<MTLDevice>)device;
+- (void)prepareBuffer:(float * const _Nonnull * _Nullable)buffer size:(const unsigned int)bufferSize;
+- (void)sendComputeCommand;
 
 @end
 

@@ -182,19 +182,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     
     if (self == [super init])
     {
-        //        dispatch_source_set_event_handler(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, ^{
-        //            struct ContextData * data = dispatch_get_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
-        //            printf("x = %f", data->x);
-        //        });
-        //
-        //        dispatch_resume(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source);
-        //
-        //        struct ContextData *context_data = malloc(sizeof(struct ContextData));
-        //        context_data->x = 2.0;
-        //        dispatch_set_context(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, context_data);
-        //        dispatch_source_merge_data(ToneBarrierScoreDispatchObjects.sharedDispatchObjects.tone_barrier_dispatch_source, 1);
+        self.audio_engine_status_dispatch_queue  = dispatch_queue_create_with_target("Audio Engine Status Serial Dispatch Queue", DISPATCH_QUEUE_SERIAL, dispatch_get_main_queue());
+        self.audio_engine_status_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.audio_engine_status_dispatch_queue);
+
+//        [self setupEngine];
         
-        [self setupEngine];
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
@@ -211,12 +203,12 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         [self.commandCenter.stopCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.pauseCommand addTargetWithHandler:remoteCommandHandler];
         
-        // GPU configuration
-        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
-
-        SignalCalculator* signal_calculator = [[SignalCalculator alloc] initWithDevice:device];
-        [signal_calculator prepareData];
-        [signal_calculator sendComputeCommand];
+//        // GPU configuration
+//        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
+//
+//        SignalCalculator* signal_calculator = [[SignalCalculator alloc] initWithDevice:device];
+////        [signal_calculator
+//        [signal_calculator sendComputeCommand];
 
     }
     
@@ -455,13 +447,18 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
         
         [self.audioEngine stop];
         
+        struct AudioEngineStatus *audio_engine_status = malloc(sizeof(struct AudioEngineStatus));
+        audio_engine_status->status = AudioEngineStatusStopped;
+        dispatch_set_context(self.audio_engine_status_dispatch_source, audio_engine_status);
+        dispatch_source_merge_data(self.audio_engine_status_dispatch_source, 1);
+        
         return FALSE;
     } else {
         
-        [self setupEngine];
+        if ([self setupEngine]) [self.audioEngine prepare];
         
         self.playerNode = [[AVAudioPlayerNode alloc] init];
-        [self.playerNode setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
+         [self.playerNode setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
         [self.playerNode setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
         [self.playerNode setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
         
@@ -493,6 +490,11 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
         {
             if (![self.playerNode isPlaying]) [self.playerNode play];
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
+            
+            struct AudioEngineStatus *audio_engine_status = malloc(sizeof(struct AudioEngineStatus));
+            audio_engine_status->status = AudioEngineStatusPlaying;
+            dispatch_set_context(self.audio_engine_status_dispatch_source, audio_engine_status);
+            dispatch_source_merge_data(self.audio_engine_status_dispatch_source, 1);
             
 //            struct AudioStreamBasicDescription {
 //                mSampleRate       = 44100.0;
@@ -530,70 +532,29 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 const AVAudioFrameCount frame_count = sample_rate * 2.0;
                 pcm_buffer.frameLength = frame_count;
                 
-                const double PI_2 = 2.0 * M_PI;
-                const double phase_increment = PI_2 / frame_count;
-                const double (^phase_validator)(double) = ^ double (double phase) {
-                    if (phase >= PI_2) phase -= PI_2;
-                    if (phase < 0.0)   phase += PI_2;
-                    
-                    return phase;
-                };
-                
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-                        for (int channel_index = 0; channel_index < channel_count; channel_index++)
-                        {
-                            double signal_frequency = (^ double (double fundamental_frequency, double frequency_ratio) {
-                                return (fundamental_frequency * frequency_ratio);
-                            } ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2)
-                               ? ^ double (double * root_frequency, long random) {
-                                *root_frequency = pow(1.059463094f, random) * 440.0;
-                                return *root_frequency;
-                            } (&chord_frequency_ratios->root, ^ long (long random, int n, int m) {
-                                long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-                                return result;
-                            } (random(), -8, 24))
-                               : chord_frequency_ratios->root,
-                               ratio[1][chord_frequency_ratios->indices.ratio]));
-//                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
-                            
-                            double divider = ^ double (long random, int n, int m) {
-                                double result = (random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n)) * .01;
-                                return result;
-                            } (random(), 25, 175);
-                            
-                            printf("divider == %f\n", divider);
-                            
-                            double signal_phase = 0.0;
-                            double signal_increment = signal_frequency * phase_increment;
-                            double signal_increment_aux = signal_frequency * (5.0/4.0) /*ratio[1][chord_frequency_ratios->indices.ratio])*/ * phase_increment;
-                            
-                            double amplitude_frequency = 1.0;
-                            double amplitude_phase = 0.0;
-                            double amplitude_increment = (amplitude_frequency) * phase_increment;
-                            
-                            double tremolo_min, tremolo_max;
-                            tremolo_min = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 4.0 : 6.0;
-                            tremolo_max = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 6.0 : 4.0;
-                            double tremolo_frequency   = scale(tremolo_min, tremolo_max, chord_frequency_ratios->root, 277.1826317, 1396.912916);
-                            
-                            double tremolo_phase = 0.0;
-                            double tremolo_increment = (tremolo_frequency) * phase_increment;
                         
+                        for (int channel_index = 0; channel_index < 1; channel_index++)
+                        {
+                            double sin_phase = 0.0;
+                            double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_aux = (880.0 * (2.0 * M_PI)) / sample_rate;
+
+                            double divider = ^ long (long random, int n, int m) {
+                                                                long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+                                                                return result;
+                            } (random(), 11025, 77175);
                             if (float_channel_data[channel_index])
                                 for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-                                    float_channel_data[channel_index][buffer_index] = sinf(tremolo_phase) * sinf(amplitude_phase) * sinf(signal_phase);
-                                    signal_phase += ^ double (double time) { return (time < divider) ? signal_increment : signal_increment_aux; } (scale(0.0, 1.0, buffer_index, 0, frame_count));
-                                    
-                                    phase_validator(signal_phase);
-                                    amplitude_phase += amplitude_increment;
-                                    phase_validator(amplitude_phase);
-                                    tremolo_phase += ^ double (double time) { return time * tremolo_increment; } (scale(MIN(tremolo_min, tremolo_frequency), MIN(tremolo_max, tremolo_frequency), buffer_index, 0, frame_count));
-                                    phase_validator(tremolo_phase);
+                                    if (float_channel_data) float_channel_data[channel_index][buffer_index] = sinf(sin_phase);
+                                    sin_phase += (buffer_index > 11025) ? sin_increment : sin_increment_aux;
+                                        if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
+                                        if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
+
                                 }
-                            chord_frequency_ratios->indices.ratio++;
                         }
                             
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
@@ -621,6 +582,108 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
                 dispatch_async(samplerQueue, samplerBlock);
             };
+//            play_tones =
+//            ^ (__weak typeof(AVAudioPlayerNode) * player_node,
+//               __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
+//               __weak typeof(AVAudioFormat) * audio_format) {
+//
+//                const double sample_rate = [audio_format sampleRate];
+//
+//                const AVAudioChannelCount channel_count = audio_format.channelCount;
+//                const AVAudioFrameCount frame_count = sample_rate * 2.0;
+//                pcm_buffer.frameLength = frame_count;
+//
+//                const double PI_2 = 2.0 * M_PI;
+//                const double phase_increment = PI_2 / frame_count;
+//                const double (^phase_validator)(double) = ^ double (double phase) {
+//                    if (phase >= PI_2) phase -= PI_2;
+//                    if (phase < 0.0)   phase += PI_2;
+//
+//                    return phase;
+//                };
+//
+//                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
+//                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
+//
+//                    ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
+//                        for (int channel_index = 0; channel_index < channel_count; channel_index++)
+//                        {
+//                            double signal_frequency = (^ double (double fundamental_frequency, double frequency_ratio) {
+//                                return (fundamental_frequency * frequency_ratio);
+//                            } ((chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2)
+//                               ? ^ double (double * root_frequency, long random) {
+//                                *root_frequency = pow(1.059463094f, random) * 440.0;
+//                                return *root_frequency;
+//                            } (&chord_frequency_ratios->root, ^ long (long random, int n, int m) {
+//                                long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+//                                return result;
+//                            } (random(), -8, 24))
+//                               : chord_frequency_ratios->root,
+//                               ratio[1][chord_frequency_ratios->indices.ratio]));
+////                            if (chord_frequency_ratios->indices.ratio == 0) chord_frequency_ratios->indices.chord++;
+//
+//                            double divider = ^ double (long random, int n, int m) {
+//                                double result = (random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n)) * .01;
+//                                return result;
+//                            } (random(), 25, 175);
+//
+//                            printf("divider == %f\n", divider);
+//
+//                            double signal_phase = 0.0;
+//                            double signal_increment = signal_frequency * phase_increment;
+//                            double signal_increment_aux = signal_frequency * (5.0/4.0) /*ratio[1][chord_frequency_ratios->indices.ratio])*/ * phase_increment;
+//
+//                            double amplitude_frequency = 1.0;
+//                            double amplitude_phase = 0.0;
+//                            double amplitude_increment = (amplitude_frequency) * phase_increment;
+//
+//                            double tremolo_min, tremolo_max;
+//                            tremolo_min = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 4.0 : 6.0;
+//                            tremolo_max = (chord_frequency_ratios->indices.ratio == 0 || chord_frequency_ratios->indices.ratio == 2) ? 6.0 : 4.0;
+//                            double tremolo_frequency   = scale(tremolo_min, tremolo_max, chord_frequency_ratios->root, 277.1826317, 1396.912916);
+//
+//                            double tremolo_phase = 0.0;
+//                            double tremolo_increment = (tremolo_frequency) * phase_increment;
+//
+//                            if (float_channel_data[channel_index])
+//                                for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
+//                                    float_channel_data[channel_index][buffer_index] = /*sinf(tremolo_phase) **/ sinf(amplitude_phase) * sinf(signal_phase);
+//                                    signal_phase += ^ double (double time) { return (time < divider) ? signal_increment : signal_increment_aux; } (scale(0.0, 1.0, buffer_index, 0, frame_count));
+//
+//                                    phase_validator(signal_phase);
+//                                    amplitude_phase += amplitude_increment;
+//                                    phase_validator(amplitude_phase);
+//                                    tremolo_phase += ^ double (double time) { return time * tremolo_increment; } (scale(MIN(tremolo_min, tremolo_frequency), MIN(tremolo_max, tremolo_frequency), buffer_index, 0, frame_count));
+//                                    phase_validator(tremolo_phase);
+//                                }
+//                            chord_frequency_ratios->indices.ratio++;
+//                        }
+//
+//                    } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
+//                });
+//                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
+//                    ^ (PlayedToneCompletionBlock played_tone) {
+//                        if ([player_node isPlaying])
+//                        {
+////                            report_memory();
+//
+//                            [player_node prepareWithFrameCount:frame_count];
+//                            [player_node scheduleBuffer:pcm_buffer
+//                                                 atTime:nil
+//                                                options:AVAudioPlayerNodeBufferInterruptsAtLoop
+//                                 completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack
+//                                      completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+//                                if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
+//                                    played_tone();
+//                            }];
+//                        }
+//                    } (^ {
+//                        play_tones(player_node, pcm_buffer, audio_format);
+//                    });
+//                });
+//                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
+//                dispatch_async(samplerQueue, samplerBlock);
+//            };
             
             __weak typeof(AVAudioPlayerNode) * w_playerNode = self.playerNode;
             __weak typeof(AVAudioPCMBuffer) * w_pcmBuffer = self.pcmBuffer;

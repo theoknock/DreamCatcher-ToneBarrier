@@ -72,58 +72,13 @@
                     <connections>
                         <outlet property="logContainerView" destination="PFW-NN-poo" id="L5W-C7-ZKo"/>
                         <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
-                        <outlet property="logViewControllerTapGestureRecognizer" destination="PYG-RA-uI8" id="77e-iG-49d"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
-                <tapGestureRecognizer id="PYG-RA-uI8">
-                    <connections>
-                        <action selector="presentAction:" destination="BYZ-38-t0r" id="TdG-xp-k22"/>
-                    </connections>
-                </tapGestureRecognizer>
                 <customObject id="23E-y9-uzd" customClass="LogViewDataSource"/>
             </objects>
             <point key="canvasLocation" x="121.73913043478262" y="112.5"/>
-        </scene>
-        <!--Log View Controller-->
-        <scene sceneID="1dT-EJ-p8j">
-            <objects>
-                <viewController interfaceStyle="dark" id="pvo-O4-ymS" customClass="LogViewController" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="Oae-wV-xVg">
-                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
-                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view opaque="NO" contentMode="scaleToFill" ambiguous="YES" translatesAutoresizingMaskIntoConstraints="NO" id="H0b-UK-Qpt" userLabel="Event Log Text View Container">
-                                <rect key="frame" x="0.0" y="39" width="414" height="818"/>
-                                <subviews>
-                                    <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" alpha="0.0" contentMode="scaleToFill" ambiguous="YES" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lBg-de-vBD">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
-                                        <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                        <attributedString key="attributedText"/>
-                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
-                                    </textView>
-                                </subviews>
-                                <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="leading" secondItem="H0b-UK-Qpt" secondAttribute="leading" id="4NA-qx-Ris"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="width" secondItem="H0b-UK-Qpt" secondAttribute="width" id="IX3-xf-ShD"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="bottom" secondItem="H0b-UK-Qpt" secondAttribute="bottom" id="Kvg-Md-3ft"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="height" secondItem="H0b-UK-Qpt" secondAttribute="height" id="Wqo-F7-pI2"/>
-                                    <constraint firstAttribute="trailing" secondItem="lBg-de-vBD" secondAttribute="trailing" id="Z4a-R0-DpI"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="centerX" secondItem="H0b-UK-Qpt" secondAttribute="centerX" id="bko-ey-PLU"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="top" secondItem="H0b-UK-Qpt" secondAttribute="top" id="hYV-Ah-cjV"/>
-                                    <constraint firstItem="lBg-de-vBD" firstAttribute="centerY" secondItem="H0b-UK-Qpt" secondAttribute="centerY" id="q5A-Zx-abd"/>
-                                </constraints>
-                            </view>
-                        </subviews>
-                        <viewLayoutGuide key="safeArea" id="8pi-Fi-mvZ"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
-                    </view>
-                </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="DO0-25-zkj" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
-            </objects>
-            <point key="canvasLocation" x="928" y="113"/>
         </scene>
     </scenes>
     <resources>

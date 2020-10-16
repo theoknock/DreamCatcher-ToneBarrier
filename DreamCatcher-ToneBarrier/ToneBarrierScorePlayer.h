@@ -34,6 +34,15 @@ typedef void (^BufferRendered)(void (^)(AVAudioPCMBuffer * _Nonnull,
 //                                                                      void (^BufferConsumed)(AVAudioPlayerNode * _Nonnull)))));
 
 
+typedef struct AudioEngineStatus
+{
+    enum : unsigned int {
+        AudioEngineStatusPlaying,
+        AudioEngineStatusStopped
+    } status;
+} AudioEngineStatus;
+
+
 @interface ToneBarrierScorePlayer : NSObject
 
 + (nonnull ToneBarrierScorePlayer *)sharedPlayer;
@@ -49,6 +58,9 @@ typedef void (^BufferRendered)(void (^)(AVAudioPCMBuffer * _Nonnull,
 @property (nonatomic, strong) AVAudioPCMBuffer * pcmBufferAux;
 
 @property (nonatomic, strong) MPRemoteCommandCenter * commandCenter;
+
+@property (strong, nonatomic) dispatch_queue_t audio_engine_status_dispatch_queue;
+@property (strong, nonatomic) dispatch_source_t audio_engine_status_dispatch_source;
 
 - (BOOL)play;
 

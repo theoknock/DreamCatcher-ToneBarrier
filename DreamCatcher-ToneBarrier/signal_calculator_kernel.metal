@@ -9,10 +9,12 @@
 #include <metal_math>
 using namespace metal;
 
-kernel void signal_calculation_kernel(device const float* signal_increment,
-                       device float* channel_data,
-                       uint index [[thread_position_in_grid]])
+kernel void signal_calculation_kernel(device const float * frequency,
+                                      device const float * sample_rate,
+                                      device float * channel_data,
+                                      uint index [[thread_position_in_grid]])
 {
-    channel_data[index] = sin(2.0); //sin(*signal_increment);
+    float time = (float)index / *sample_rate;
+    channel_data[index] = sin(*frequency * M_PI_F * time);
 }
 
