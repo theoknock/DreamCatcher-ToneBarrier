@@ -53,13 +53,13 @@
     // Use this method to save data, release shared resources, and store enough scene-specific state information
     // to restore the scene back to its current state.
     NSLog(@"%s", __PRETTY_FUNCTION__);
-    struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
-    audio_engine_command->command = AudioEngineCommandInit;
-    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
-    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
-    audio_engine_command->command = AudioEngineCommandStart;
-    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
-    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+//    struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+//    audio_engine_command->command = AudioEngineCommandInit;
+//    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
+//    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+//    audio_engine_command->command = AudioEngineCommandStart;
+//    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
+//    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
 }
 
 @end
