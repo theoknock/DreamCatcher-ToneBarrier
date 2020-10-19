@@ -44,118 +44,8 @@
 #define randomdouble()    (arc4random() / ((unsigned)RAND_MAX))
 #define E_NUM 0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495
 
-typedef unsigned int AVAudioPlayerNodeCount, AVAudioPlayerNodeChannelIndex, AVAudioPlayerNodeDurationIndex;
-
-// Classification of structs:
-// - some organize properties and methods that relate to software design and architecture (computer science, hardware considerations, best practices, provisions)
-// - some organize methods and properties to affect or ensure tone barrier specifications
-// - some organize methods and properties relating to the mathematics (statistics)
-// - some organize methods and properties relating to the science (music and sound theory and practice)
-// - some organize methods and properties relating to expediency (driven by external and personal concerns, urgency of demand)
-//typedef int (^next_ratio_index)(int * total, int * tally);
-//next_ratio_index next_ratio = ^ int (int * total, int * tally) {
-//    if (*tally == *total)
-//    {
-//        *tally = *total - *tally;
-//        return *tally;
-//    } else {
-//        int diff = *total - *tally;
-//        *tally = *tally + 1;
-//        return diff;
-//    }
-//};
-
-struct DurationTally
-{
-    double total;
-    double tally;
-    __unsafe_unretained double(^next_duration)(double * tally, double * total);
-} * duration_tally;
-
-// Pitch Set - Major Seventh
-//                double majorSeventhFrequencyRatios[4]  = {8.0, 10.0, 12.0, 15.0};
-//                double root_frequency = random_frequency->generate_distributed_random(random_frequency) / majorSeventhFrequencyRatios[0];
-//                double frequencies[4] = {root_frequency * majorSeventhFrequencyRatios[0] * durations[0],
-//                                         root_frequency * majorSeventhFrequencyRatios[1] * durations[1],
-//                                         root_frequency * majorSeventhFrequencyRatios[2] * durations[2],
-//                                         root_frequency * majorSeventhFrequencyRatios[3] * durations[3]};
-
-//typedef enum HarmonicAlignment {
-//    HarmonicAlignmentConsonant,
-//    HarmonicAlignmentDissonant,
-//    HarmonicAlignmentRandomize,
-//} HarmonicAlignment;
-
-//typedef NSUInteger HarmonicInterval;
-
-//typedef typeof(HarmonicInterval) HarmonicIntervalConsonance;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantUnison = 0;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantOctave = 1;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorSixth = 2;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFifth = 3;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantPerfectFourth = 4;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantMajorThird = 5;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantMinorThird = 6;
-//static HarmonicIntervalConsonance HarmonicIntervalConsonantRandomize = 7;
-//
-//typedef typeof(HarmonicInterval) HarmonicIntervalDissonance;
-//static HarmonicIntervalConsonance HarmonicIntervalDissonantMinorSecond = 8;                    // C/C sharp
-//static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSecond = 9;                       // C/D
-//static HarmonicIntervalDissonance HarmonicIntervalDissonantMinorSevenths = 10;                    // C/B flat
-//static HarmonicIntervalDissonance HarmonicIntervalDissonantMajorSevenths = 11;                     // C/B
-//static HarmonicIntervalDissonance HarmonicIntervalDissonantRandomize = 12;
-
-//typedef NSUInteger Harmonics;
-//
-//typedef NS_OPTIONS(Harmonics, HarmonicAlignment) {
-//    HarmonicAlignmentConsonant = 1 << 0,
-//    HarmonicAlignmentDissonant = 2 << 0,
-//    HarmonicAlignmentRandom    = 3 << 0,
-//};
-//
-//typedef NS_OPTIONS(Harmonics, HarmonicInterval) {
-//    Unison = 1 << 0,
-//    Octave = 1 << 1,
-//    MajorSixth = 1 << 2,
-//    PerfectFifth = 1 << 3,
-//    PerfectFourth = 1 << 4,
-//    MajorThird = 1 << 5,
-//    MinorThird = 1 << 6,
-//    Random = 1 << 7,
-//    MinorSecond = 2 << 0,
-//    MajorSecond = 2 << 1,
-//    MinorSevenths = 2 << 2,
-//    MajorSevenths = 2 << 3,
-//    Random = 2 << 4
-//};
-//
-//typedef enum Chord
-//{
-//    ChordRandomize,
-//    ChordMonad,
-//    ChordDyad,
-//    ChordTriad,
-//    ChordTetrad,
-//    ChordPentad,
-//    ChordHexad,
-//    ChordHeptad
-//} Chord;
-//
-//static double harmonic_alignment_ratios_consonant[7] = {1.0, 2.0, 5.0/3.0, 4.0/3.0, 5.0/4.0, 6.0/5.0};
-//static double harmonic_alignment_ratios_dissonant[5] = {1.0, 2.0, 3.0, 4.0, 5.0};
-
-
-
 #import <CoreMedia/CMTime.h>
 #import <CoreMedia/CMSync.h>
-
-@interface ToneBarrierScorePlayer ()
-{
-    //    struct DurationTally * duration_tally;
-    //    struct FrequencyScale * frequency_scale;
-}
-
-@end
 
 @implementation ToneBarrierScorePlayer
 
@@ -253,7 +143,6 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     [[MPNowPlayingInfoCenter defaultCenter] setNowPlayingInfo:(NSDictionary *)self.nowPlayingInfo];
 }
 
-// TO-DO: Replace this method with a dispatch source event handler
 - (BOOL)setupEngine
 {
     if (self.audioEngine)
@@ -272,7 +161,6 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     return (self.audioEngine != nil) ? TRUE : FALSE;
 }
 
-// TO-DO: Replace this method with a dispatch source event handler
 - (BOOL)startEngine
 {
     [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
@@ -339,95 +227,6 @@ typedef double (^Linearize)(double, double, double);
 Linearize linearize = ^double(double range_min, double range_max, double value)
 {
     double result = (value * (range_max - range_min)) + range_min;
-    
-    return result;
-};
-
-//typedef double (^FrequencySample)(double, double, ...);
-// TO-DO: Cut normalized time into three segments, each corresponding to attack, sustain and release;
-//        Distribute time in proportion to the relative duration of each segment;
-//        Use the lowest and highest values in each segment to normalize the values from the amplitude envelope function
-//        Calculate the weighted sum of the three sinusoids to create a amplitude sinusoid that conforms to [what you wanted for the attack, sustain and release]
-
-// TO-DO: To rescale a sine curve period into a 0 to 1 frame,
-//  use 0 to 1/frequency as the new minimum and new maximum, respectively
-typedef double (^FrequencySample)(double time, double frequency);//, int argument_count, ...);// , double trill_min, double trill_max, double trill_gamma);
-FrequencySample sample_frequency_vibrato = ^(double time, double frequency)//, int argument_count, ...)
-{
-    //    va_list ap;
-    //    double gamma, trill_min, trill_max;
-    //    va_start(ap, argument_count);
-    //
-    //    gamma = va_arg (ap, double);
-    //    trill_min = va_arg (ap, double);
-    //    trill_max = va_arg (ap, double);
-    
-    //    va_end (ap);
-    
-    double result = sinf(2.0 * M_PI * time * frequency);/*^double(double time_, double trill_max_, double trill_min_, double gamma_)
-                                                         {
-                                                         return ((trill_max_ - trill_min_) * pow(time_, gamma_)) + trill_min_;
-                                                         } (frequency, trill_min, trill_max, gamma));/* * ^double(double time, double trill) {
-                                                         return sinf(M_PI * time * trill);
-                                                         } (time, trill);*/
-    return result;
-};
-
-//FrequencySampleModifier harmonize_frequency_sample = ^{
-//    return ^double(double frequency_sample, int argument_count, ...) {
-//        va_list ap;
-//        enum HarmonicAlignment harmonic_alignment, typeof(HarmonicInterval) harmonic_interval;
-//        va_start (ap, argument_count);
-//
-//        va_arg (ap, enum HarmonicAlignment);
-//        va_arg (ap, typeof(HarmonicInterval) harmonic_interval);
-//
-//        va_end (ap);
-//
-//        double harmonized_frequency = frequency * ^double(HarmonicAlignment harmonic_alignment_, typeof(HarmonicInterval) harmonic_interval_) {
-//            double * harmonic_alignment_intervals[2] = {consonant_harmonic_interval_ratios, dissonant_harmonic_interval_ratios};
-//
-//            return (harmonic_alignment_   == HarmonicAlignmentConsonant)
-//            ? ((harmonic_interval_ == HarmonicIntervalConsonantRandomize) ? consonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(7)] : consonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]))
-//            : ((harmonic_interval_ == HarmonicIntervalDissonantRandomize) ? dissonant_harmonic_interval_ratios[(HarmonicInterval)arc4random_uniform(4)] : dissonant_harmonic_interval_ratios[harmonic_alignment_consonant_interval_]);
-//        } (harmonic_alignment, harmonic_interval);
-//
-//        return harmonized_frequency;
-//    };
-//};
-
-// TO-DO: Modify the amplitude to account for any changes in the mean
-//        See https://en.wikipedia.org/wiki/Least_squares
-typedef double (^AmplitudeSample)(double, double);//, int, ...);//double, double, StereoChannelOutput);
-AmplitudeSample sample_amplitude_tremolo = ^(double time, double gain)//, int argument_count, ...) // double tremolo, double gamma, StereoChannelOutput stereo_channel_output)
-{
-    // ERROR: tremolo equation should be: (frequency * amplitude) * tremolo
-    //        NOT: frequency * (amplitude * tremolo)
-    //    va_list ap;
-    //    double tremolo, gamma;
-    //    int stereo_channel_output;
-    //    va_start(ap, argument_count);
-    //
-    //    tremolo = va_arg (ap, double);
-    //    gamma = va_arg (ap, double);
-    //
-    //    va_end (ap);
-    //
-    double result = ^double(double time_, double gain_)
-    {
-        return sinf(M_PI * time) * gain;//pow(sinf(time_ * M_PI), (stereo_channel_output_) ? 10.0 : 0.1);
-    } (time, gain); //(sinf(M_PI  * time * tremolo) * sinf(M_PI_PI * time) / 2.0);// * sinf((M_PI * time * tremolo)));//sinf((M_PI_PI * time * tremolo) / 2) * (time * gain);
-    //    result = result * ^double(double gamma_, double time_)
-    //    {
-    //        double a = pow(time_, gamma_);
-    //        double b = 1.0 - a;
-    //        double c = a * b;
-    ////        c = (stereo_channel_output_ == StereoChannelOutputRight)
-    ////        ? 1.0 - c : c;
-    //
-    //        return c;
-    //    } (gamma, time);
-    //    result *= gain;
     
     return result;
 };
