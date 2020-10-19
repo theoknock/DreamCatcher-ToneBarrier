@@ -188,153 +188,9 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         self.audio_engine_command_dispatch_source = dispatch_source_create(DISPATCH_SOURCE_TYPE_DATA_ADD, 0, 0, self.audio_engine_command_dispatch_queue);
         
         dispatch_source_set_event_handler(self.audio_engine_command_dispatch_source, ^{
-            [self play];
-//            struct AudioEngineCommand * audio_engine_command = dispatch_get_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source);
-//            if (audio_engine_command->command == AudioEngineCommandStop) {
-//                [self.playerNode pause];
-//                [self.playerNodeAux pause];
-//
-//                [self.audioEngine pause];
-//
-//                [self.audioEngine detachNode:self.playerNode];
-//                self.playerNode = nil;
-//                [self.audioEngine detachNode:self.playerNodeAux];
-//                self.playerNodeAux = nil;
-//
-//                [self.audioEngine detachNode:self.reverb];
-//                self.reverb = nil;
-//
-//                [self.audioEngine detachNode:self.mixerNode];
-//                self.mixerNode = nil;
-//
-//                [self.audioEngine stop];
-//
-//            } else if (audio_engine_command->command == AudioEngineCommandPlay) {
-//
-//                if ([self setupEngine]) [self.audioEngine prepare];
-//
-//                self.playerNode = [[AVAudioPlayerNode alloc] init];
-//                [self.playerNode setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
-//                [self.playerNode setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
-//                [self.playerNode setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
-//
-//                self.playerNodeAux = [[AVAudioPlayerNode alloc] init];
-//                [self.playerNodeAux setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
-//                [self.playerNodeAux setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
-//                [self.playerNodeAux setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
-//
-//                self.mixerNode = [[AVAudioMixerNode alloc] init];
-//
-//                self.reverb = [[AVAudioUnitReverb alloc] init];
-//                [self.reverb loadFactoryPreset:AVAudioUnitReverbPresetLargeChamber];
-//                [self.reverb setWetDryMix:50.0];
-//
-//                [self.audioEngine attachNode:self.reverb];
-//                [self.audioEngine attachNode:self.playerNode];
-//                [self.audioEngine attachNode:self.playerNodeAux];
-//                [self.audioEngine attachNode:self.mixerNode];
-//
-//                [self.audioEngine connect:self.playerNode     to:self.mixerNode  format:self.audioFormat];
-//                [self.audioEngine connect:self.playerNodeAux  to:self.mixerNode  format:self.audioFormat];
-//                [self.audioEngine connect:self.mixerNode      to:self.reverb     format:self.audioFormat];
-//                [self.audioEngine connect:self.reverb         to:self.mainNode   format:self.audioFormat];
-//
-//                self.pcmBuffer     = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioFormat frameCapacity:self.audioFormat.sampleRate * 2.0 * self.audioFormat.channelCount];
-//                self.pcmBufferAux  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioFormat frameCapacity:self.audioFormat.sampleRate * 2.0 * self.audioFormat.channelCount];
-//
-//                if ([self startEngine])
-//                {
-//                    if (![self.playerNode isPlaying]) [self.playerNode play];
-//                    if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
-//
-//                    unsigned int seed    = (unsigned int)time(0);
-//                    size_t buffer_size   = 256 * sizeof(char *);
-//                    char * random_buffer = (char *)malloc(buffer_size);
-//                    initstate(seed, random_buffer, buffer_size);
-//                    srandomdev();
-//
-//                    chord_frequency_ratios = (struct ChordFrequencyRatio *)malloc(sizeof(struct ChordFrequencyRatio));
-//                    struct AudioEngineStatus * audio_engine_status = (struct AudioEngineStatus *)malloc(sizeof(struct AudioEngineStatus));
-//
-//                    typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
-//                                              __weak typeof(AVAudioPCMBuffer) *,
-//                                              __weak typeof(AVAudioFormat) *);
-//
-//                    static PlayTones play_tones;
-//                    play_tones =
-//                    ^ (__weak typeof(AVAudioPlayerNode) * player_node,
-//                       __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
-//                       __weak typeof(AVAudioFormat) * audio_format) {
-//
-//                        audio_engine_status->status = AudioEngineStatusPlaying;
-//                        dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, audio_engine_status);
-//                        dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, 1);
-//
-//                        const double sample_rate = [audio_format sampleRate];
-//
-//                        const AVAudioChannelCount channel_count = audio_format.channelCount;
-//                        const AVAudioFrameCount frame_count = sample_rate * 2.0;
-//                        pcm_buffer.frameLength = frame_count;
-//
-//                        // TO-DO: Initialize queue prior to running block
-//                        dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
-//                        dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
-//                            ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-//
-//                                for (int channel_index = 0; channel_index < channel_count; channel_index++)
-//                                {
-//                                    double sin_phase = 0.0;
-//                                    double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
-//                                    double sin_increment_aux = (880.0 * (2.0 * M_PI)) / sample_rate;
-//
-//                                    long divider = ^ long (long random, int n, int m) {
-//                                        long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-//                                        long scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n)) - 0.5;
-//                                        result = 1.0 / (1.0 + pow(E_NUM, (-10.0 * scaled_result)));
-//                                        NSLog(@"result == %ld", result);
-//                                        return result;
-//                                    } (random(), 11025, 77175);
-//                                    for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-//                                        float_channel_data[channel_index][buffer_index] = sinf(sin_phase);
-//                                        sin_phase += (buffer_index > 11025) ? sin_increment : sin_increment_aux;
-////                                                                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
-////                                                                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
-//                                    }
-//                                }
-//                            } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
-//                        });
-//                        dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
-//                            ^ (PlayedToneCompletionBlock played_tone) {
-//                                if ([player_node isPlaying])
-//                                {
-//                                    //                            report_memory();
-//
-//                                    [player_node prepareWithFrameCount:frame_count];
-//                                    [player_node scheduleBuffer:pcm_buffer
-//                                                         atTime:nil
-//                                                        options:AVAudioPlayerNodeBufferInterruptsAtLoop
-//                                         completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack
-//                                              completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-//                                        if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-//                                            played_tone();
-//                                    }];
-//                                }
-//                                // TO-DO: Add else block to change play button to stop (to accurately reflect whether a tone barrier is playing)
-//                                else {
-//                                    audio_engine_status->status = AudioEngineStatusStopped;
-//                                    dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, audio_engine_status);
-//                                    dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, 1);
-//                                }
-//                            } (^ {
-//                                play_tones(player_node, pcm_buffer, audio_format);
-//                            });
-//                        });
-//
-//                        dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
-//                        dispatch_async(samplerQueue, samplerBlock);
-//                    };
-//                }
-//            }
+            AudioEngineStatus status = [self play];
+            dispatch_set_context(self.audio_engine_status_dispatch_source, (void *)status);
+            dispatch_source_merge_data(self.audio_engine_status_dispatch_source, 1);
         });
         
         dispatch_resume(self.audio_engine_command_dispatch_source);
@@ -346,18 +202,18 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-            struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
-            
+            //            struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
+            AudioEngineCommand command;
             if ([[event command] isEqual:self.commandCenter.playCommand])
             {
-                audio_engine_command->command = AudioEngineCommandPlay;
+                command = AudioEngineCommandPlay;
             } else if ([[event command] isEqual:self.commandCenter.stopCommand]) {
-                audio_engine_command->command = AudioEngineCommandStop;
-            } else if ([[event command] isEqual:self.commandCenter.pauseCommand]) {
-                audio_engine_command->command = AudioEngineCommandStop;
+                command = AudioEngineCommandStop;
+            } else {
+                command = AudioEngineCommandStop;
             }
             
-            dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, audio_engine_command);
+            dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, (void *)command);
             dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
             
             return MPRemoteCommandHandlerStatusSuccess;
@@ -594,91 +450,79 @@ typedef void (^BufferRenderedCompletionBlock)(PlayedToneCompletionBlock _Nonnull
 typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelOutput, float *, BufferRenderedCompletionBlock); // adds the sample data to the PCM buffer; calls the buffer rendered completion block when finisned
 typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, AVAudioPCMBuffer *, DurationTally *, BufferRenderer); // starts the process of creating a buffer, scheduling it and playing it, and recursively starting itself again while the player node passed to it isPlaying
 
-
-// TO-DO: Embed in source event handler (?)
-- (BOOL)play
+- (AudioEngineStatus)play
 {
     if ([self.audioEngine isRunning])
     {
         [self.playerNode pause];
         [self.playerNodeAux pause];
-
+        
         [self.audioEngine pause];
-
+        
         [self.audioEngine detachNode:self.playerNode];
         self.playerNode = nil;
         [self.audioEngine detachNode:self.playerNodeAux];
         self.playerNodeAux = nil;
-
+        
         [self.audioEngine detachNode:self.reverb];
         self.reverb = nil;
-
+        
         [self.audioEngine detachNode:self.mixerNode];
         self.mixerNode = nil;
-
+        
         [self.audioEngine stop];
-
-        struct AudioEngineStatus *audio_engine_status = malloc(sizeof(struct AudioEngineStatus));
-        audio_engine_status->status = AudioEngineStatusStopped;
-        dispatch_set_context(self.audio_engine_status_dispatch_source, audio_engine_status);
-        dispatch_source_merge_data(self.audio_engine_status_dispatch_source, 1);
-
-        return FALSE;
+        
+        return AudioEngineStatusStopped;
     } else {
-
+        
         if ([self setupEngine]) [self.audioEngine prepare];
-
+        
         self.playerNode = [[AVAudioPlayerNode alloc] init];
         [self.playerNode setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
         [self.playerNode setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
         [self.playerNode setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
-
+        
         self.playerNodeAux = [[AVAudioPlayerNode alloc] init];
         [self.playerNodeAux setRenderingAlgorithm:AVAudio3DMixingRenderingAlgorithmAuto];
         [self.playerNodeAux setSourceMode:AVAudio3DMixingSourceModeAmbienceBed];
         [self.playerNodeAux setPosition:AVAudioMake3DPoint(0.0, 0.0, 0.0)];
-
+        
         self.mixerNode = [[AVAudioMixerNode alloc] init];
-
+        
         self.reverb = [[AVAudioUnitReverb alloc] init];
         [self.reverb loadFactoryPreset:AVAudioUnitReverbPresetLargeChamber];
         [self.reverb setWetDryMix:50.0];
-
+        
         [self.audioEngine attachNode:self.reverb];
         [self.audioEngine attachNode:self.playerNode];
         [self.audioEngine attachNode:self.playerNodeAux];
         [self.audioEngine attachNode:self.mixerNode];
-
+        
         [self.audioEngine connect:self.playerNode     to:self.mixerNode  format:self.audioFormat];
         [self.audioEngine connect:self.playerNodeAux  to:self.mixerNode  format:self.audioFormat];
         [self.audioEngine connect:self.mixerNode      to:self.reverb     format:self.audioFormat];
         [self.audioEngine connect:self.reverb         to:self.mainNode   format:self.audioFormat];
-
+        
         self.pcmBuffer     = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioFormat frameCapacity:self.audioFormat.sampleRate * 2.0 * self.audioFormat.channelCount];
         self.pcmBufferAux  = [[AVAudioPCMBuffer alloc] initWithPCMFormat:self.audioFormat frameCapacity:self.audioFormat.sampleRate * 2.0 * self.audioFormat.channelCount];
-
+        
         if ([self startEngine])
         {
             if (![self.playerNode isPlaying]) [self.playerNode play];
             if (![self.playerNodeAux isPlaying]) [self.playerNodeAux play];
-
-            struct AudioEngineStatus *audio_engine_status = malloc(sizeof(struct AudioEngineStatus));
-            audio_engine_status->status = AudioEngineStatusPlaying;
-            dispatch_set_context(self.audio_engine_status_dispatch_source, audio_engine_status);
-            dispatch_source_merge_data(self.audio_engine_status_dispatch_source, 1);
-
+            
             unsigned int seed    = (unsigned int)time(0);
             size_t buffer_size   = 256 * sizeof(char *);
             char * random_buffer = (char *)malloc(buffer_size);
             initstate(seed, random_buffer, buffer_size);
             srandomdev();
-
+            
             chord_frequency_ratios = (struct ChordFrequencyRatio *)malloc(sizeof(struct ChordFrequencyRatio));
-
+            
             typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
                                       __weak typeof(AVAudioPCMBuffer) *,
                                       __weak typeof(AVAudioFormat) *);
-
+            
             // TO-DO: Define play_tones, then assign its value to a separate reference to copy it (to maintain separate values for otherwise shared __block variable references;
             //        copying play_tones only increases the reference count, so reference variables are shared
             //        (Source: https://www.cocoawithlove.com/2009/10/how-blocks-are-implemented-and.html)
@@ -687,38 +531,39 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             ^ (__weak typeof(AVAudioPlayerNode) * player_node,
                __weak typeof(AVAudioPCMBuffer) * pcm_buffer,
                __weak typeof(AVAudioFormat) * audio_format) {
-
+                
                 const double sample_rate = [audio_format sampleRate];
-
+                
                 const AVAudioChannelCount channel_count = audio_format.channelCount;
                 const AVAudioFrameCount frame_count = sample_rate * 2.0;
                 pcm_buffer.frameLength = frame_count;
-
+                
                 dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
                 dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
+                        
+                        double divider = ^ double (long random, int n, int m) {
+                            //                                printf("random == %ld\n", random);
+                            double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+                            //                                printf("result == %f\n", result);
+                            double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
+                            //                                printf("\tscaled_result == %f\n", scaled_result);
+                            double weighted_result = 1.0 / (1.0 + pow(E_NUM, (-10.0 * (scaled_result - 0.5))));
+                            //                                printf("\t\tweighted_result == %f\n", weighted_result);
+                            return result;
+                        } (random(), 11025, 77175);
+                        //                            printf("\t\t\tdivider == %ld\n", divider);
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_phase = 0.0;
                             double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
                             double sin_increment_aux = (880.0 * (2.0 * M_PI)) / sample_rate;
-
-                            double divider = ^ double (long random, int n, int m) {
-//                                printf("random == %ld\n", random);
-                                double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-//                                printf("result == %f\n", result);
-                                double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
-//                                printf("\tscaled_result == %f\n", scaled_result);
-                                double weighted_result = 1.0 / (1.0 + pow(E_NUM, (-10.0 * (scaled_result - 0.5))));
-//                                printf("\t\tweighted_result == %f\n", weighted_result);
-                                return result;
-                            } (random(), 11025, 77175);
-//                            printf("\t\t\tdivider == %ld\n", divider);
+                            
                             for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
                                 float_channel_data[channel_index][buffer_index] = sinf(sin_phase);
                                 sin_phase += (buffer_index > divider) ? sin_increment : sin_increment_aux;
-//                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
-//                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
+                                //                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
+                                //                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
                             }
                         }
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
@@ -750,10 +595,10 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
             __weak typeof(AVAudioFormat) * w_audioFormat = self.audioFormat;
             
             play_tones(w_playerNode, w_pcmBuffer, w_audioFormat);
-
-            return TRUE;
+            
+            return AudioEngineStatusPlaying;
         } else {
-            return FALSE;
+            return AudioEngineStatusError;
         }
     }
 }
