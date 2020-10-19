@@ -30,7 +30,26 @@
     dispatch_source_set_event_handler(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, ^{
         NSLog(@"%s", __PRETTY_FUNCTION__);
         AudioEngineStatus status = (AudioEngineStatus)dispatch_get_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source);
-        [self.playButton setImage:(status == AudioEngineStatusPlaying) ? [UIImage systemImageNamed:@"stop"] : [UIImage systemImageNamed:@"play"] forState:UIControlStateNormal];
+        [self.playButton setImage:^ UIImage * (AudioEngineStatus status)
+         {
+            switch (status) {
+                case AudioEngineStatusPlaying:
+                    return [UIImage systemImageNamed:@"stop"];
+                    break;
+                    
+                case AudioEngineStatusStopped:
+                    return [UIImage systemImageNamed:@"play"];
+                    break;
+                    
+                case AudioEngineStatusError:
+                    return [UIImage systemImageNamed:@"play.slash"];
+                    break;
+                    
+                default:
+                    return [UIImage systemImageNamed:@"play.slash"];
+                    break;
+            }
+        } (status) forState:UIControlStateNormal];
     });
     dispatch_resume(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source);
 }
@@ -39,6 +58,27 @@
     AudioEngineCommand command = ([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning]) ? AudioEngineCommandStop : AudioEngineCommandPlay;
     dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, (void *)command);
     dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+}
+
+- (UIImage *)symbolForAudioEngineStatus:(AudioEngineStatus)status
+{
+    switch (status) {
+        case AudioEngineStatusPlaying:
+            return [UIImage systemImageNamed:@"play"];
+            break;
+            
+        case AudioEngineStatusStopped:
+            return [UIImage systemImageNamed:@"stop"];
+            break;
+            
+        case AudioEngineStatusError:
+            return [UIImage systemImageNamed:@"play.slash"];
+            break;
+            
+        default:
+            return [UIImage systemImageNamed:@"play.slash"];
+            break;
+    }
 }
 
 @end
