@@ -170,8 +170,8 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
     __autoreleasing NSError *error = nil;
     if ([self.audioEngine startAndReturnError:&error])
     {
-        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioEngine started"]
-                                                  entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+        [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                  entry:[NSString stringWithFormat:@"AudioEngine started"]
                                          attributeStyle:LogEntryAttributeStyleSuccess];
         [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:&error];
         if (error)
@@ -181,8 +181,8 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                                              attributeStyle:LogEntryAttributeStyleError];
             return FALSE;
         } else {
-            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession configured"]
-                                                      entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+            [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                      entry:[NSString stringWithFormat:@"AudioSession configured"]
                                              attributeStyle:LogEntryAttributeStyleSuccess];
             [[AVAudioSession sharedInstance] setActive:YES error:&error];
             if (error)
@@ -192,8 +192,8 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                                                  attributeStyle:LogEntryAttributeStyleError];
                 return FALSE;
             } else {
-                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"AudioSession activated"]
-                                                          entry:[NSString stringWithFormat:@"%@", (error) ? error.description : @"---"]
+                [LogViewDataSource.logData addLogEntryWithTitle:[NSString stringWithFormat:@"%@", self.description]
+                                                          entry:[NSString stringWithFormat:@"AudioSession activated"]
                                                  attributeStyle:LogEntryAttributeStyleSuccess];
                 return TRUE;
             }
