@@ -60,25 +60,4 @@
     dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
 }
 
-- (UIImage *)symbolForAudioEngineStatus:(AudioEngineStatus)status
-{
-    switch (status) {
-        case AudioEngineStatusPlaying:
-            return [UIImage systemImageNamed:@"play"];
-            break;
-            
-        case AudioEngineStatusStopped:
-            return [UIImage systemImageNamed:@"stop"];
-            break;
-            
-        case AudioEngineStatusError:
-            return [UIImage systemImageNamed:@"play.slash"];
-            break;
-            
-        default:
-            return [UIImage systemImageNamed:@"play.slash"];
-            break;
-    }
-}
-
 @end
