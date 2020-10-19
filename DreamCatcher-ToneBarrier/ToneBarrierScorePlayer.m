@@ -222,7 +222,6 @@ Scale scale = ^double(double min_new, double max_new, double val_old, double min
     return val_new;
 };
 
-
 typedef double (^Linearize)(double, double, double);
 Linearize linearize = ^double(double range_min, double range_max, double value)
 {
@@ -238,13 +237,10 @@ typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
     StereoChannelOutputUnspecified
 };
 
-typedef NSUInteger AVAudioPlayerNodeIndex;
-typedef struct DurationTally DurationTally;
-
 typedef void (^PlayedToneCompletionBlock)(void); // passed to player node buffer scheduler by the buffer rendered completion block; called by the player node buffer scheduler after the schedule buffer plays; reruns the render buffer block
 typedef void (^BufferRenderedCompletionBlock)(PlayedToneCompletionBlock _Nonnull); // called by buffer renderer after buffer samples are created; runs the player node buffer scheduler
 typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelOutput, float *, BufferRenderedCompletionBlock); // adds the sample data to the PCM buffer; calls the buffer rendered completion block when finisned
-typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, AVAudioPCMBuffer *, DurationTally *, BufferRenderer); // starts the process of creating a buffer, scheduling it and playing it, and recursively starting itself again while the player node passed to it isPlaying
+//typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, dispatch_queue_t __strong, AVAudioPlayerNode * __strong, AVAudioPCMBuffer *, DurationTally *, BufferRenderer); // starts the process of creating a buffer, scheduling it and playing it, and recursively starting itself again while the player node passed to it isPlaying
 
 - (AudioEngineStatus)play
 {
@@ -334,8 +330,8 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                 const AVAudioFrameCount frame_count = sample_rate * 2.0;
                 pcm_buffer.frameLength = frame_count;
                 
-                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
-                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
+//                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
+//                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                         
                         double divider = ^ double (long random, int n, int m) {
@@ -363,8 +359,8 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                             }
                         }
                     } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
-                });
-                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
+//                });
+//                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
                     ^ (PlayedToneCompletionBlock played_tone) {
                         if ([player_node isPlaying])
                         {
@@ -381,9 +377,9 @@ typedef void(^RenderBuffer)(AVAudioPlayerNodeIndex, dispatch_queue_t __strong, d
                     } (^ {
                         play_tones(player_node, pcm_buffer, audio_format);
                     });
-                });
-                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
-                dispatch_async(samplerQueue, samplerBlock);
+//                });
+//                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
+//                dispatch_async(samplerQueue, samplerBlock);
             };
             
             __weak typeof(AVAudioPlayerNode) * w_playerNode = self.playerNode;
@@ -413,13 +409,5 @@ void report_memory(void) {
         NSLog(@"Error with task_info(): %s", mach_error_string(kerr));
     }
 }
-
-void add_arrays(const float signal_increment,
-                float* channel_data,
-                int index)
-{
-    channel_data[index] = sin(signal_increment);
-}
-
 
 @end
