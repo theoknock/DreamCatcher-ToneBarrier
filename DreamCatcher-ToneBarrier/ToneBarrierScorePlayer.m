@@ -348,12 +348,25 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_phase = 0.0;
+                            double sin_phase_dyad = 0.0;
+                            double sin_phase_aux = 0.0;
+                            double sin_phase_aux_dyad = 0.0;
+
                             double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_aux = (880.0 * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_dyad = ((440.0 * (10.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_aux = ((440.0 * (12.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_aux_dyad = ((440.0 * (15.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
                             
                             for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-                                float_channel_data[channel_index][buffer_index] = sinf(sin_phase);
-                                sin_phase += (buffer_index > divider) ? sin_increment : sin_increment_aux;
+                                float_channel_data[channel_index][buffer_index] = (buffer_index > divider)
+                                ? sinf(sin_phase) + sinf(sin_phase_dyad)
+                                : sinf(sin_phase_aux) + sinf(sin_phase_aux_dyad);
+                                
+                                sin_phase      += sin_increment;
+                                sin_phase_dyad += sin_increment_dyad;
+                                sin_phase_aux  += sin_increment_aux;
+                                sin_phase_aux_dyad  += sin_increment_aux_dyad;
+                                
                                 //                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
                                 //                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
                             }
