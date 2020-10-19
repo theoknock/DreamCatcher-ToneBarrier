@@ -195,14 +195,11 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         
         dispatch_resume(self.audio_engine_command_dispatch_source);
         
-        // ---------
-        
         [self playingInfo];
         
         self.commandCenter = [MPRemoteCommandCenter sharedCommandCenter];
         
         MPRemoteCommandHandlerStatus (^remoteCommandHandler)(MPRemoteCommandEvent * _Nonnull) = ^ MPRemoteCommandHandlerStatus (MPRemoteCommandEvent * _Nonnull event) {
-            //            struct AudioEngineCommand *audio_engine_command = malloc(sizeof(struct AudioEngineCommand));
             AudioEngineCommand command;
             if ([[event command] isEqual:self.commandCenter.playCommand])
             {
