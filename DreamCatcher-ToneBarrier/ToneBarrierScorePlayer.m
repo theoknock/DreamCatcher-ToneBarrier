@@ -333,18 +333,21 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
 //                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
 //                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                     ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-                        
                         double divider = ^ double (long random, int n, int m) {
-                            //                                printf("random == %ld\n", random);
+                                                            printf("random == %ld\n", random);
                             double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-                            //                                printf("result == %f\n", result);
                             double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
-                            //                                printf("\tscaled_result == %f\n", scaled_result);
-                            double weighted_result = 1.0 / (1.0 + pow(E_NUM, (-10.0 * (scaled_result - 0.5))));
-                            //                                printf("\t\tweighted_result == %f\n", weighted_result);
-                            return result;
+                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
+                                                            printf("result == %f\n", result);
+                                                            printf("\tscaled_result == %f\n", scaled_result);
+                                                            printf("\t\tweighted_result == %f\n", weighted_result);
+                            double rescaled_result = scale(0.125, 0.875, weighted_result, 0.0, 1.0);
+                            // TO-DO: Weighted result must be adjusted to account for 0.25 and 1.75 (actual) min-max divider duration
+                            //        Weighted result should be greater than 0.125 and less than 0.875
+                            printf("\t\trescaled_result == %f\n", rescaled_result);
+                            return rescaled_result * frame_count;
                         } (random(), 11025, 77175);
-                        //                            printf("\t\t\tdivider == %ld\n", divider);
+                        printf("\t\t\tdivider == %f\n", divider);
                         for (int channel_index = 0; channel_index < channel_count; channel_index++)
                         {
                             double sin_phase = 0.0;
