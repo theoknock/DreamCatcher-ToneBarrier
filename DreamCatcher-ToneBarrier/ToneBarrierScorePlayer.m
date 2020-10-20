@@ -337,7 +337,9 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                                                             printf("random == %ld\n", random);
                             double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                             double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
-                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
+//                            double weighted_result = pow(scaled_result, 3.0);
+                            double weighted_result = 4.0 * pow((scaled_result - 0.5), 2.0);
+//                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
                                                             printf("result == %f\n", result);
                                                             printf("\tscaled_result == %f\n", scaled_result);
                                                             printf("\t\tweighted_result == %f\n", weighted_result);
@@ -352,23 +354,30 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         {
                             double sin_phase = 0.0;
                             double sin_phase_dyad = 0.0;
+                            double sin_phase_tremolo = 0.0;
                             double sin_phase_aux = 0.0;
-                            double sin_phase_aux_dyad = 0.0;
+                            double sin_phase_dyad_aux = 0.0;
+                            double sin_phase_tremolo_aux = 0.0;
 
                             double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
                             double sin_increment_dyad = ((440.0 * (10.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_tremolo = (2.0 * (2.0 * M_PI)) / sample_rate;
                             double sin_increment_aux = ((440.0 * (12.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
                             double sin_increment_aux_dyad = ((440.0 * (15.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
+                            double sin_increment_tremolo_aux = (4.0 * (2.0 * M_PI)) / sample_rate;
+                            
                             
                             for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
                                 float_channel_data[channel_index][buffer_index] = (buffer_index > divider)
-                                ? sinf(sin_phase) + sinf(sin_phase_dyad)
-                                : sinf(sin_phase_aux) + sinf(sin_phase_aux_dyad);
+                                ? (sinf(sin_phase) + sinf(sin_phase_dyad)) * sinf(sin_phase_tremolo)
+                                : (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux)) * sinf(sin_phase_tremolo_aux);
                                 
                                 sin_phase      += sin_increment;
                                 sin_phase_dyad += sin_increment_dyad;
+                                sin_phase_tremolo += sin_increment_tremolo;
                                 sin_phase_aux  += sin_increment_aux;
-                                sin_phase_aux_dyad  += sin_increment_aux_dyad;
+                                sin_phase_dyad_aux  += sin_increment_aux_dyad;
+                                sin_phase_tremolo_aux += sin_increment_tremolo_aux;
                                 
                                 //                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
                                 //                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
