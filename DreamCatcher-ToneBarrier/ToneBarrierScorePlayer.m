@@ -16,6 +16,9 @@
 #import <AVFoundation/AVFoundation.h>
 #import <MediaPlayer/MediaPlayer.h>
 #import <GameKit/GameKit.h>
+#import <CoreMedia/CMTime.h>
+#import <CoreMedia/CMSync.h>
+
 #import <objc/runtime.h>
 #import <mach/mach.h>
 
@@ -44,18 +47,17 @@
 #define E_NUM 0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495
 
 static float ratio[4] = {1.f,   12.f / 10.f,    15.f / 10.f,    18.f / 10.f};
-struct chord
+typedef struct Chord
 {
     double root_frequency;
     unsigned int ratio_index : 2;
-} * dyad;
+} chord;
 
-#import <CoreMedia/CMTime.h>
-#import <CoreMedia/CMSync.h>
 
 @interface ToneBarrierScorePlayer ()
 {
-    double (^signal_frequency)(struct chord *);
+    double (^signal_frequency)(void);
+    __block struct Chord * dyad;
 }
 
 @end
@@ -123,9 +125,9 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         [self.commandCenter.stopCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.pauseCommand addTargetWithHandler:remoteCommandHandler];
         
-        dyad = (struct chord *)malloc(sizeof(struct chord));
+        dyad = (struct Chord *)malloc(sizeof(struct Chord));
         
-        signal_frequency = ^ double (struct chord * dyad) {
+        signal_frequency = ^ double (void) {
             if (dyad->ratio_index == 0)
             {
                 // Generate random frequency
@@ -136,8 +138,9 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
                     long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                     return result;
                 } (random(), -8, 24));
-                // Store result in dyad->root_frequency
             }
+            
+            printf("%d\t\t%f\t\t%f\t\t%f\n", dyad->ratio_index, dyad->root_frequency, ratio[dyad->ratio_index], dyad->root_frequency * ratio[dyad->ratio_index]);
             
             double frequency = dyad->root_frequency * ratio[dyad->ratio_index];
             
@@ -369,22 +372,22 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                 //                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
                 ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                     double divider = ^ double (long random, int n, int m) {
-                        printf("random == %ld\n", random);
+//                        printf("random == %ld\n", random);
                         double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                         double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
                         //                            double weighted_result = pow(scaled_result, 3.0);
                         double weighted_result = 4.0 * pow((scaled_result - 0.5), 2.0);
                         //                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
-                        printf("result == %f\n", result);
-                        printf("\tscaled_result == %f\n", scaled_result);
-                        printf("\t\tweighted_result == %f\n", weighted_result);
+//                        printf("result == %f\n", result);
+//                        printf("\tscaled_result == %f\n", scaled_result);
+//                        printf("\t\tweighted_result == %f\n", weighted_result);
                         double rescaled_result = scale(0.125, 0.875, weighted_result, 0.0, 1.0);
                         // TO-DO: Weighted result must be adjusted to account for 0.25 and 1.75 (actual) min-max divider duration
                         //        Weighted result should be greater than 0.125 and less than 0.875
-                        printf("\t\trescaled_result == %f\n", rescaled_result);
+//                        printf("\t\trescaled_result == %f\n", rescaled_result);
                         return rescaled_result * frame_count;
                     } (random(), 11025, 77175);
-                    printf("\t\t\tdivider == %f\n", divider);
+//                    printf("\t\t\tdivider == %f\n", divider);
                     for (int channel_index = 0; channel_index < channel_count; channel_index++)
                     {
                         double sin_phase = 0.0;
@@ -394,11 +397,11 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         double sin_phase_dyad_aux = 0.0;
                         double sin_phase_tremolo_aux = 0.0;
                         
-                        double sin_increment = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
-                        double sin_increment_dyad = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment = (signal_frequency() * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_dyad = (signal_frequency() * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_tremolo = (2.0 * (2.0 * M_PI)) / sample_rate;
-                        double sin_increment_aux = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
-                        double sin_increment_aux_dyad = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux = (signal_frequency() * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux_dyad = (signal_frequency() * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_tremolo_aux = (4.0 * (2.0 * M_PI)) / sample_rate;
                         
                         
