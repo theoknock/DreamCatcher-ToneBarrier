@@ -39,13 +39,26 @@
 
 #include "Randomizer.h"
 #include "Tone.h"
-#include "Chords.h"
 
 #define randomdouble()    (arc4random() / ((unsigned)RAND_MAX))
 #define E_NUM 0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495
 
+static float ratio[4] = {1.f,   12.f / 10.f,    15.f / 10.f,    18.f / 10.f};
+struct chord
+{
+    double root_frequency;
+    unsigned int ratio_index : 2;
+} * dyad;
+
 #import <CoreMedia/CMTime.h>
 #import <CoreMedia/CMSync.h>
+
+@interface ToneBarrierScorePlayer ()
+{
+    double (^signal_frequency)(struct chord *);
+}
+
+@end
 
 @implementation ToneBarrierScorePlayer
 
@@ -109,6 +122,29 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         [self.commandCenter.playCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.stopCommand addTargetWithHandler:remoteCommandHandler];
         [self.commandCenter.pauseCommand addTargetWithHandler:remoteCommandHandler];
+        
+        dyad = (struct chord *)malloc(sizeof(struct chord));
+        
+        signal_frequency = ^ double (struct chord * dyad) {
+            if (dyad->ratio_index == 0)
+            {
+                // Generate random frequency
+                dyad->root_frequency = ^ double (double * root_frequency, long random) {
+                    *root_frequency = pow(1.059463094f, random) * 440.0;
+                    return *root_frequency;
+                } (&dyad->root_frequency, ^ long (long random, int n, int m) {
+                    long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+                    return result;
+                } (random(), -8, 24));
+                // Store result in dyad->root_frequency
+            }
+            
+            double frequency = dyad->root_frequency * ratio[dyad->ratio_index];
+            
+            dyad->ratio_index++;
+            return frequency;
+        };
+        
         
         //        // GPU configuration
         //        id<MTLDevice> device = MTLCreateSystemDefaultDevice();
@@ -308,8 +344,7 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
             char * random_buffer = (char *)malloc(buffer_size);
             initstate(seed, random_buffer, buffer_size);
             srandomdev();
-            
-            chord_frequency_ratios = (struct ChordFrequencyRatio *)malloc(sizeof(struct ChordFrequencyRatio));
+        
             
             typedef void (^PlayTones)(__weak typeof(AVAudioPlayerNode) *,
                                       __weak typeof(AVAudioPCMBuffer) *,
@@ -330,81 +365,81 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                 const AVAudioFrameCount frame_count = sample_rate * 2.0;
                 pcm_buffer.frameLength = frame_count;
                 
-//                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
-//                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
-                    ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
-                        double divider = ^ double (long random, int n, int m) {
-                                                            printf("random == %ld\n", random);
-                            double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
-                            double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
-//                            double weighted_result = pow(scaled_result, 3.0);
-                            double weighted_result = 4.0 * pow((scaled_result - 0.5), 2.0);
-//                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
-                                                            printf("result == %f\n", result);
-                                                            printf("\tscaled_result == %f\n", scaled_result);
-                                                            printf("\t\tweighted_result == %f\n", weighted_result);
-                            double rescaled_result = scale(0.125, 0.875, weighted_result, 0.0, 1.0);
-                            // TO-DO: Weighted result must be adjusted to account for 0.25 and 1.75 (actual) min-max divider duration
-                            //        Weighted result should be greater than 0.125 and less than 0.875
-                            printf("\t\trescaled_result == %f\n", rescaled_result);
-                            return rescaled_result * frame_count;
-                        } (random(), 11025, 77175);
-                        printf("\t\t\tdivider == %f\n", divider);
-                        for (int channel_index = 0; channel_index < channel_count; channel_index++)
-                        {
-                            double sin_phase = 0.0;
-                            double sin_phase_dyad = 0.0;
-                            double sin_phase_tremolo = 0.0;
-                            double sin_phase_aux = 0.0;
-                            double sin_phase_dyad_aux = 0.0;
-                            double sin_phase_tremolo_aux = 0.0;
-
-                            double sin_increment = (440.0 * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_dyad = ((440.0 * (10.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_tremolo = (2.0 * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_aux = ((440.0 * (12.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_aux_dyad = ((440.0 * (15.0 / 8.0)) * (2.0 * M_PI)) / sample_rate;
-                            double sin_increment_tremolo_aux = (4.0 * (2.0 * M_PI)) / sample_rate;
+                //                dispatch_queue_t samplerQueue = dispatch_queue_create("com.blogspot.demonicactivity.samplerQueue", DISPATCH_QUEUE_SERIAL);
+                //                dispatch_block_t samplerBlock = dispatch_block_create(0, ^{
+                ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
+                    double divider = ^ double (long random, int n, int m) {
+                        printf("random == %ld\n", random);
+                        double result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
+                        double scaled_result = scale(0.0, 1.0, result, MIN(m, n), MAX(m, n));
+                        //                            double weighted_result = pow(scaled_result, 3.0);
+                        double weighted_result = 4.0 * pow((scaled_result - 0.5), 2.0);
+                        //                            double weighted_result = (-(1.0 - scaled_result) * log2(1.0 - scaled_result) - scaled_result * log2(scaled_result));
+                        printf("result == %f\n", result);
+                        printf("\tscaled_result == %f\n", scaled_result);
+                        printf("\t\tweighted_result == %f\n", weighted_result);
+                        double rescaled_result = scale(0.125, 0.875, weighted_result, 0.0, 1.0);
+                        // TO-DO: Weighted result must be adjusted to account for 0.25 and 1.75 (actual) min-max divider duration
+                        //        Weighted result should be greater than 0.125 and less than 0.875
+                        printf("\t\trescaled_result == %f\n", rescaled_result);
+                        return rescaled_result * frame_count;
+                    } (random(), 11025, 77175);
+                    printf("\t\t\tdivider == %f\n", divider);
+                    for (int channel_index = 0; channel_index < channel_count; channel_index++)
+                    {
+                        double sin_phase = 0.0;
+                        double sin_phase_dyad = 0.0;
+                        double sin_phase_tremolo = 0.0;
+                        double sin_phase_aux = 0.0;
+                        double sin_phase_dyad_aux = 0.0;
+                        double sin_phase_tremolo_aux = 0.0;
+                        
+                        double sin_increment = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_dyad = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_tremolo = (2.0 * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux_dyad = (signal_frequency(dyad) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_tremolo_aux = (4.0 * (2.0 * M_PI)) / sample_rate;
+                        
+                        
+                        for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
+                            float_channel_data[channel_index][buffer_index] = (buffer_index > divider)
+                            ? (sinf(sin_phase) + sinf(sin_phase_dyad)) * sinf(sin_phase_tremolo)
+                            : (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux)) * sinf(sin_phase_tremolo_aux);
                             
+                            sin_phase      += sin_increment;
+                            sin_phase_dyad += sin_increment_dyad;
+                            sin_phase_tremolo += sin_increment_tremolo;
+                            sin_phase_aux  += sin_increment_aux;
+                            sin_phase_dyad_aux  += sin_increment_aux_dyad;
+                            sin_phase_tremolo_aux += sin_increment_tremolo_aux;
                             
-                            for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
-                                float_channel_data[channel_index][buffer_index] = (buffer_index > divider)
-                                ? (sinf(sin_phase) + sinf(sin_phase_dyad)) * sinf(sin_phase_tremolo)
-                                : (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux)) * sinf(sin_phase_tremolo_aux);
-                                
-                                sin_phase      += sin_increment;
-                                sin_phase_dyad += sin_increment_dyad;
-                                sin_phase_tremolo += sin_increment_tremolo;
-                                sin_phase_aux  += sin_increment_aux;
-                                sin_phase_dyad_aux  += sin_increment_aux_dyad;
-                                sin_phase_tremolo_aux += sin_increment_tremolo_aux;
-                                
-                                //                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
-                                //                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
-                            }
+                            //                                    if (sin_phase >= (2.0 * M_PI)) sin_phase -= (2.0 * M_PI);
+                            //                                    if (sin_phase < 0.0) sin_phase += (2.0 * M_PI);
                         }
-                    } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
-//                });
-//                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
-                    ^ (PlayedToneCompletionBlock played_tone) {
-                        if ([player_node isPlaying])
-                        {
-                            [player_node prepareWithFrameCount:frame_count];
-                            [player_node scheduleBuffer:pcm_buffer
-                                                 atTime:nil
-                                                options:AVAudioPlayerNodeBufferInterruptsAtLoop
-                                 completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack
-                                      completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
-                                if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
-                                    played_tone();
-                            }];
-                        }
-                    } (^ {
-                        play_tones(player_node, pcm_buffer, audio_format);
-                    });
-//                });
-//                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
-//                dispatch_async(samplerQueue, samplerBlock);
+                    }
+                } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
+                //                });
+                //                dispatch_block_t playToneBlock = dispatch_block_create(0, ^{
+                ^ (PlayedToneCompletionBlock played_tone) {
+                    if ([player_node isPlaying])
+                    {
+                        [player_node prepareWithFrameCount:frame_count];
+                        [player_node scheduleBuffer:pcm_buffer
+                                             atTime:nil
+                                            options:AVAudioPlayerNodeBufferInterruptsAtLoop
+                             completionCallbackType:AVAudioPlayerNodeCompletionDataPlayedBack
+                                  completionHandler:^(AVAudioPlayerNodeCompletionCallbackType callbackType) {
+                            if (callbackType == AVAudioPlayerNodeCompletionDataPlayedBack)
+                                played_tone();
+                        }];
+                    }
+                } (^ {
+                    play_tones(player_node, pcm_buffer, audio_format);
+                });
+                //                });
+                //                dispatch_block_notify(samplerBlock, dispatch_get_main_queue(), playToneBlock);
+                //                dispatch_async(samplerQueue, samplerBlock);
             };
             
             __weak typeof(AVAudioPlayerNode) * w_playerNode = self.playerNode;
