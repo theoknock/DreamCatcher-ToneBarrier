@@ -102,6 +102,7 @@
 - (void)viewDidAppear:(BOOL)animated
 {
     self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(shimmerWaveFormTint)];
+    [self.displayLink setPreferredFramesPerSecond:15];
     [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
