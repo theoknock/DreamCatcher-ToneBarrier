@@ -11,6 +11,8 @@
 		8A41089B250AE6300004FD0E /* String.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A41089A250AE6300004FD0E /* String.c */; };
 		8A4108C3250C61580004FD0E /* Score.c in Sources */ = {isa = PBXBuildFile; fileRef = 8A4108C2250C61580004FD0E /* Score.c */; };
 		8AF985E4250ACA14004900DA /* Randomizers.c in Sources */ = {isa = PBXBuildFile; fileRef = 8AF985E3250ACA14004900DA /* Randomizers.c */; };
+		B90800922540FBAA00BE3467 /* Signal.c in Sources */ = {isa = PBXBuildFile; fileRef = B90800912540FBAA00BE3467 /* Signal.c */; };
+		B90800952540FBBC00BE3467 /* Mixer.c in Sources */ = {isa = PBXBuildFile; fileRef = B90800942540FBBC00BE3467 /* Mixer.c */; };
 		B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D1F24F669DD00FA19FA /* AppDelegate.m */; };
 		B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2224F669DD00FA19FA /* SceneDelegate.m */; };
 		B9259D2624F669DD00FA19FA /* ViewController.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D2524F669DD00FA19FA /* ViewController.m */; };
@@ -67,6 +69,10 @@
 		8AFCCA32250517D8001427D2 /* Object.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Object.h; sourceTree = "<group>"; };
 		8AFCCA35250517D8001427D2 /* Class.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = Class.h; sourceTree = "<group>"; };
 		8AFCCA36250517D8001427D2 /* new.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = new.h; sourceTree = "<group>"; };
+		B90800902540FBAA00BE3467 /* Signal.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Signal.h; sourceTree = "<group>"; };
+		B90800912540FBAA00BE3467 /* Signal.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Signal.c; sourceTree = "<group>"; };
+		B90800932540FBBC00BE3467 /* Mixer.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Mixer.h; sourceTree = "<group>"; };
+		B90800942540FBBC00BE3467 /* Mixer.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = Mixer.c; sourceTree = "<group>"; };
 		B9259D1B24F669DD00FA19FA /* DreamCatcher-ToneBarrier.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "DreamCatcher-ToneBarrier.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		B9259D1E24F669DD00FA19FA /* AppDelegate.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = AppDelegate.h; sourceTree = "<group>"; };
 		B9259D1F24F669DD00FA19FA /* AppDelegate.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = AppDelegate.m; sourceTree = "<group>"; };
@@ -178,6 +184,10 @@
 				B9259D2524F669DD00FA19FA /* ViewController.m */,
 				B9259D6B24F66C9C00FA19FA /* ToneBarrierScorePlayer.h */,
 				B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */,
+				B90800902540FBAA00BE3467 /* Signal.h */,
+				B90800912540FBAA00BE3467 /* Signal.c */,
+				B90800932540FBBC00BE3467 /* Mixer.h */,
+				B90800942540FBBC00BE3467 /* Mixer.c */,
 				B92C45B42531E1B0001A3D9D /* SignalCalculator.h */,
 				B92C45B52531E1B0001A3D9D /* SignalCalculator.m */,
 				B92C45B72531E259001A3D9D /* signal_calculator_kernel.metal */,
@@ -337,10 +347,12 @@
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,
 				B9763DFE250822B5003DB662 /* test.m in Sources */,
 				B92C45B82531E259001A3D9D /* signal_calculator_kernel.metal in Sources */,
+				B90800922540FBAA00BE3467 /* Signal.c in Sources */,
 				8AF985E4250ACA14004900DA /* Randomizers.c in Sources */,
 				B92C45B62531E1B0001A3D9D /* SignalCalculator.m in Sources */,
 				B9259D2024F669DD00FA19FA /* AppDelegate.m in Sources */,
 				B9259D3324F669E000FA19FA /* main.m in Sources */,
+				B90800952540FBBC00BE3467 /* Mixer.c in Sources */,
 				B9259D2624F669DD00FA19FA /* ViewController.m in Sources */,
 				B9259D2B24F669DD00FA19FA /* ContentView.swift in Sources */,
 				B9259D2324F669DD00FA19FA /* SceneDelegate.m in Sources */,
