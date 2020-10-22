@@ -18,10 +18,10 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <view opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="PFW-NN-poo" userLabel="Event Log Text View Container">
-                                <rect key="frame" x="0.0" y="44" width="414" height="818"/>
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                 <subviews>
                                     <textView autoresizesSubviews="NO" opaque="NO" multipleTouchEnabled="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" showsHorizontalScrollIndicator="NO" indicatorStyle="black" delaysContentTouches="NO" canCancelContentTouches="NO" bouncesZoom="NO" editable="NO" usesAttributedText="YES" selectable="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Wky-rW-XYV">
-                                        <rect key="frame" x="0.0" y="0.0" width="414" height="818"/>
+                                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                                         <attributedString key="attributedText"/>
                                         <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
@@ -41,6 +41,7 @@
                             </view>
                             <imageView opaque="NO" clipsSubviews="YES" userInteractionEnabled="NO" alpha="0.14999999999999999" contentMode="center" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="waveform" catalog="system" translatesAutoresizingMaskIntoConstraints="NO" id="MdB-Vf-a99">
                                 <rect key="frame" x="17" y="263.5" width="380.5" height="384"/>
+                                <color key="tintColor" systemColor="systemBlueColor"/>
                                 <preferredSymbolConfiguration key="preferredSymbolConfiguration" configurationType="pointSize" pointSize="370"/>
                             </imageView>
                             <button opaque="NO" contentMode="center" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="WCT-a9-qbI">
@@ -56,15 +57,15 @@
                                 </connections>
                             </button>
                         </subviews>
-                        <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
+                        <viewLayoutGuide key="safeArea" id="90t-W8-2RJ"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerX" secondItem="MdB-Vf-a99" secondAttribute="centerX" id="Lff-Md-abE"/>
                             <constraint firstItem="PFW-NN-poo" firstAttribute="width" secondItem="8bC-Xf-vdC" secondAttribute="width" id="OHM-oh-tLk"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="WON-SS-ws2"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="6Tk-OE-BBY" secondAttribute="centerX" id="WPL-Dv-ZAY"/>
+                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerY" id="WON-SS-ws2"/>
+                            <constraint firstItem="PFW-NN-poo" firstAttribute="centerX" secondItem="90t-W8-2RJ" secondAttribute="centerX" id="WPL-Dv-ZAY"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerY" secondItem="8bC-Xf-vdC" secondAttribute="centerYWithinMargins" id="XVf-bk-fjW"/>
-                            <constraint firstItem="PFW-NN-poo" firstAttribute="height" secondItem="6Tk-OE-BBY" secondAttribute="height" id="bF2-NJ-9NE"/>
+                            <constraint firstItem="PFW-NN-poo" firstAttribute="height" secondItem="8bC-Xf-vdC" secondAttribute="height" id="bF2-NJ-9NE"/>
                             <constraint firstItem="MdB-Vf-a99" firstAttribute="centerX" secondItem="8bC-Xf-vdC" secondAttribute="centerXWithinMargins" id="dUJ-3h-o9Q"/>
                             <constraint firstItem="WCT-a9-qbI" firstAttribute="centerY" secondItem="MdB-Vf-a99" secondAttribute="centerY" id="rY6-QP-9l4"/>
                         </constraints>
@@ -73,6 +74,7 @@
                         <outlet property="logContainerView" destination="PFW-NN-poo" id="L5W-C7-ZKo"/>
                         <outlet property="logView" destination="Wky-rW-XYV" id="jka-b6-egl"/>
                         <outlet property="playButton" destination="WCT-a9-qbI" id="jar-FV-0ot"/>
+                        <outlet property="waveformImageView" destination="MdB-Vf-a99" id="2V9-NM-yTB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
@@ -86,6 +88,9 @@
         <image name="waveform" catalog="system" width="128" height="128"/>
         <systemColor name="systemBackgroundColor">
             <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBlueColor">
+            <color red="0.0" green="0.47843137254901963" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>
     </resources>
 </document>

@@ -33,7 +33,7 @@ typedef struct Harmony
     Ratio * ratio_array;
 } harmony;
 
-typedef struct Note
+typedef struct Note // Needs sample rate and frequency parameters
 {
     double sine_phase;
     double phase_increment;

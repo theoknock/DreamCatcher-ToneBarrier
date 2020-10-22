@@ -23,6 +23,7 @@
 @property (weak, nonatomic) IBOutlet UIVisualEffectView *blurView;
 
 @property (strong, nonatomic) LogViewGestureRecognizer *log_view_gesture_recognizer;
+@property (weak, nonatomic) IBOutlet UIImageView *waveformImageView;
 
 
 @end

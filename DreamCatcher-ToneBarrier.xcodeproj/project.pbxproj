@@ -26,6 +26,7 @@
 		B92C45B82531E259001A3D9D /* signal_calculator_kernel.metal in Sources */ = {isa = PBXBuildFile; fileRef = B92C45B72531E259001A3D9D /* signal_calculator_kernel.metal */; };
 		B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = B9259D6C24F66C9C00FA19FA /* ToneBarrierScorePlayer.m */; };
 		B9763DFE250822B5003DB662 /* test.m in Sources */ = {isa = PBXBuildFile; fileRef = B9763DFD250822B5003DB662 /* test.m */; };
+		B993EE72254227B9007AA2BA /* UIColor+ColorTransition.m in Sources */ = {isa = PBXBuildFile; fileRef = B993EE71254227B9007AA2BA /* UIColor+ColorTransition.m */; };
 		B9FAD48E2503FA3900FF4772 /* Randomizer.c in Sources */ = {isa = PBXBuildFile; fileRef = B9FAD48D2503FA3900FF4772 /* Randomizer.c */; };
 /* End PBXBuildFile section */
 
@@ -110,6 +111,8 @@
 		B96EC02725006C5F00F9C929 /* ToneBarrierScoreCodeCemetary.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = ToneBarrierScoreCodeCemetary.h; sourceTree = "<group>"; };
 		B9763DFC250822B5003DB662 /* test.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = test.h; sourceTree = "<group>"; };
 		B9763DFD250822B5003DB662 /* test.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = test.m; sourceTree = "<group>"; wrapsLines = 0; };
+		B993EE70254227B9007AA2BA /* UIColor+ColorTransition.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "UIColor+ColorTransition.h"; sourceTree = "<group>"; };
+		B993EE71254227B9007AA2BA /* UIColor+ColorTransition.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "UIColor+ColorTransition.m"; sourceTree = "<group>"; };
 		B9EF5C6024F95BF9008EC0F9 /* CodeCemetary */ = {isa = PBXFileReference; lastKnownFileType = text; path = CodeCemetary; sourceTree = "<group>"; };
 		B9FAD4752503D47800FF4772 /* PlayerNode.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = PlayerNode.h; sourceTree = "<group>"; wrapsLines = 0; };
 		B9FAD4762503D47800FF4772 /* PlayerNode.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = PlayerNode.c; sourceTree = "<group>"; };
@@ -178,6 +181,8 @@
 				B9259D1F24F669DD00FA19FA /* AppDelegate.m */,
 				B9259D2124F669DD00FA19FA /* SceneDelegate.h */,
 				B9259D2224F669DD00FA19FA /* SceneDelegate.m */,
+				B993EE70254227B9007AA2BA /* UIColor+ColorTransition.h */,
+				B993EE71254227B9007AA2BA /* UIColor+ColorTransition.m */,
 				B9273D392517D90A00F1BE30 /* LogViewDataSource.h */,
 				B9273D3A2517D90A00F1BE30 /* LogViewDataSource.m */,
 				B9259D2424F669DD00FA19FA /* ViewController.h */,
@@ -342,6 +347,7 @@
 			files = (
 				8A4108C3250C61580004FD0E /* Score.c in Sources */,
 				8A410892250AE3D80004FD0E /* New.c in Sources */,
+				B993EE72254227B9007AA2BA /* UIColor+ColorTransition.m in Sources */,
 				B9273D3B2517D90A00F1BE30 /* LogViewDataSource.m in Sources */,
 				8A41089B250AE6300004FD0E /* String.c in Sources */,
 				B93E23B024FF586000A324DE /* ToneBarrierScorePlayer.m in Sources */,

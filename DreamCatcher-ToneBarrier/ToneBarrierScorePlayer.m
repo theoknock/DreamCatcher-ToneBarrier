@@ -52,14 +52,21 @@ typedef struct Chord
     double root_frequency;
     unsigned int ratio_index : 2;
 } chord;
-
 typedef double (^FrequencyGenerator)(struct Chord *, int, int);
+
+typedef struct Sine
+{
+    double phase_start;
+    double phase_increment;
+} sine;
 
 @interface ToneBarrierScorePlayer ()
 {
     double (^duration_split)(AVAudioFrameCount, long, int, int);
     __block struct Chord * soprano_dyad;
     __block struct Chord * bass_dyad;
+    
+    double (^sample)(double sample_rate, double * phase_start, double * phase_increment);
 }
 
 @end
@@ -137,6 +144,10 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         
         soprano_dyad = (struct Chord *)malloc(sizeof(struct Chord));
         bass_dyad    = (struct Chord *)malloc(sizeof(struct Chord));
+        
+//        sample = ^ double (double * phase_start, double * phase_increment) {
+//            
+//        };
         
 //        signal_frequency = ^ double (struct Chord * dyad, int min_key, int max_key) {
 //            if (dyad->ratio_index == 0)

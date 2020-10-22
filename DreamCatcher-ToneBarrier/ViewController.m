@@ -9,13 +9,28 @@
 #import "AppDelegate.h"
 #import "ToneBarrierScorePlayer.h"
 #import "LogViewDataSource.h"
+#import "UIColor+ColorTransition.h"
 
 #import <mach/mach.h>
+
+#define BLUE_HUE_NORM 240.0 / 360.0
+#define RED_HUE_NORM  0.0
+
+@interface ViewController ()
+{
+    CGFloat color_transition_step;
+}
+
+@property (strong, nonatomic) CADisplayLink *displayLink;
+
+@end
 
 @implementation ViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    
+    [self.waveformImageView setTintColor:[UIColor colorWithHue:BLUE_HUE_NORM saturation:1.0 brightness:1.0 alpha:1.0]];
     
     CAGradientLayer * gradient = [CAGradientLayer new];
     gradient.frame = self.logContainerView.bounds;
@@ -58,6 +73,36 @@
     AudioEngineCommand command = ([ToneBarrierScorePlayer.sharedPlayer.audioEngine isRunning]) ? AudioEngineCommandStop : AudioEngineCommandPlay;
     dispatch_set_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, (void *)command);
     dispatch_source_merge_data(ToneBarrierScorePlayer.sharedPlayer.audio_engine_command_dispatch_source, 1);
+}
+
+- (void)shimmerWaveFormTint
+{
+    CGFloat hue, saturation, brightness, alpha;
+    BOOL didGetHSBColor = [[self.waveformImageView tintColor] getHue:&hue saturation:&saturation brightness:&brightness alpha:&alpha];
+    if (didGetHSBColor)
+    {
+        [self.waveformImageView setTintColor:[UIColor colorWithHue:(hue + (1.0 / [self.displayLink duration])) saturation:saturation brightness:brightness alpha:alpha]];
+    }
+//    // TO-DO: Cycle the transition (don't just loop it linearly)
+//    dispatch_async(dispatch_get_main_queue(), ^{
+//        // Get the current wave form symbol tint hue value
+//        // increment or decrement by 1.0 / display refresh rate [CADisplayLink duration]
+//        // (depends on whether current hue value is greater than or equal to red hue value or less than or equal to blue hue value)
+//        [self.waveformImageView setTintColor:[UIColor interpolateHSVColorFrom:self.blue to:self.red withFraction:[self.displayLink duration]]];
+//    });
+}
+
+- (void)viewWillDisappear:(BOOL)animated
+{
+    if (self.displayLink) {
+        [self.displayLink invalidate];
+    }
+}
+
+- (void)viewDidAppear:(BOOL)animated
+{
+    self.displayLink = [CADisplayLink displayLinkWithTarget:self selector:@selector(shimmerWaveFormTint)];
+    [self.displayLink addToRunLoop:[NSRunLoop currentRunLoop] forMode:NSRunLoopCommonModes];
 }
 
 @end
