@@ -41,24 +41,25 @@
 #import "LogViewDataSource.h"
 
 #include "Randomizer.h"
-#include "Tone.h"
+#include "Signal.h"
+#include "Score.h"
 
 #define randomdouble()    (arc4random() / ((unsigned)RAND_MAX))
 #define E_NUM 0.5772156649015328606065120900824024310421593359399235988057672348848677267776646709369470632917467495
 
-static float ratio[4] = {1.f,   12.f / 10.f,    15.f / 10.f,    18.f / 10.f};
-typedef struct Chord
-{
-    double root_frequency;
-    unsigned int ratio_index : 2;
-} chord;
+//static float ratio[4] = {1.f,   12.f / 10.f,    15.f / 10.f,    18.f / 10.f};
+//typedef struct Chord
+//{
+//    double root_frequency;
+//    unsigned int ratio_index : 2;
+//} chord;
 typedef double (^FrequencyGenerator)(struct Chord *, int, int);
-
-typedef struct Sine
-{
-    double phase_start;
-    double phase_increment;
-} sine;
+//
+//typedef struct Sine
+//{
+//    double phase_start;
+//    double phase_increment;
+//} sine;
 
 @interface ToneBarrierScorePlayer ()
 {
@@ -176,7 +177,7 @@ static ToneBarrierScorePlayer * sharedPlayer = NULL;
         //
         //        SignalCalculator* signal_calculator = [[SignalCalculator alloc] initWithDevice:device];
         ////        [signal_calculator
-        //        [signal_calculator sendComputeCommand];
+        //        [ph_calculator sendComputeCommand];
         
     }
     
@@ -291,6 +292,20 @@ Linearize linearize = ^double(double range_min, double range_max, double value)
     return result;
 };
 
+//typedef double (^BinaryExponent)(double, long);
+//BinaryExponent binexp = ^ double (double base, long exponent)
+//{
+//    double ans = 1.0;
+//    while (exponent != 0)
+//    {
+//        if (exponent & 1) ans = ans * base;
+//        exponent >>= 1;
+//        base = base * base;
+//    }
+//    
+//    return ans;
+//};
+
 typedef NS_ENUM(NSUInteger, StereoChannelOutput) {
     StereoChannelOutputLeft,
     StereoChannelOutputRight,
@@ -392,6 +407,17 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                 pcm_buffer.frameLength = frame_count;
                 
                 ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
+                    struct Harmony * harmony = (struct Harmony *)malloc(sizeof(struct Harmony));
+                    
+                    struct Note * note = (struct Note *)malloc(sizeof(struct Note));
+                    struct Chord * chord = (struct Chord *)malloc(sizeof(struct Chord) + sizeof(struct Harmony));
+                    chord->harmony = (struct Harmony *)malloc(sizeof(struct Harmony));
+                    chord->harmony->ratio_array = malloc(sizeof(double) * 4);
+                    chord->harmony->ratio_array[0] = 1.f;
+                    chord->harmony->ratio_array[1] = 12.f / 10.f;
+                    chord->harmony->ratio_array[2] = 15.f / 10.f;
+                    chord->harmony->ratio_array[3] = 18.f / 10.f;
+                    
                     for (int channel_index = 0; channel_index < channel_count; channel_index++)
                     {
                         double sin_phase = 0.0;
@@ -401,12 +427,27 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         double sin_phase_dyad_aux = 0.0;
                         double sin_phase_tremolo_aux = 0.0;
                         
+                        double sin_phase_bass = 0.0;
+                        double sin_phase_dyad_bass = 0.0;
+                        double sin_phase_tremolo_bass = 0.0;
+                        double sin_phase_aux_bass = 0.0;
+                        double sin_phase_dyad_aux_bass = 0.0;
+                        double sin_phase_tremolo_aux_bass = 0.0;
+                        
                         double sin_increment = (frequency_generator(self->soprano_dyad, -8, 24) * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_dyad = (frequency_generator(self->soprano_dyad, -8, 24) * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_tremolo = (2.0 * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_aux = (frequency_generator(self->soprano_dyad, -8, 24) * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_aux_dyad = (frequency_generator(self->soprano_dyad, -8, 24) * (2.0 * M_PI)) / sample_rate;
                         double sin_increment_tremolo_aux = (4.0 * (2.0 * M_PI)) / sample_rate;
+                        
+                        double sin_increment_bass = (frequency_generator(self->bass_dyad, -8, 0) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_dyad_bass = (frequency_generator(self->bass_dyad, -8, 0) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_tremolo_bass = (2.0 * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux_bass = (frequency_generator(self->bass_dyad, -8, 0) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_aux_dyad_bass = (frequency_generator(self->bass_dyad, -8, 0) * (2.0 * M_PI)) / sample_rate;
+                        double sin_increment_tremolo_aux_bass = (4.0 * (2.0 * M_PI)) / sample_rate;
+                        
                         
                         double ds = self->duration_split(frame_count, random(), 11025, 77175);
                         double amplitude_step = 1.0 / frame_count;
@@ -415,8 +456,8 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
                             double damped_sine_wave = pow(E_NUM, -1.0 * amplitude) * (cosf(2.0 * M_PI * amplitude));
                             float_channel_data[channel_index][buffer_index] = damped_sine_wave * ((buffer_index > ds)
-                            ? (sinf(sin_phase) + sinf(sin_phase_dyad)) * (1.0 * sinf(sin_phase_tremolo))
-                            : amplitude * (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux)) * (1.0 * sinf(sin_phase_tremolo_aux)));
+                            ? (sinf(sin_phase) + sinf(sin_phase_dyad) + sinf(sin_phase_bass) + sinf(sin_phase_dyad_bass)) * (1.0 * sinf(sin_phase_tremolo))
+                            : amplitude * (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux) + sinf(sin_phase_aux_bass) + sinf(sin_phase_dyad_aux_bass)) * (1.0 * sinf(sin_phase_tremolo_aux)));
                             
                             sin_phase += sin_increment;
                             sin_phase_dyad += sin_increment_dyad;
@@ -424,6 +465,14 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                             sin_phase_aux += sin_increment_aux;
                             sin_phase_dyad_aux += sin_increment_aux_dyad;
                             sin_phase_tremolo_aux += sin_increment_tremolo_aux;
+                            
+                            sin_phase_bass += sin_increment_bass;
+                            sin_phase_dyad_bass += sin_increment_dyad_bass;
+                            sin_phase_tremolo_bass += sin_increment_tremolo_bass;
+                            sin_phase_aux_bass += sin_increment_aux_bass;
+                            sin_phase_dyad_aux_bass += sin_increment_aux_dyad_bass;
+                            sin_phase_tremolo_aux_bass += sin_increment_tremolo_aux_bass;
+                            
                             amplitude += amplitude_step;
                         }
                     }
@@ -450,13 +499,13 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
             __weak typeof(AVAudioPCMBuffer) * w_pcmBuffer = self.pcmBuffer;
             __weak typeof(AVAudioFormat) * w_audioFormat = self.audioFormat;
             
-            play_tones(w_playerNode, w_pcmBuffer, w_audioFormat, ^ double (struct Chord * dyad, int min_key, int max_key) {
-                            if (dyad->ratio_index == 0)
+            play_tones(w_playerNode, w_pcmBuffer, w_audioFormat, ^ double (struct Chord * chord, int min_key, int max_key) {
+                            if (chord->harmony->ratio_index == 0)
                             {
-                                dyad->root_frequency = ^ double (double * root_frequency, long random) {
-                                    *root_frequency = pow(1.059463094f, random) * 440.0;
-                                    return *root_frequency;
-                                } (&dyad->root_frequency, ^ long (long random, int n, int m) {
+                                chord->root = ^ double (double * frequency, long random) {
+                                    *frequency = pow(1.059463094f, random) * 440.0; // binexp(1.059463094f, random) * 440.0;
+                                    return *frequency;
+                                } (&chord->root, ^ long (long random, int n, int m) {
                                     long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                                     return result;
                                 } (random(), min_key, max_key));
@@ -464,9 +513,9 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                 
                 //            printf("%d\t\t%f\t\t%f\t\t%f\n", dyad->ratio_index, dyad->root_frequency, ratio[dyad->ratio_index], dyad->root_frequency * ratio[dyad->ratio_index]);
                 
-                            double frequency = dyad->root_frequency * ratio[dyad->ratio_index];
+                            double frequency = chord->root * chord->harmony->ratio_array[chord->harmony->ratio_index];
                 
-                            dyad->ratio_index++;
+                chord->harmony->ratio_index++;
                 
                             return frequency;
                         });

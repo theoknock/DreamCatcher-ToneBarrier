@@ -43,7 +43,6 @@
     dispatch_resume(LogViewDataSource.logData.log_view_dispatch_source);
     
     dispatch_source_set_event_handler(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source, ^{
-        NSLog(@"%s", __PRETTY_FUNCTION__);
         AudioEngineStatus status = (AudioEngineStatus)dispatch_get_context(ToneBarrierScorePlayer.sharedPlayer.audio_engine_status_dispatch_source);
         [self.playButton setImage:^ UIImage * (AudioEngineStatus status)
          {
