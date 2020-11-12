@@ -70,6 +70,18 @@ typedef double (^FrequencyGenerator)(struct Chord *, int, int);
     double (^sample)(double sample_rate, double * phase_start, double * phase_increment);
 }
 
+typedef struct ADSR
+{
+    double a_peak;
+    double d_peak;
+    
+    double times[4];
+    unsigned int times_index : 2;
+    
+    // slope = (target_amplitude - initial amplitude)/(target_time - initial_time)
+} adsr;
+
+
 @end
 
 @implementation ToneBarrierScorePlayer
@@ -292,6 +304,18 @@ Linearize linearize = ^double(double range_min, double range_max, double value)
     return result;
 };
 
+static double (^slope)(double, double, AVAudioFrameCount, AVAudioFrameCount, AVAudioFrameCount) = ^ double (double initial_amplitude, double target_amplitude, AVAudioFrameCount current_frame, AVAudioFrameCount min_frame, AVAudioFrameCount max_frame) {
+    // Start with the initial_amplitude
+    // Find the percentage of the current frame within the max-min frame count range
+    // Multiply the percentage by the difference between the initial and target amplitude
+    // Add the prodiuct to the initial_amplitude
+    //return (value * (range_max - range_min)) + range_min
+    double frame_perc = linearize(current_frame, min_frame, max_frame);
+    double amplitude = (fabs(initial_amplitude - target_amplitude) * frame_perc) + initial_amplitude;
+    
+    return amplitude;
+};
+
 //typedef double (^BinaryExponent)(double, long);
 //BinaryExponent binexp = ^ double (double base, long exponent)
 //{
@@ -408,15 +432,33 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                 
                 ^ (AVAudioChannelCount channel_count, AVAudioFrameCount frame_count, double sample_rate, float * const _Nonnull * _Nullable float_channel_data) {
                     struct Harmony * harmony = (struct Harmony *)malloc(sizeof(struct Harmony));
-                    
-                    struct Note * note = (struct Note *)malloc(sizeof(struct Note));
+                    harmony->ratio_index = 0;
+                    harmony->ratio_array = malloc(sizeof(double) * 4);
+                    harmony->ratio_array[0] = 1.f;
+                    harmony->ratio_array[1] = 12.f / 10.f;
+                    harmony->ratio_array[2] = 15.f / 10.f;
+                    harmony->ratio_array[3] = 18.f / 10.f;
+//                    struct Note * note = (struct Note *)malloc(sizeof(struct Note));
                     struct Chord * chord = (struct Chord *)malloc(sizeof(struct Chord) + sizeof(struct Harmony));
-                    chord->harmony = (struct Harmony *)malloc(sizeof(struct Harmony));
-                    chord->harmony->ratio_array = malloc(sizeof(double) * 4);
-                    chord->harmony->ratio_array[0] = 1.f;
-                    chord->harmony->ratio_array[1] = 12.f / 10.f;
-                    chord->harmony->ratio_array[2] = 15.f / 10.f;
-                    chord->harmony->ratio_array[3] = 18.f / 10.f;
+                    chord->harmony = harmony; //(struct Harmony *)malloc(sizeof(struct Harmony));
+                    
+                    struct ADSR * amplitude_env = (struct ADSR *)malloc(sizeof(struct ADSR));
+                    amplitude_env->a_peak = 3.0;
+                    amplitude_env->d_peak = 0.15;
+        
+                    void (^occ_time)(AVAudioFrameCount, double *) = ^ (AVAudioFrameCount frame_count, double * times) {
+                        times[0] = times[0] * frame_count;
+                        times[1] = times[1] * frame_count;
+                        times[2] = times[2] * frame_count;
+                        times[3] = times[3] * frame_count;
+                    };
+                    
+                    amplitude_env->times[0] = 0.1;
+                    amplitude_env->times[1] = 0.1;
+                    amplitude_env->times[2] = .7;
+                    amplitude_env->times[3] = 0.1;
+                    
+                    occ_time(frame_count, amplitude_env->times);
                     
                     for (int channel_index = 0; channel_index < channel_count; channel_index++)
                     {
@@ -453,11 +495,53 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                         double amplitude_step = 1.0 / frame_count;
                         double amplitude = 0.0;
                         
+                        double adsr_envelope = 0.0;
+                        
                         for (int buffer_index = 0; buffer_index < frame_count; buffer_index++) {
+                            // TO-DO:
+                            // 1. Test buffer_index for equality with times[times_index]
+                            // 2. Use a switch statement to calculate amplitude value for each stage of the ADSR envelope
+                            
+                            switch (amplitude_env->times_index) {
+                                case 0: {
+                                    // attack (initial_amp = 0.0; target_amp = amplitude_env->a_peak; target_time = amplitude_env->times[0]; initial_time = 0)
+                                    //double initial_amplitude, double target_amplitude, AVAudioFrameCount current_frame, AVAudioFrameCount min_frame, AVAudioFrameCount max_frame) {
+                                    adsr_envelope = slope(0.0, amplitude_env->a_peak, buffer_index, 0.0, amplitude_env->times[0]);
+                                    if (buffer_index == amplitude_env->times[0]) amplitude_env->times_index++;
+                                    break;
+                                }
+                                    
+                                case 1: {
+                                    // decay (initial_amp = amplitude_env->a_peak; target_amp = amplitude_env->d_peak; target_time = amplitude_env->times[1]; initial_time = amplitude_env->times[0])
+                                    adsr_envelope = slope(amplitude_env->a_peak, amplitude_env->d_peak, buffer_index, amplitude_env->times[0], amplitude_env->times[1]);
+                                    if (buffer_index == amplitude_env->times[1]) amplitude_env->times_index++;
+                                    break;
+                                }
+                                    
+                                case 2: {
+                                    // sustain (amplitude_env->d_peak)
+                                    adsr_envelope = amplitude_env->d_peak;
+                                    if (buffer_index == amplitude_env->times[2]) amplitude_env->times_index++;
+                                    break;
+                                }
+                                    
+                                case 3: {
+                                    // release (initial_amp = amplitude_env->d_peak; target_amp = 0.0; target_time = amplitude_env->times[3]; initial_time = amplitude_env->times[2])
+                                    adsr_envelope = slope(amplitude_env->d_peak, 0.0, buffer_index, amplitude_env->times[2], amplitude_env->times[3]);
+                                    if (buffer_index == amplitude_env->times[0]) amplitude_env->times_index++; // reset to zero for next pass
+                                    break;
+                                }
+                                    
+                                default:
+                                    break;
+                            }
+                            
+                            
                             double damped_sine_wave = pow(E_NUM, -1.0 * amplitude) * (cosf(2.0 * M_PI * amplitude));
-                            float_channel_data[channel_index][buffer_index] = damped_sine_wave * ((buffer_index > ds)
+                            float_channel_data[channel_index][buffer_index] = sinf(sin_phase) * adsr_envelope;
+                            /* damped_sine_wave * ((buffer_index > ds)
                             ? (sinf(sin_phase) + sinf(sin_phase_dyad) + sinf(sin_phase_bass) + sinf(sin_phase_dyad_bass)) * (1.0 * sinf(sin_phase_tremolo))
-                            : amplitude * (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux) + sinf(sin_phase_aux_bass) + sinf(sin_phase_dyad_aux_bass)) * (1.0 * sinf(sin_phase_tremolo_aux)));
+                            : adsr_envelope * (sinf(sin_phase_aux) + sinf(sin_phase_dyad_aux) + sinf(sin_phase_aux_bass) + sinf(sin_phase_dyad_aux_bass)) * (1.0 * sinf(sin_phase_tremolo_aux))); */
                             
                             sin_phase += sin_increment;
                             sin_phase_dyad += sin_increment_dyad;
@@ -474,6 +558,8 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                             sin_phase_tremolo_aux_bass += sin_increment_tremolo_aux_bass;
                             
                             amplitude += amplitude_step;
+                            
+                            
                         }
                     }
                 } (channel_count, frame_count, sample_rate, pcm_buffer.floatChannelData);
@@ -500,8 +586,8 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
             __weak typeof(AVAudioFormat) * w_audioFormat = self.audioFormat;
             
             play_tones(w_playerNode, w_pcmBuffer, w_audioFormat, ^ double (struct Chord * chord, int min_key, int max_key) {
-                            if (chord->harmony->ratio_index == 0)
-                            {
+//                            if (chord->harmony->ratio_index == 0)
+//                            {
                                 chord->root = ^ double (double * frequency, long random) {
                                     *frequency = pow(1.059463094f, random) * 440.0; // binexp(1.059463094f, random) * 440.0;
                                     return *frequency;
@@ -509,13 +595,13 @@ typedef void (^BufferRenderer)(AVAudioFrameCount, double, double, StereoChannelO
                                     long result = random % abs(MIN(m, n) - MAX(m, n)) + MIN(m, n);
                                     return result;
                                 } (random(), min_key, max_key));
-                            }
+//                            }
                 
                 //            printf("%d\t\t%f\t\t%f\t\t%f\n", dyad->ratio_index, dyad->root_frequency, ratio[dyad->ratio_index], dyad->root_frequency * ratio[dyad->ratio_index]);
                 
-                            double frequency = chord->root * chord->harmony->ratio_array[chord->harmony->ratio_index];
+                double frequency = 440.0; // chord->root * chord->harmony->ratio_array[chord->harmony->ratio_index];
                 
-                chord->harmony->ratio_index++;
+//                chord->harmony->ratio_index++;
                 
                             return frequency;
                         });
